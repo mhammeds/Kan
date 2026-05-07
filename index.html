@@ -394,6 +394,7 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
     <div class="ni" onclick="ST('players',this)" data-t="players"><span class="ic">👥</span><span>اللاعبون</span><span class="bdg" id="navBdg">٠</span></div>
     <div class="ni" onclick="ST('trn',this)" data-t="trn"><span class="ic">🏆</span><span>البطولة</span></div>
     <div class="ni" onclick="ST('timer',this)" data-t="timer"><span class="ic">⏱</span><span>الوقت</span></div>
+    <div class="ni" onclick="ST('vote',this)" data-t="vote"><span class="ic">🗳</span><span>التصويت</span></div>
     <div class="ni" onclick="ST('rules',this)" data-t="rules"><span class="ic">📜</span><span>الشروط</span></div>
     <div class="ni" onclick="ST('titles',this)" data-t="titles"><span class="ic">👑</span><span>الألقاب</span></div>
     <div class="ni" onclick="ST('admin',this)" data-t="admin"><span class="ic">🔐</span><span>الإدارة</span></div>
@@ -481,6 +482,14 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
     <ul class="rl" id="rlist"></ul>
   </div>
 
+  <!-- VOTE -->
+  <div id="vote" class="sec">
+    <div class="pt">
+      <div><div class="pt-t">🗳 التصويت</div><div class="pt-s" id="voteStat">اختر شرط كل قيم</div></div>
+    </div>
+    <div id="voteContent"></div>
+  </div>
+
   <!-- TITLES -->
   <div id="titles" class="sec">
     <div class="pt"><div><div class="pt-t">👑 حمله الألقاب</div></div></div>
@@ -502,6 +511,7 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
   <div class="mni" onclick="ST('players',this)" data-t="players"><span class="m-ic">👥</span><span class="m-lb">لاعبون</span></div>
   <div class="mni" onclick="ST('trn',this)" data-t="trn"><span class="m-ic">🏆</span><span class="m-lb">بطولة</span></div>
   <div class="mni" onclick="ST('timer',this)" data-t="timer"><span class="m-ic">⏱</span><span class="m-lb">وقت</span></div>
+  <div class="mni" onclick="ST('vote',this)" data-t="vote"><span class="m-ic">🗳</span><span class="m-lb">تصويت</span></div>
   <div class="mni" onclick="ST('admin',this)" data-t="admin"><span class="m-ic">🔐</span><span class="m-lb">إدارة</span></div>
 </nav>
 
@@ -641,6 +651,7 @@ async function fbPoll(){
     applyRemote(d);
     updCtr();renderList();buildPGrid();
     if(document.getElementById('trn')?.classList.contains('on'))renderTrn();
+    if(document.getElementById('vote')?.classList.contains('on'))buildVotePage();
     const tv=document.getElementById('totalVotes');
     if(tv)tv.textContent=ar(S.totalVotes||0);
   }catch(e){}
@@ -1228,6 +1239,141 @@ function closeModal(){document.getElementById('modal').classList.remove('open');
 document.getElementById('modal-ok').onclick=()=>{if(modalCb)modalCb();closeModal();};
 document.getElementById('modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
 
+// ── VOTE PAGE ──
+function buildVotePage(){
+  const cont = document.getElementById('voteContent');
+  const stat = document.getElementById('voteStat');
+  if(!cont) return;
+
+  const b = S.tournament && S.tournament.bracket;
+  const vo = S.tournament && S.tournament.votingOpen;
+
+  if(!b || !b.r32){
+    cont.innerHTML=`<div style="text-align:center;padding:60px 20px;color:var(--g2)">
+      <div style="font-size:48px;margin-bottom:12px">⏳</div>
+      <div style="font-size:16px">لم يتم توزيع اللاعبين بعد</div>
+    </div>`;
+    return;
+  }
+
+  if(!vo && !S.tournament.started){
+    cont.innerHTML=`<div style="text-align:center;padding:60px 20px;color:var(--g2)">
+      <div style="font-size:48px;margin-bottom:12px">🔒</div>
+      <div style="font-size:16px">التصويت لم يُفتح بعد</div>
+      <div style="font-size:12px;margin-top:6px">انتظر حتى يفتح المنظم التصويت</div>
+    </div>`;
+    return;
+  }
+
+  const rounds = S.tournament.started ? ['r32','r16','r8','r4','r2'] : ['r32'];
+  const activeMatches = [];
+  rounds.forEach(r=>{
+    if(!b[r]) return;
+    b[r].forEach(m=>{
+      if(m.p1!==null && m.p2!==null) activeMatches.push(m);
+    });
+  });
+
+  if(!activeMatches.length){
+    cont.innerHTML='<div class="empty">لا توجد مباريات</div>';
+    return;
+  }
+
+  stat.textContent = `${ar(activeMatches.length)} قيم — صوّت على شرط كل قيم`;
+
+  let h = '<div class="vgrid">';
+  activeMatches.forEach(m=>{
+    if(!S.votes) S.votes={};
+    if(!S.votes[m.matchNum]) S.votes[m.matchNum]={counts:{},voted:false,chosen:null};
+    const mv = S.votes[m.matchNum];
+    const tot = CONDS.reduce((s,c)=>s+(mv.counts&&mv.counts[c.id]?mv.counts[c.id]:0),0);
+    const p1=pById(m.p1), p2=pById(m.p2);
+    const[bg1,fg1]=pal(m.p1??0), [bg2,fg2]=pal(m.p2??0);
+
+    // Find winning cond
+    let topCond=null, topPct=0;
+    CONDS.forEach(c=>{
+      const cnt=mv.counts[c.id]||0;
+      const pct=tot>0?Math.round(cnt/tot*100):0;
+      if(pct>topPct){topPct=pct;topCond=c;}
+    });
+
+    h+=`<div class="vc" id="vc-card-${m.matchNum}">
+      <div class="vl">${RN[m.round]||'قيم'} ${ar(m.matchNum)}</div>
+      <!-- Players -->
+      <div style="display:flex;align-items:center;gap:10px;padding:9px;background:rgba(46,118,184,.06);border-radius:var(--r);margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:6px;flex:1">
+          ${p1&&p1.photo?`<img src="${p1.photo}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:1.5px solid var(--sep2)">`:`<div style="width:32px;height:32px;border-radius:50%;background:${bg1};color:${fg1};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">${init(pName(m.p1))}</div>`}
+          <span style="font-size:13px;color:var(--g1);font-weight:700">${pName(m.p1)}</span>
+        </div>
+        <span style="font-size:10px;color:var(--b2);letter-spacing:2px">ضد</span>
+        <div style="display:flex;align-items:center;gap:6px;flex:1;justify-content:flex-end">
+          <span style="font-size:13px;color:var(--g1);font-weight:700">${pName(m.p2)}</span>
+          ${p2&&p2.photo?`<img src="${p2.photo}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:1.5px solid var(--sep2)">`:`<div style="width:32px;height:32px;border-radius:50%;background:${bg2};color:${fg2};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">${init(pName(m.p2))}</div>`}
+        </div>
+      </div>
+      <!-- Voted indicator -->
+      <div style="display:${mv.voted?'block':'none'};text-align:center;padding:5px 8px;background:rgba(30,150,80,.1);border:1px solid rgba(30,150,80,.25);border-radius:var(--r);color:#70D090;font-size:12px;margin-bottom:8px">
+        ✅ صوّتت — ${topCond&&tot>0?topCond.icon+' '+topCond.name+' الأعلى ('+ar(topPct)+'%)':''}
+      </div>
+      <!-- Conditions with live results -->
+      <div class="cg">
+        ${CONDS.map(c=>{
+          const cnt=mv.counts[c.id]||0;
+          const pct=tot>0?Math.round(cnt/tot*100):0;
+          const isTop=topCond&&topCond.id===c.id&&tot>0;
+          return`<div class="co${mv.chosen===c.id?' sel':''}" 
+            id="vp-${m.matchNum}-${c.id}" 
+            onclick="castVote(${m.matchNum},${c.id},this)"
+            style="${isTop?'border-color:rgba(46,118,184,.5)':''}">
+            <span>${c.icon} ${c.name}</span>
+            <span class="vcnt" id="vp-cnt-${m.matchNum}-${c.id}">
+              ${ar(pct)}% · ${ar(cnt)} صوت${isTop?' 🏆':''}
+            </span>
+            <div class="vbar" style="width:${pct}%;background:${isTop?'var(--b2)':'rgba(46,118,184,.4)'}"></div>
+          </div>`;
+        }).join('')}
+      </div>
+      ${!mv.voted?`<button class="vbtn" onclick="castVoteSubmit(${m.matchNum})">تأكيد التصويت</button>`:''}
+    </div>`;
+  });
+  h+='</div>';
+  cont.innerHTML=h;
+}
+
+// pending vote per match
+const _pendingVotes={};
+
+function castVote(mn,cid,el){
+  if(S.votes[mn]&&S.votes[mn].voted)return;
+  document.querySelectorAll(`[id^="vp-${mn}-"]`).forEach(e=>e.classList.remove('sel'));
+  el.classList.add('sel');
+  _pendingVotes[mn]=cid;
+}
+
+function castVoteSubmit(mn){
+  const cid=_pendingVotes[mn];
+  if(!cid)return;
+  if(!S.votes)S.votes={};
+  if(!S.votes[mn])S.votes[mn]={counts:{},voted:false,chosen:null};
+  const mv=S.votes[mn];
+  if(mv.voted)return;
+  mv.counts[cid]=(mv.counts[cid]||0)+1;
+  mv.voted=true;mv.chosen=cid;
+  S.totalVotes=(S.totalVotes||0)+1;
+  // Update bracket condId
+  if(S.tournament.bracket){
+    for(const r of['r32','r16','r8','r4','r2']){
+      const bm=S.tournament.bracket[r]&&S.tournament.bracket[r].find(x=>x.matchNum===mn);
+      if(bm&&!bm.condId){bm.condId=cid;break;}
+    }
+  }
+  const tv=document.getElementById('totalVotes');if(tv)tv.textContent=ar(S.totalVotes||0);
+  save();
+  // Refresh this card
+  buildVotePage();
+}
+
 // ── NAVIGATION ──
 function ST(tab,btn){
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
@@ -1237,6 +1383,7 @@ function ST(tab,btn){
   if(tab==='trn')renderTrn();
   if(tab==='players')buildPGrid();
   if(tab==='admin')renderAdmin();
+  if(tab==='vote')buildVotePage();
   window.scrollTo(0,0);
 }
 
