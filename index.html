@@ -1349,11 +1349,23 @@ function getVoteMatches(){
     for(const r of rounds){
       const arr = b[r];
       if(!arr) continue;
-      // Handle both array and object (Firebase converts arrays to objects)
       const items = Array.isArray(arr) ? arr : Object.values(arr);
       items.forEach(m=>{
-        if(m && m.p1!==null && m.p1!==undefined && m.p2!==null && m.p2!==undefined){
-          result.push({matchNum:m.matchNum, p1:m.p1, p2:m.p2, round:m.round});
+        if(!m) return;
+        // Firebase drops null values — treat missing as null
+        const p1 = m.p1 !== undefined ? m.p1 : null;
+        const p2 = m.p2 !== undefined ? m.p2 : null;
+        const winner = m.winner !== undefined ? m.winner : null;
+        // Only show match if at least p1 exists and no winner yet
+        if(p1 !== null && p2 !== null && !winner){
+          result.push({
+            matchNum: m.matchNum,
+            p1: p1,
+            p2: p2,
+            round: m.round,
+            winner: winner,
+            condId: m.condId || null
+          });
         }
       });
     }
