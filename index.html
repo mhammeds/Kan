@@ -585,33 +585,36 @@ async function fbLoad(){
   showBar('🔥 جاري تحميل البيانات...');
   try{
     const d=await fbRead();
-    if(d&&typeof d==='object'){
-      if(Array.isArray(d.players))d.players.forEach((p,i)=>{if(p&&S.players[i])Object.assign(S.players[i],p);});
-      if(d.tournament)S.tournament=d.tournament;
-      if(d.votes)S.votes=d.votes;
-      if(typeof d.totalVotes==='number')S.totalVotes=d.totalVotes;
-      if(typeof d.simMin==='number')simM=d.simMin;
-    }
+    applyRemote(d);
     _fbReady=true;
   }catch(e){console.error(e);}
   hideBar();
   updCtr();renderList();buildPGrid();refreshSlots();
-  const tv=document.getElementById('totalVotes');if(tv&&S.totalVotes)tv.textContent=ar(S.totalVotes);
+  const tv=document.getElementById('totalVotes');
+  if(tv&&S.totalVotes)tv.textContent=ar(S.totalVotes);
 }
 
-function save(){
-  clearTimeout(_saveT);
-  _saveT=setTimeout(()=>forceSave(),900);
+function applyRemote(d){
+  if(!d||typeof d!=='object')return;
+  if(Array.isArray(d.players)){
+    d.players.forEach((p,i)=>{if(p&&p.registered&&S.players[i])Object.assign(S.players[i],p);});
+  }
+  if(d.tournament)S.tournament=JSON.parse(JSON.stringify(d.tournament));
+  if(d.votes)S.votes=JSON.parse(JSON.stringify(d.votes));
+  if(typeof d.totalVotes==='number')S.totalVotes=d.totalVotes;
+  if(typeof d.simMin==='number')simM=d.simMin;
 }
+
+function save(){clearTimeout(_saveT);_saveT=setTimeout(()=>forceSave(),800);}
 
 async function forceSave(){
   if(!_fbReady)return;
   clearTimeout(_saveT);
-  showBar('💾 جاري الحفظ...');
+  showBar('💾 حفظ...');
   try{
-    await fbMerge({
+    await fbWrite('',{
       players:S.players.map(p=>({...p})),
-      tournament:S.tournament||null,
+      tournament:S.tournament||{started:false,bracket:null,champion:null},
       votes:S.votes||{},
       totalVotes:S.totalVotes||0,
       simMin:simM||0
@@ -620,40 +623,29 @@ async function forceSave(){
   hideBar();
 }
 
-// Poll every 6s
+let _lastSig='';
 async function fbPoll(){
   if(!_fbReady)return;
   try{
     const d=await fbRead();if(!d)return;
-    let chg=false;
-    if(Array.isArray(d.players)){
-      d.players.forEach((p,i)=>{
-        if(!p)return;
-        if(p.registered&&!S.players[i].registered){Object.assign(S.players[i],p);chg=true;}
-        else if(p.registered&&S.players[i].registered&&p.photo&&!S.players[i].photo){S.players[i].photo=p.photo;chg=true;}
-      });
-    }
-    if(d.tournament){
-      const remote=JSON.stringify(d.tournament);
-      const local=JSON.stringify(S.tournament);
-      if(remote!==local){
-        S.tournament=d.tournament;chg=true;
-        // If tournament just started, show it
-        if(d.tournament.started&&!S.tournament?.started){
-          const trnTab=document.getElementById('trn');
-          if(trnTab&&trnTab.classList.contains('on'))renderTrn();
-        }
-      }
-    }
-    if(d.votes&&JSON.stringify(d.votes)!==JSON.stringify(S.votes)){S.votes=d.votes;chg=true;}
-    if(typeof d.totalVotes==='number'&&d.totalVotes!==S.totalVotes){
-      S.totalVotes=d.totalVotes;
-      const tv=document.getElementById('totalVotes');if(tv)tv.textContent=ar(S.totalVotes);
-    }
-    if(chg){updCtr();renderList();buildPGrid();if(document.getElementById('trn').classList.contains('on'))renderTrn();}
+    // Build signature of key fields to detect changes
+    const sig=JSON.stringify([
+      d.tournament&&d.tournament.started?1:0,
+      d.tournament&&d.tournament.bracket?JSON.stringify(d.tournament.bracket).length:0,
+      d.votes?Object.keys(d.votes).length:0,
+      d.totalVotes||0,
+      Array.isArray(d.players)?d.players.filter(p=>p&&p.registered).length:0
+    ]);
+    if(sig===_lastSig)return;
+    _lastSig=sig;
+    applyRemote(d);
+    updCtr();renderList();buildPGrid();
+    if(document.getElementById('trn')?.classList.contains('on'))renderTrn();
+    const tv=document.getElementById('totalVotes');
+    if(tv)tv.textContent=ar(S.totalVotes||0);
   }catch(e){}
 }
-setInterval(fbPoll,3000);
+setInterval(fbPoll,2500);
 
 // ── REGISTER ──
 function refreshSlots(){
