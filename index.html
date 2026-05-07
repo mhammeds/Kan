@@ -766,6 +766,7 @@ function advanceWinner(bracket, matchId, winnerId){
 // DRAW BOARD
 let drawAssign={};
 function showDraw(){
+  if(!adminUnlocked){showModal('🔐 محظور','هذا الخيار للمدير فقط. ادخل من لوحة الإدارة أولاً.',null);return;}
   if(S.tournament.started){
     showModal('تحذير','البطولة بدأت. هل تريد إعادة التوزيع وحذف النتائج؟',()=>{S.tournament={started:false,bracket:null,champion:null};save();drawAssign={};renderDraw();});
     return;
@@ -836,6 +837,7 @@ function autoFill(){
   renderDraw();
 }
 function startTrn(){
+  if(!adminUnlocked){showModal('🔐 محظور','هذا الخيار للمدير فقط.',null);return;}
   const slots=Array.from({length:32},(_,i)=>drawAssign[i]??null);
   const filled=slots.filter(x=>x!==null);
   if(filled.length<2){alert('أضف لاعبين على الأقل!');return;}
@@ -940,6 +942,7 @@ function renderTrn(){
 }
 
 function setWin(matchId,winnerId){
+  if(!adminUnlocked){return;}
   showModal('تأكيد الفوز',`هل تؤكد أن ${pName(winnerId)} هو الفائز؟`,()=>{
     if(advanceWinner(S.tournament.bracket,matchId,winnerId)){
       // Auto-advance round tab
@@ -1318,8 +1321,9 @@ function showModal(title,body,cb){
   modalCb=cb;
   document.getElementById('modal').classList.add('open');
 }
-function closeModal(){document.getElementById('modal').classList.remove('open');modalCb=null;}
+function closeModal(){document.getElementById('modal').classList.remove('open');modalCb=null;document.getElementById('modal-ok').textContent='تأكيد';}
 document.getElementById('modal-ok').onclick=()=>{if(modalCb)modalCb();closeModal();};
+document.getElementById('modal-ok').textContent='حسناً';
 document.getElementById('modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
 
 // ══ NAVIGATION ══════════════════════════════
