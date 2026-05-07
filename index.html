@@ -526,7 +526,7 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
     <h3 id="modal-title"></h3>
     <p id="modal-body"></p>
     <div class="modal-btns">
-      <button class="mbtn cancel" onclick="closeModal()">إلغاء</button>
+      <button class="mbtn cancel" id="modal-cancel" onclick="closeModal()">إلغاء</button>
       <button class="mbtn confirm" id="modal-ok">تأكيد</button>
     </div>
   </div>
@@ -797,7 +797,7 @@ function renderDraw(){
     <div class="draw-grid">${sH}</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
       <button class="btn" onclick="autoFill()">🔀 توزيع تلقائي</button>
-      <button class="btn green" onclick="startTrn()">🚀 بدء البطولة</button>
+<button class="btn green" onclick="startTrn()">🚀 بدء البطولة</button>
     </div>
     <div class="pool-wrap"><div class="pool-lbl">اللاعبون المتاحون</div><div class="pool">${pH}</div></div>
   </div>`;
@@ -848,13 +848,8 @@ function renderTrn(){
   if(adminBar){
     if(adminMode){
       adminBar.style.display='flex';
-      const vo=S.tournament&&S.tournament.votingOpen;
-      const ts=S.tournament&&S.tournament.started;
       adminBar.innerHTML=`
-        <button class="btn" onclick="showDraw()">🎯 توزيع</button>
-        ${!ts&&!vo?`<button class="btn gold" onclick="openVoting()">🗳 فتح التصويت</button>`:''}
-        ${!ts&&vo?`<button class="btn red" onclick="closeVoting()">🔒 إغلاق التصويت</button>`:''}
-        ${!ts?`<button class="btn green" onclick="startTrn()">🚀 بدء البطولة</button>`:''}
+        <button class="btn" onclick="showDraw()">🎯 توزيع اللاعبين</button>
         <button class="btn" onclick="exportJSON()">💾 حفظ</button>
         <label class="btn" style="cursor:pointer"><input type="file" accept=".json" style="display:none" onchange="importJSON(event)">📂 استيراد</label>`;
     } else {
@@ -1011,16 +1006,26 @@ function renderTrn(){
 
 async function openVoting(){
   if(!adminMode)return;
-  if(!S.tournament.bracket){alert('وزّع اللاعبين أولاً!');return;}
-  S.tournament.votingOpen=true;
-  await forceSave();
-  renderTrn();
+  if(!S.tournament.bracket||!S.tournament.bracket.r32){
+    showModal('تنبيه','وزّع اللاعبين على الجدول أولاً قبل فتح التصويت.',null);
+    return;
+  }
+  showModal('تأكيد','هل تريد فتح التصويت للجمهور؟ سيتمكنون من التصويت على شرط كل قيم.',async()=>{
+    S.tournament.votingOpen=true;
+    await forceSave();
+    renderTrn();
+    renderAdmin();
+    showModal('✅ تم','التصويت مفتوح الآن — الجمهور يرى الجدول ويصوت على شرط كل قيم.',null);
+  });
 }
 async function closeVoting(){
   if(!adminMode)return;
-  S.tournament.votingOpen=false;
-  await forceSave();
-  renderTrn();
+  showModal('إغلاق التصويت','هل تريد إغلاق التصويت؟',async()=>{
+    S.tournament.votingOpen=false;
+    await forceSave();
+    renderTrn();
+    renderAdmin();
+  });
 }
 function setWin(matchId,winnerId){
   if(!adminMode)return;
@@ -1128,7 +1133,20 @@ function renderAdmin(){
     <div class="admin-section">
       <h4>🎮 البطولة</h4>
       <div class="aa"><div><div class="aa-l">الحالة</div><div class="aa-s">${S.tournament.started?'جارية':'لم تبدأ'}</div></div>
-        ${S.tournament.started?`<button class="btn red" onclick="confirmResetTrn()">🗑 إعادة</button>`:`<button class="btn" onclick="ST('trn',document.querySelector('[data-t=trn]'))">🎯 ابدأ</button>`}
+        ${S.tournament.started?`<button class="btn red" onclick="confirmResetTrn()">🗑 إعادة</button>`:`<button class="btn" onclick="ST('trn',document.querySelector('[data-t=trn]'))">🎯 توزيع</button>`}
+      </div>
+      <div class="aa">
+        <div>
+          <div class="aa-l">التصويت على الشروط</div>
+          <div class="aa-s">${S.tournament.votingOpen?'مفتوح للجمهور':'مغلق'}</div>
+        </div>
+        ${S.tournament.votingOpen
+          ?`<button class="btn red" onclick="closeVoting()">🔒 إغلاق التصويت</button>`
+          :`<button class="btn gold" onclick="openVoting()">🗳 بدء التصويت</button>`
+        }
+      </div>
+      <div class="aa"><div><div class="aa-l">بدء البطولة</div><div class="aa-s">بعد انتهاء التصويت</div></div>
+        ${!S.tournament.started?`<button class="btn green" onclick="ST('trn',document.querySelector('[data-t=trn]'));startTrn()">🚀 بدء</button>`:''}
       </div>
       <div class="aa"><div><div class="aa-l">اللاعبون</div><div class="aa-s">${ar(reg.length)} / ٦٤</div></div>
         <button class="btn red" onclick="confirmClearPlayers()">🗑 مسح</button></div>
@@ -1196,7 +1214,16 @@ const rl=document.getElementById('rlist');
 CONDS.forEach(c=>{const li=document.createElement('li');li.className='ri';li.innerHTML=`<span class="ri-ic">${c.icon}</span><span class="ri-tx">${c.name}</span>`;rl.appendChild(li);});
 
 // ── MODAL ──
-function showModal(title,body,cb){document.getElementById('modal-title').textContent=title;document.getElementById('modal-body').textContent=body;modalCb=cb;document.getElementById('modal-ok').style.display=cb?'block':'none';document.getElementById('modal').classList.add('open');}
+function showModal(title,body,cb){
+  document.getElementById('modal-title').textContent=title;
+  document.getElementById('modal-body').textContent=body;
+  modalCb=cb;
+  // If no callback = info only, hide cancel show only OK
+  document.getElementById('modal-cancel').style.display=cb?'flex':'none';
+  document.getElementById('modal-ok').textContent=cb?'تأكيد':'حسناً';
+  document.getElementById('modal-ok').style.display='block';
+  document.getElementById('modal').classList.add('open');
+}
 function closeModal(){document.getElementById('modal').classList.remove('open');modalCb=null;}
 document.getElementById('modal-ok').onclick=()=>{if(modalCb)modalCb();closeModal();};
 document.getElementById('modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
