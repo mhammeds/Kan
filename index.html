@@ -251,7 +251,7 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
 .admin-locked .lock-icon{font-size:40px;margin-bottom:10px}
 .admin-locked p{font-size:13px;color:var(--g2);margin-bottom:14px}
 
-/* ── MODAL ── */
+/* ── MODAL (confirm) ── */
 .modal-bg{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.65);align-items:center;justify-content:center;padding:20px}
 .modal-bg.open{display:flex}
 .modal{background:rgba(4,10,18,.96);border:1px solid var(--sep2);border-top:2px solid var(--b2);border-radius:var(--r2);padding:22px;max-width:320px;width:100%;text-align:center;backdrop-filter:blur(20px)}
@@ -263,6 +263,33 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
 .mbtn.confirm:hover{background:rgba(46,118,184,.38);color:var(--g1)}
 .mbtn.cancel{background:rgba(255,255,255,.04);color:var(--g2)}
 .mbtn.cancel:hover{background:rgba(255,255,255,.08);color:var(--g1)}
+
+/* ── VOTE MODAL ── */
+.vm-bg{display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.75);align-items:center;justify-content:center;padding:16px}
+.vm-bg.open{display:flex}
+.vm{background:rgba(4,10,20,.97);border:1px solid var(--sep2);border-top:3px solid var(--b2);border-radius:var(--r2);padding:20px;max-width:420px;width:100%;backdrop-filter:blur(24px);max-height:90vh;overflow-y:auto}
+.vm::-webkit-scrollbar{width:3px}
+.vm-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.vm-title{font-size:17px;color:var(--g1);font-weight:700;line-height:1.3}
+.vm-close{background:transparent;border:none;color:var(--g2);font-size:20px;cursor:pointer;padding:0 4px;line-height:1;margin-top:-2px}
+.vm-close:hover{color:var(--g1)}
+.vm-players{display:flex;align-items:center;gap:12px;padding:12px;background:rgba(46,118,184,.06);border:1px solid var(--sep);border-radius:var(--r2);margin-bottom:14px}
+.vm-vs{font-size:11px;color:var(--b2);letter-spacing:3px;flex-shrink:0}
+.vm-player{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1}
+.vm-player img,.vm-player .vm-av-i{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--sep2)}
+.vm-av-i{display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
+.vm-pname{font-size:12px;color:var(--g1);font-weight:700;text-align:center}
+.vm-lbl{font-size:11px;color:var(--b3);letter-spacing:2px;margin-bottom:8px}
+.vm-conds{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
+.vm-cond{padding:9px 10px;background:rgba(255,255,255,.03);border:1px solid var(--sep);border-radius:var(--r);cursor:pointer;transition:all .2s;font-family:'Amiri',serif;font-size:12px;color:var(--g2);text-align:center;position:relative;overflow:hidden}
+.vm-cond:hover{border-color:var(--sep2);color:var(--g1)}
+.vm-cond.sel{background:rgba(30,80,140,.28);border-color:rgba(46,118,184,.55);color:var(--b4);font-weight:700}
+.vm-cond .vb{position:absolute;bottom:0;left:0;height:2px;background:var(--b2);transition:width .5s}
+.vm-cnt{font-size:10px;color:var(--g2);display:block;margin-top:3px}
+.vm-voted{text-align:center;padding:8px;background:rgba(30,150,80,.1);border:1px solid rgba(30,150,80,.25);border-radius:var(--r);color:#70D090;font-size:13px;margin-bottom:10px;display:none}
+.vm-submit{width:100%;padding:10px;background:rgba(46,118,184,.18);border:1px solid var(--sep2);color:var(--b4);font-family:'Amiri',serif;font-size:15px;cursor:pointer;border-radius:var(--r);transition:all .25s}
+.vm-submit:hover{background:rgba(46,118,184,.32);color:var(--g1)}
+.vm-submit:disabled{opacity:.4;cursor:default}
 
 /* ── MOBILE ── */
 .mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(3,6,11,.92);border-top:1px solid var(--sep2);backdrop-filter:blur(16px);flex-direction:row;align-items:center;justify-content:space-around;padding:5px 2px calc(5px + env(safe-area-inset-bottom))}
@@ -301,7 +328,7 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
     <div class="ni" onclick="ST('players',this)" data-t="players"><span class="ic">👥</span><span>اللاعبون</span><span class="bdg" id="navBdg">٠</span></div>
     <div class="ni" onclick="ST('trn',this)" data-t="trn"><span class="ic">🏆</span><span>البطولة</span></div>
     <div class="ni" onclick="ST('timer',this)" data-t="timer"><span class="ic">⏱</span><span>الوقت</span></div>
-    <div class="ni" onclick="ST('vote',this)" data-t="vote"><span class="ic">🗳</span><span>التصويت</span></div>
+    <div class="ni" onclick="ST('trn',this)" data-t="trn"><span class="ic">🗳</span><span>التصويت</span></div>
     <div class="ni" onclick="ST('titles',this)" data-t="titles"><span class="ic">👑</span><span>حمله الألقاب</span></div>
     <div class="ni" onclick="ST('rules',this)" data-t="rules"><span class="ic">📜</span><span>الشروط</span></div>
     <div class="ni" onclick="ST('admin',this)" data-t="admin"><span class="ic">🔐</span><span>الإدارة</span></div>
@@ -419,9 +446,24 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
   <div class="mni" onclick="ST('players',this)" data-t="players"><span class="m-ic">👥</span><span class="m-lb">لاعبون</span></div>
   <div class="mni" onclick="ST('trn',this)" data-t="trn"><span class="m-ic">🏆</span><span class="m-lb">بطولة</span></div>
   <div class="mni" onclick="ST('timer',this)" data-t="timer"><span class="m-ic">⏱</span><span class="m-lb">وقت</span></div>
-  <div class="mni" onclick="ST('vote',this)" data-t="vote"><span class="m-ic">🗳</span><span class="m-lb">تصويت</span></div>
+  <div class="mni" onclick="ST('trn',this)" data-t="trn"><span class="m-ic">🗳</span><span class="m-lb">تصويت</span></div>
   <div class="mni" onclick="ST('admin',this)" data-t="admin"><span class="m-ic">🔐</span><span class="m-lb">إدارة</span></div>
 </nav>
+
+<!-- VOTE MODAL -->
+<div class="vm-bg" id="vm">
+  <div class="vm">
+    <div class="vm-head">
+      <div class="vm-title" id="vm-title">تصويت القيم</div>
+      <button class="vm-close" onclick="closeVM()">✕</button>
+    </div>
+    <div class="vm-players" id="vm-players"></div>
+    <div class="vm-voted" id="vm-voted">✅ تم تسجيل صوتك!</div>
+    <div class="vm-lbl">اختر شرط هذه القيم</div>
+    <div class="vm-conds" id="vm-conds"></div>
+    <button class="vm-submit" id="vm-submit" onclick="submitVM()">تأكيد التصويت</button>
+  </div>
+</div>
 
 <!-- MODAL -->
 <div class="modal-bg" id="modal">
@@ -876,7 +918,14 @@ function renderTrn(){
         <div class="bv-player ${cl2}${m.p2===null?' empty-p':''}" onclick="${canWin&&m.p2!==null?`setWin('${m.id}',${m.p2})`:''}">
           ${avHTML(m.p2,24)}<span class="bv-name">${pName(m.p2)}</span><span class="bv-win">🏆</span></div>`;
       }
-      html+=`<div class="bv-cond ${cond?'bv-cs':'bv-cp'}">${cond?cond.icon+' '+cond.name:'🗳 انتظار التصويت'}</div></div>`;
+      // Show vote results or vote button
+      const mv2=S.votes[m.matchNum]||{counts:{},voted:false};
+      const tot2=CONDS.reduce((s,c)=>s+(mv2.counts[c.id]||0),0);
+      const topCond=tot2>0?CONDS.reduce((a,c)=>(mv2.counts[c.id]||0)>(mv2.counts[a.id]||0)?c:a,CONDS[0]):null;
+      html+=`<div class="bv-cond ${cond?'bv-cs':'bv-cp'}" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between" onclick="openVM(${m.matchNum})">
+        <span>${cond?cond.icon+' '+cond.name:topCond&&tot2>0?topCond.icon+' '+topCond.name+' ('+ar(tot2)+' صوت)':'🗳 صوّت على الشرط'}</span>
+        <span style="font-size:10px;color:var(--b3);margin-right:4px">${mv2.voted?'✓':'＋'}</span>
+      </div></div>`;
     });
     html+='</div></div>';
   });
@@ -1135,6 +1184,123 @@ for(let i=0;i<10;i++){
 }
 const rl=document.getElementById('rlist');
 CONDS.forEach(c=>{const li=document.createElement('li');li.className='ri';li.innerHTML=`<span class="ri-ic">${c.icon}</span><span class="ri-tx">${c.name}</span>`;rl.appendChild(li);});
+
+// ══ VOTE MODAL ════════════════════════════
+let vmMatchNum = null;
+let vmPending = null;
+
+function openVM(matchNum){
+  vmMatchNum = matchNum;
+  vmPending = null;
+  if(!S.votes) S.votes={};
+  if(!S.votes[matchNum]) S.votes[matchNum]={counts:{},voted:false,chosen:null};
+  const mv = S.votes[matchNum];
+
+  // Find match
+  const b = S.tournament.bracket;
+  let match = null;
+  if(b){
+    for(const r of ['r32','r16','r8','r4','r2']){
+      match = b[r].find(m=>m.matchNum===matchNum&&m.round==='r32')||match;
+    }
+    // search all rounds
+    for(const r of ['r32','r16','r8','r4','r2']){
+      const found = b[r].find(m=>m.matchNum===matchNum);
+      if(found){match=found;break;}
+    }
+  }
+  // fallback to clockMatches
+  const cm = clockMatches.find(m=>m.num===matchNum);
+
+  // Title
+  document.getElementById('vm-title').textContent = `تصويت — قيم ${ar(matchNum)}`;
+
+  // Players
+  const pid1 = match ? match.p1 : (cm ? cm.p1 : null);
+  const pid2 = match ? match.p2 : (cm ? cm.p2 : null);
+  const p1 = pById(pid1), p2 = pById(pid2);
+  const [bg1,fg1]=pal(pid1??0),[bg2,fg2]=pal(pid2??0);
+  document.getElementById('vm-players').innerHTML = `
+    <div class="vm-player">
+      ${p1&&p1.photo?`<img src="${p1.photo}">`:`<div class="vm-av-i" style="background:${bg1};color:${fg1}">${init(pName(pid1))}</div>`}
+      <div class="vm-pname">${pName(pid1)}</div>
+    </div>
+    <div class="vm-vs">✦ ضد ✦</div>
+    <div class="vm-player">
+      ${p2&&p2.photo?`<img src="${p2.photo}">`:`<div class="vm-av-i" style="background:${bg2};color:${fg2}">${init(pName(pid2))}</div>`}
+      <div class="vm-pname">${pName(pid2)}</div>
+    </div>`;
+
+  // Voted indicator
+  const vEl = document.getElementById('vm-voted');
+  vEl.style.display = mv.voted ? 'block' : 'none';
+
+  // Submit btn
+  const sb = document.getElementById('vm-submit');
+  sb.disabled = mv.voted;
+  sb.textContent = mv.voted ? '✅ صوّتت مسبقاً' : 'تأكيد التصويت';
+
+  // Conditions
+  const tot = CONDS.reduce((s,c)=>s+(mv.counts[c.id]||0),0);
+  const condsEl = document.getElementById('vm-conds');
+  condsEl.innerHTML = CONDS.map(c=>{
+    const cnt = mv.counts[c.id]||0;
+    const pct = tot>0?Math.round(cnt/tot*100):0;
+    const isSel = mv.chosen===c.id;
+    return `<div class="vm-cond${isSel?' sel':''}" id="vmc-${c.id}" onclick="pickVM(${c.id},this)">
+      <span>${c.icon} ${c.name}</span>
+      <span class="vm-cnt" id="vmcnt-${c.id}">${ar(pct)}% · ${ar(cnt)}</span>
+      <div class="vb" style="width:${pct}%"></div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('vm').classList.add('open');
+}
+
+function pickVM(cid, el){
+  if(S.votes[vmMatchNum]?.voted) return;
+  document.querySelectorAll('.vm-cond').forEach(e=>e.classList.remove('sel'));
+  el.classList.add('sel');
+  vmPending = cid;
+}
+
+function submitVM(){
+  if(!vmPending || !vmMatchNum) return;
+  const mv = S.votes[vmMatchNum];
+  if(mv.voted) return;
+  mv.counts[vmPending] = (mv.counts[vmPending]||0)+1;
+  mv.voted = true;
+  mv.chosen = vmPending;
+  S.totalVotes = (S.totalVotes||0)+1;
+  // Update bracket cond
+  if(S.tournament.bracket){
+    for(const r of ['r32','r16','r8','r4','r2']){
+      const bm = S.tournament.bracket[r].find(m=>m.matchNum===vmMatchNum);
+      if(bm&&!bm.condId){bm.condId=vmPending;break;}
+    }
+  }
+  const tv=document.getElementById('totalVotes');if(tv)tv.textContent=ar(S.totalVotes);
+  // Update display
+  const tot=CONDS.reduce((s,c)=>s+(mv.counts[c.id]||0),0);
+  CONDS.forEach(c=>{
+    const pct=Math.round((mv.counts[c.id]||0)/tot*100);
+    const ce=document.getElementById(`vmcnt-${c.id}`);
+    const ve=document.getElementById(`vmc-${c.id}`);
+    if(ce)ce.textContent=`${ar(pct)}% · ${ar(mv.counts[c.id]||0)}`;
+    if(ve){const vb=ve.querySelector('.vb');if(vb)vb.style.width=pct+'%';}
+  });
+  document.getElementById('vm-voted').style.display='block';
+  document.getElementById('vm-submit').disabled=true;
+  document.getElementById('vm-submit').textContent='✅ صوّتت مسبقاً';
+  save();
+  setTimeout(()=>{closeVM();renderTrn();},1200);
+}
+
+function closeVM(){
+  document.getElementById('vm').classList.remove('open');
+  vmMatchNum=null;vmPending=null;
+}
+document.getElementById('vm').addEventListener('click',e=>{if(e.target===e.currentTarget)closeVM();});
 
 // ══ MODAL ══════════════════════════════════
 let modalCb=null;
