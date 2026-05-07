@@ -601,20 +601,23 @@ async function fbLoad(){
 
 function save(){
   clearTimeout(_saveT);
-  _saveT=setTimeout(async()=>{
-    if(!_fbReady)return;
-    showBar('💾 جاري الحفظ...');
-    try{
-      await fbMerge({
-        players:S.players.map(p=>({...p})),
-        tournament:S.tournament||null,
-        votes:S.votes||{},
-        totalVotes:S.totalVotes||0,
-        simMin:simM||0
-      });
-    }catch(e){console.error(e);}
-    hideBar();
-  },900);
+  _saveT=setTimeout(()=>forceSave(),900);
+}
+
+async function forceSave(){
+  if(!_fbReady)return;
+  clearTimeout(_saveT);
+  showBar('💾 جاري الحفظ...');
+  try{
+    await fbMerge({
+      players:S.players.map(p=>({...p})),
+      tournament:S.tournament||null,
+      votes:S.votes||{},
+      totalVotes:S.totalVotes||0,
+      simMin:simM||0
+    });
+  }catch(e){console.error(e);}
+  hideBar();
 }
 
 // Poll every 6s
@@ -630,7 +633,18 @@ async function fbPoll(){
         else if(p.registered&&S.players[i].registered&&p.photo&&!S.players[i].photo){S.players[i].photo=p.photo;chg=true;}
       });
     }
-    if(d.tournament&&JSON.stringify(d.tournament)!==JSON.stringify(S.tournament)){S.tournament=d.tournament;chg=true;}
+    if(d.tournament){
+      const remote=JSON.stringify(d.tournament);
+      const local=JSON.stringify(S.tournament);
+      if(remote!==local){
+        S.tournament=d.tournament;chg=true;
+        // If tournament just started, show it
+        if(d.tournament.started&&!S.tournament?.started){
+          const trnTab=document.getElementById('trn');
+          if(trnTab&&trnTab.classList.contains('on'))renderTrn();
+        }
+      }
+    }
     if(d.votes&&JSON.stringify(d.votes)!==JSON.stringify(S.votes)){S.votes=d.votes;chg=true;}
     if(typeof d.totalVotes==='number'&&d.totalVotes!==S.totalVotes){
       S.totalVotes=d.totalVotes;
@@ -639,7 +653,7 @@ async function fbPoll(){
     if(chg){updCtr();renderList();buildPGrid();if(document.getElementById('trn').classList.contains('on'))renderTrn();}
   }catch(e){}
 }
-setInterval(fbPoll,6000);
+setInterval(fbPoll,3000);
 
 // ── REGISTER ──
 function refreshSlots(){
@@ -818,12 +832,15 @@ function autoFill(){
   let ai=0;for(let i=0;i<32&&ai<avail.length;i++){if(drawAssign[i]===undefined){drawAssign[i]=avail[ai++].id;}}
   renderDraw();
 }
-function startTrn(){
+async function startTrn(){
   if(!adminMode)return;
   const slots=Array.from({length:32},(_,i)=>drawAssign[i]??null);
   if(slots.filter(x=>x!==null).length<2){alert('أضف لاعبين على الأقل!');return;}
   S.tournament.bracket=buildBracket(slots);S.tournament.started=true;
-  activeRound='r32';save();renderTrn();
+  activeRound='r32';
+  // Force immediate save to Firebase
+  await forceSave();
+  renderTrn();
 }
 
 // ── RENDER TOURNAMENT ──
@@ -928,13 +945,14 @@ function renderTrn(){
 
 function setWin(matchId,winnerId){
   if(!adminMode)return;
-  showModal('تأكيد الفوز',`هل تؤكد أن ${pName(winnerId)} هو الفائز؟`,()=>{
+  showModal('تأكيد الفوز',`هل تؤكد أن ${pName(winnerId)} هو الفائز؟`,async()=>{
     if(advanceWinner(S.tournament.bracket,matchId,winnerId)){
       const rounds=['r32','r16','r8','r4','r2'];
       const rIdx=rounds.find(r=>S.tournament.bracket[r].find(m=>m.id===matchId));
       if(rIdx){const allDone=S.tournament.bracket[rIdx].every(m=>m.winner!==null);if(allDone){const ni=rounds.indexOf(rIdx)+1;activeRound=ni<rounds.length?rounds[ni]:'done';}}
       if(S.tournament.bracket.done)S.tournament.champion=S.tournament.bracket.done;
-      save();renderTrn();
+      await forceSave();
+      renderTrn();
     }
   });
 }
