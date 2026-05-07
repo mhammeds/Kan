@@ -559,7 +559,7 @@ let CM=[];
 (()=>{let mi=0;for(let d=0;d<3;d++)for(let g=0;g<DIST[d];g++){const s=START+(g*SLOT);CM.push({day:d,num:mi+1,p1:mi*2,p2:mi*2+1,s,e:s+GAME,be:s+SLOT,st:fmt(s)});mi++;}})();
 
 // State
-function initS(){return{players:Array.from({length:64},(_,i)=>({id:i,slot:i+1,name:null,photo:null,registered:false})),tournament:{started:false,bracket:null,champion:null},votes:{},totalVotes:0,simMin:0};}
+function initS(){return{players:Array.from({length:64},(_,i)=>({id:i,slot:i+1,name:null,photo:null,registered:false})),tournament:{started:false,bracket:null,champion:null,votingOpen:false},votes:{},totalVotes:0,simMin:0};}
 let S=initS();
 let _fbReady=false,_saveT=null,simM=0,aDay=0,adminMode=false;
 let dragPid=null,selPid=null,drawAssign={},activeRound='r32';
@@ -842,26 +842,78 @@ function renderTrn(){
   const tabs=document.getElementById('trnRoundTabs');
   const cont=document.getElementById('trnContent');
   const adminBar=document.getElementById('trnAdminBar');
+  if(!stat||!tabs||!cont)return;
 
-  // Admin bar
-  if(adminMode){
-    adminBar.style.display='flex';
-    adminBar.innerHTML=`
-      <button class="btn" onclick="showDraw()">🎯 توزيع</button>
-      <button class="btn green" onclick="exportJSON()">💾 حفظ</button>
-      <label class="btn gold" style="cursor:pointer"><input type="file" accept=".json" style="display:none" onchange="importJSON(event)">📂 استيراد</label>`;
-  } else {
-    adminBar.style.display='none';
+  // Admin bar — show only to admin
+  if(adminBar){
+    if(adminMode){
+      adminBar.style.display='flex';
+      const vo=S.tournament&&S.tournament.votingOpen;
+      const ts=S.tournament&&S.tournament.started;
+      adminBar.innerHTML=`
+        <button class="btn" onclick="showDraw()">🎯 توزيع</button>
+        ${!ts&&!vo?`<button class="btn gold" onclick="openVoting()">🗳 فتح التصويت</button>`:''}
+        ${!ts&&vo?`<button class="btn red" onclick="closeVoting()">🔒 إغلاق التصويت</button>`:''}
+        ${!ts?`<button class="btn green" onclick="startTrn()">🚀 بدء البطولة</button>`:''}
+        <button class="btn" onclick="exportJSON()">💾 حفظ</button>
+        <label class="btn" style="cursor:pointer"><input type="file" accept=".json" style="display:none" onchange="importJSON(event)">📂 استيراد</label>`;
+    } else {
+      adminBar.style.display='none';
+    }
   }
 
-  if(!b){if(adminMode)renderDraw();else{cont.innerHTML='<div class="empty" style="padding:40px">⏳ البطولة لم تبدأ بعد</div>';tabs.innerHTML='';}return;}
+  // Not started yet
+  if(!b||!b.r32){
+    stat.textContent='لم تبدأ بعد';
+    tabs.innerHTML='';
+    if(adminMode){
+      cont.innerHTML='';
+      renderDraw();
+    } else {
+      const vo2=S.tournament&&S.tournament.votingOpen;
+      if(vo2&&b&&b.r32){
+        // Show vote-only view before tournament starts
+        let vhtml='<div style="margin-bottom:10px;padding:10px 14px;background:rgba(46,118,184,.1);border:1px solid var(--sep2);border-radius:var(--r2);color:var(--b4);font-size:13px;text-align:center">🗳 التصويت مفتوح — صوّت على شرط كل قيم قبل البدء</div>';
+        vhtml+='<div class="bracket-wrap"><div class="bracket-visual"><div class="bv-round" style="min-width:260px"><div class="bv-round-title">دور الـ٣٢ — التصويت</div><div class="bv-matches">';
+        b.r32.forEach(m=>{
+          if(m.p1===null&&m.p2===null)return;
+          const mv=S.votes&&S.votes[m.matchNum]?S.votes[m.matchNum]:{counts:{},voted:false,chosen:null};
+          const tot=CONDS.reduce((s,c)=>s+(mv.counts&&mv.counts[c.id]?mv.counts[c.id]:0),0);
+          const cond=CONDS.find(c=>c.id===m.condId);
+          vhtml+=`<div class="bv-match">
+            <div class="bv-player" onclick="openVM(${m.matchNum})" style="cursor:pointer">
+              ${avHTML(m.p1,24)}<span class="bv-name">${pName(m.p1)}</span>
+            </div>
+            <div class="bv-vs">✦ ضد ✦</div>
+            <div class="bv-player" onclick="openVM(${m.matchNum})" style="cursor:pointer">
+              ${avHTML(m.p2,24)}<span class="bv-name">${pName(m.p2)}</span>
+            </div>
+            <button class="bv-vote-btn${mv.voted?' voted':''}" onclick="openVM(${m.matchNum})">
+              ${cond?cond.icon+' '+cond.name:mv.voted?'✅ صوّتت · '+ar(tot)+' صوت':'🗳 صوّت على شرط القيم'}
+            </button>
+          </div>`;
+        });
+        vhtml+='</div></div></div></div>';
+        cont.innerHTML=vhtml;
+      } else {
+        cont.innerHTML=`<div style="text-align:center;padding:60px 20px;color:var(--g2)">
+          <div style="font-size:48px;margin-bottom:12px">⏳</div>
+          <div style="font-size:16px">البطولة لم تبدأ بعد</div>
+          <div style="font-size:12px;margin-top:6px">انتظر حتى يبدأ المنظم البطولة</div>
+        </div>`;
+      }
+    }
+    return;
+  }
 
   const rounds=['r32','r16','r8','r4','r2'];
-  stat.textContent=b.done?`🏆 البطل: ${pName(b.done)}`:RN[rounds.find(r=>b[r].some(m=>m.p1!==null&&!m.winner))||'r32'];
+  const curRound = b.done ? 'done' : (rounds.find(r=>b[r]&&b[r].some(m=>m.p1!==null&&!m.winner)) || 'r32');
+  stat.textContent = b.done ? `🏆 البطل: ${pName(b.done)}` : (RN[curRound]||'جارية');
 
   // Round tabs
   tabs.innerHTML='';
   rounds.forEach(r=>{
+    if(!b[r])return;
     const has=b[r].some(m=>m.p1!==null||m.p2!==null);
     if(!has&&r!=='r32')return;
     const done=b[r].every(m=>m.winner!==null);
@@ -893,48 +945,83 @@ function renderTrn(){
     return;
   }
 
-  // Matches
-  const matches=b[activeRound]||[];
+  // Make sure activeRound is valid
+  if(!b[activeRound]||!b[activeRound].length){activeRound='r32';}
+
+  // Build bracket visual — scrollable horizontal tree
+  const visRounds=rounds.filter(r=>b[r]&&b[r].some(m=>m.p1!==null||m.p2!==null));
   let html='<div class="bracket-wrap"><div class="bracket-visual">';
-  const visRounds=rounds.filter(r=>b[r].some(m=>m.p1!==null||m.p2!==null));
+
   visRounds.forEach(r=>{
-    html+=`<div class="bv-round"><div class="bv-round-title">${RN[r]}</div><div class="bv-matches">`;
+    const isCur = r===activeRound;
+    html+=`<div class="bv-round" style="opacity:${isCur?1:.65}">
+      <div class="bv-round-title">${RN[r]}</div>
+      <div class="bv-matches">`;
+
     b[r].forEach(m=>{
-      const mv=S.votes[m.matchNum]||{counts:{},voted:false};
-      const tot=CONDS.reduce((s,c)=>s+(mv.counts[c.id]||0),0);
+      const mv=S.votes&&S.votes[m.matchNum]?S.votes[m.matchNum]:{counts:{},voted:false,chosen:null};
+      const tot=CONDS.reduce((s,c)=>s+(mv.counts&&mv.counts[c.id]?mv.counts[c.id]:0),0);
+      const topCond=tot>0?CONDS.reduce((a,c)=>((mv.counts[c.id]||0)>(mv.counts[a.id]||0)?c:a)):null;
       const cond=CONDS.find(c=>c.id===m.condId);
-      const canWin=adminMode&&!m.winner&&m.p1!==null&&m.p2!==null&&r===activeRound;
+      const canWin=adminMode&&isCur&&!m.winner&&m.p1!==null&&m.p2!==null;
       const cl1=m.winner===m.p1?'won':m.winner?'lost':'';
       const cl2=m.winner===m.p2?'won':m.winner?'lost':'';
-      const oc1=canWin?`onclick="setWin('${m.id}',${m.p1})"`:m.p1!==null&&!m.winner?`onclick="openVM(${m.matchNum})"`:'' ;
-      const oc2=canWin?`onclick="setWin('${m.id}',${m.p2})"`:m.p2!==null&&!m.winner?`onclick="openVM(${m.matchNum})"`:'' ;
-      const ptr=canWin||(!m.winner&&m.p1!==null)?'cursor:pointer':'';
 
       if(m.p1===null&&m.p2===null){
-        html+=`<div class="bv-match"><div style="text-align:center;padding:10px;color:var(--g2);font-size:11px">ينتظر الفائزين</div></div>`;
+        html+=`<div class="bv-match"><div style="text-align:center;padding:10px;color:var(--g2);font-size:11px;opacity:.5">ينتظر الفائزين</div></div>`;
         return;
       }
+
+      // Player row onclick: admin→setWin, visitor→openVM
+      const oc1 = m.p1!==null&&!m.winner
+        ? (canWin ? `onclick="setWin('${m.id}',${m.p1})"` : `onclick="openVM(${m.matchNum})"`)
+        : '';
+      const oc2 = m.p2!==null&&!m.winner
+        ? (canWin ? `onclick="setWin('${m.id}',${m.p2})"` : `onclick="openVM(${m.matchNum})"`)
+        : '';
+      const ptr = !m.winner&&(m.p1!==null||m.p2!==null) ? 'cursor:pointer' : '';
+
       html+=`<div class="bv-match${m.winner?' done':''}">
-        <div class="bv-player ${cl1}${m.p1===null?' empty-p':canWin?' clickable':''}" ${oc1} style="${ptr}">
-          ${avHTML(m.p1,24)}<span class="bv-name">${pName(m.p1)}</span><span class="bv-win">🏆</span>
-          ${canWin?'<span style="font-size:9px;color:var(--b3);margin-right:auto">اضغط للفوز</span>':''}
+        <div class="bv-player ${cl1}${m.p1===null?' empty-p':''}" ${oc1} style="${ptr}">
+          ${avHTML(m.p1,24)}<span class="bv-name">${pName(m.p1)}</span>
+          <span class="bv-win">🏆</span>
+          ${canWin?'<span style="font-size:9px;color:var(--b3);margin-right:auto;opacity:.7">اضغط للفوز</span>':''}
         </div>
         <div class="bv-vs">✦ ضد ✦</div>
-        <div class="bv-player ${cl2}${m.p2===null?' empty-p':canWin?' clickable':''}" ${oc2} style="${ptr}">
-          ${avHTML(m.p2,24)}<span class="bv-name">${pName(m.p2)}</span><span class="bv-win">🏆</span>
-          ${canWin?'<span style="font-size:9px;color:var(--b3);margin-right:auto">اضغط للفوز</span>':''}
+        <div class="bv-player ${cl2}${m.p2===null?' empty-p':''}" ${oc2} style="${ptr}">
+          ${avHTML(m.p2,24)}<span class="bv-name">${pName(m.p2)}</span>
+          <span class="bv-win">🏆</span>
+          ${canWin?'<span style="font-size:9px;color:var(--b3);margin-right:auto;opacity:.7">اضغط للفوز</span>':''}
         </div>
         <button class="bv-vote-btn${mv.voted?' voted':''}" onclick="openVM(${m.matchNum})">
-          ${cond?cond.icon+' '+cond.name:mv.voted?'✅ صوّتت ('+ar(tot)+' صوت)':'🗳 صوّت على الشرط'}
+          ${cond
+            ? cond.icon+' '+cond.name+(tot>0?' ('+ar(tot)+' صوت)':'')
+            : mv.voted
+              ? '✅ '+(topCond?topCond.icon+' '+topCond.name:'صوّتت')+' · '+ar(tot)+' صوت'
+              : '🗳 صوّت على شرط القيم'}
         </button>
       </div>`;
     });
     html+='</div></div>';
   });
+
   html+='</div></div>';
   cont.innerHTML=html;
 }
 
+async function openVoting(){
+  if(!adminMode)return;
+  if(!S.tournament.bracket){alert('وزّع اللاعبين أولاً!');return;}
+  S.tournament.votingOpen=true;
+  await forceSave();
+  renderTrn();
+}
+async function closeVoting(){
+  if(!adminMode)return;
+  S.tournament.votingOpen=false;
+  await forceSave();
+  renderTrn();
+}
 function setWin(matchId,winnerId){
   if(!adminMode)return;
   showModal('تأكيد الفوز',`هل تؤكد أن ${pName(winnerId)} هو الفائز؟`,async()=>{
