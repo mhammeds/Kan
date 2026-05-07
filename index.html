@@ -328,7 +328,7 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
     <div class="ni" onclick="ST('players',this)" data-t="players"><span class="ic">👥</span><span>اللاعبون</span><span class="bdg" id="navBdg">٠</span></div>
     <div class="ni" onclick="ST('trn',this)" data-t="trn"><span class="ic">🏆</span><span>البطولة</span></div>
     <div class="ni" onclick="ST('timer',this)" data-t="timer"><span class="ic">⏱</span><span>الوقت</span></div>
-    <div class="ni" onclick="ST('trn',this)" data-t="trn"><span class="ic">🗳</span><span>التصويت</span></div>
+
     <div class="ni" onclick="ST('titles',this)" data-t="titles"><span class="ic">👑</span><span>حمله الألقاب</span></div>
     <div class="ni" onclick="ST('rules',this)" data-t="rules"><span class="ic">📜</span><span>الشروط</span></div>
     <div class="ni" onclick="ST('admin',this)" data-t="admin"><span class="ic">🔐</span><span>الإدارة</span></div>
@@ -413,11 +413,7 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
     </div>
   </div>
 
-  <!-- VOTE -->
-  <div id="vote" class="sec">
-    <div class="pt"><div><div class="pt-t">🗳 التصويت</div><div class="pt-s">الجمهور يقرر شرط كل قيم</div></div></div>
-    <div class="vgrid" id="vcards"></div>
-  </div>
+
 
   <!-- TITLES -->
   <div id="titles" class="sec">
@@ -446,7 +442,7 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
   <div class="mni" onclick="ST('players',this)" data-t="players"><span class="m-ic">👥</span><span class="m-lb">لاعبون</span></div>
   <div class="mni" onclick="ST('trn',this)" data-t="trn"><span class="m-ic">🏆</span><span class="m-lb">بطولة</span></div>
   <div class="mni" onclick="ST('timer',this)" data-t="timer"><span class="m-ic">⏱</span><span class="m-lb">وقت</span></div>
-  <div class="mni" onclick="ST('trn',this)" data-t="trn"><span class="m-ic">🗳</span><span class="m-lb">تصويت</span></div>
+
   <div class="mni" onclick="ST('admin',this)" data-t="admin"><span class="m-ic">🔐</span><span class="m-lb">إدارة</span></div>
 </nav>
 
@@ -1322,7 +1318,7 @@ function ST(tab,btn){
   if(btn){btn.classList.add('on');const t=btn.dataset.t||tab;document.querySelectorAll(`[data-t="${t}"]`).forEach(b=>b.classList.add('on'));}
   if(tab==='players')buildPGrid();
   if(tab==='trn'){if(S.tournament.started)renderTrn();else renderDraw();}
-  if(tab==='vote')buildVotes();
+
   if(tab==='admin')renderAdmin();
   window.scrollTo(0,0);
 }
