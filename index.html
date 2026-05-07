@@ -538,9 +538,8 @@ function dbSave(){
     showBar('💾 جاري الحفظ...');
     try{
       // strip large photos from main doc, save separately
-      const ps=S.players.map(p=>{
-        const c={...p};if(c.photo&&c.photo.length>200){c.photo='__photo__';};return c;
-      });
+      // Photos compressed to ~10KB — safe to store inline in Firebase
+      const ps=S.players.map(p=>({...p}));
       await fbMerge({
         players:ps,
         tournament:S.tournament||null,
@@ -548,12 +547,8 @@ function dbSave(){
         totalVotes:S.totalVotes||0,
         simMin:simM||0
       });
-      // save photos separately
-      for(const p of S.players){
-        if(p.registered&&p.photo&&p.photo.startsWith('data:')){
-          await fbWrite(`photos/${p.id}`,p.photo);
-        }
-      }
+      // photos are now compressed ~10KB — save inline
+      // no separate photo storage needed
     }catch(e){console.error('save error',e);}
     hideBar();
   },1000);
@@ -572,10 +567,7 @@ async function fbPoll(){
         if(!p)continue;
         if(p.registered&&!S.players[i].registered){
           Object.assign(S.players[i],p);
-          if(p.photo==='__photo__'){
-            const photo=await fbRead(`photos/${i}`);
-            if(photo)S.players[i].photo=photo;
-          }
+          // photo included inline (compressed)
           changed=true;
         }
       }
@@ -623,9 +615,31 @@ refreshSlots();
 
 function previewPhoto(e){
   const f=e.target.files[0];if(!f)return;
-  const r=new FileReader();
-  r.onload=ev=>{pPhoto=ev.target.result;const c=document.getElementById('uc');c.innerHTML=`<img src="${ev.target.result}" style="position:absolute;inset:0;width:100%;height:100%;border-radius:50%;object-fit:cover">`;};
-  r.readAsDataURL(f);e.target.value='';
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    // Compress image using canvas
+    const img=new Image();
+    img.onload=()=>{
+      // Compress to 80x80 circle — ~3KB max, fits Firebase easily
+      const SIZE=80;
+      const canvas=document.createElement('canvas');
+      canvas.width=SIZE;canvas.height=SIZE;
+      const ctx=canvas.getContext('2d');
+      // Draw circular crop
+      ctx.beginPath();ctx.arc(SIZE/2,SIZE/2,SIZE/2,0,Math.PI*2);ctx.clip();
+      const scale=Math.max(SIZE/img.width,SIZE/img.height);
+      const sw=img.width*scale,sh=img.height*scale;
+      const ox=(SIZE-sw)/2,oy=(SIZE-sh)/2;
+      ctx.drawImage(img,ox,oy,sw,sh);
+      const compressed=canvas.toDataURL('image/jpeg',0.55);
+      pPhoto=compressed;
+      const c=document.getElementById('uc');
+      c.innerHTML=`<img src="${compressed}" style="position:absolute;inset:0;width:100%;height:100%;border-radius:50%;object-fit:cover">`;
+      console.log('photo size:',Math.round(compressed.length/1024)+'KB');
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(f);e.target.value='';
 }
 
 function updCtr(){
