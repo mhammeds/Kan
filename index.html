@@ -554,6 +554,7 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
         <input type="file" accept="image/*" style="display:none" id="rpi" onchange="previewPhoto(event)">
         <div class="fl"><label>الاسم الكامل</label><input type="text" id="rn" placeholder="أدخل اسمك..."></div>
         <div class="fl"><label>رقم المقعد</label><select id="rs"><option value="">— اختر —</option></select></div>
+        <div class="fl"><label>قصتك (اختياري)</label><textarea id="rstory" placeholder="عرّف نفسك بسطرين... لقبك، أسلوبك، أو طموحك في البطولة" maxlength="500" rows="3" style="width:100%;background:rgba(255,255,255,.04);border:1px solid var(--sep);border-radius:var(--r);padding:8px 10px;color:var(--g1);font-family:'Amiri',serif;font-size:13px;outline:none;direction:rtl;resize:vertical;line-height:1.7"></textarea><div style="font-size:10px;color:var(--g2);margin-top:3px;text-align:left"><span id="rstory-cnt">٠</span> / ٥٠٠</div></div>
         <button class="btn" style="width:100%;margin-top:3px" onclick="regPlayer()">✅ تأكيد التسجيل</button>
         <div class="rsuc" id="rsuc"></div>
       </div>
@@ -721,7 +722,7 @@ let CM=[];
 (()=>{let mi=0;for(let d=0;d<3;d++)for(let g=0;g<DIST[d];g++){const s=START+(g*SLOT);CM.push({day:d,num:mi+1,p1:mi*2,p2:mi*2+1,s,e:s+GAME,be:s+SLOT,st:fmt(s)});mi++;}})();
 
 // State
-function initS(){return{players:Array.from({length:64},(_,i)=>({id:i,slot:i+1,name:null,photo:null,registered:false})),tournament:{started:false,bracket:null,champion:null,votingOpen:false},votes:{},totalVotes:0,simMin:0};}
+function initS(){return{players:Array.from({length:64},(_,i)=>({id:i,slot:i+1,name:null,photo:null,story:null,registered:false})),tournament:{started:false,bracket:null,champion:null,votingOpen:false},votes:{},totalVotes:0,simMin:0};}
 let S=initS();
 let _fbReady=false,_saveT=null,simM=0,aDay=0,adminMode=false;
 let dragPid=null,selPid=null,drawAssign={},activeRound='r32';
@@ -1166,11 +1167,14 @@ function updCtr(){
 
 function regPlayer(){
   const nEl=document.getElementById('rn'),sEl=document.getElementById('rs');
+  const storyEl=document.getElementById('rstory');
   const name=nEl.value.trim(),id=parseInt(sEl.value);
+  const story=storyEl?storyEl.value.trim():'';
   if(!name){nEl.focus();nEl.style.borderColor='rgba(46,118,184,.6)';setTimeout(()=>nEl.style.borderColor='',1500);return;}
   if(isNaN(id)){sEl.style.borderColor='rgba(46,118,184,.6)';setTimeout(()=>sEl.style.borderColor='',1500);return;}
-  S.players[id]={...S.players[id],name,photo:pPhoto,registered:true};
-  nEl.value='';sEl.value='';pPhoto=null;
+  S.players[id]={...S.players[id],name,photo:pPhoto,story:story||null,registered:true};
+  nEl.value='';sEl.value='';if(storyEl){storyEl.value='';const cnt=document.getElementById('rstory-cnt');if(cnt)cnt.textContent=ar(0);}
+  pPhoto=null;
   document.getElementById('uc').innerHTML='<span class="upl-ic">📷</span><p class="upl-tx">رفع صورتك</p>';
   const suc=document.getElementById('rsuc');
   suc.textContent=`✅ تم تسجيل ${name} في المقعد ${ar(S.players[id].slot)}!`;suc.style.display='block';
@@ -1962,6 +1966,12 @@ function ST(tab,btn){
 // ── INIT ──
 buildPGrid();refreshSlots();
 fbLoad();
+
+// عدّاد أحرف لحقل القصة في التسجيل
+(function(){
+  const t=document.getElementById('rstory'),c=document.getElementById('rstory-cnt');
+  if(t&&c){t.addEventListener('input',()=>{c.textContent=ar(t.value.length);});}
+})();
 </script>
 </body>
 </html>
