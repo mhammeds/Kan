@@ -182,6 +182,16 @@ body{background:#03060B;color:var(--g1);font-family:'Amiri',serif;direction:rtl;
 }
 .bv-vote-btn:hover{background:rgba(46,118,184,.22);color:var(--b4);border-color:var(--sep2)}
 .bv-vote-btn.voted{background:rgba(30,150,80,.1);border-color:rgba(30,150,80,.25);color:#70D090;cursor:default}
+/* Match time chip */
+.bv-time{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--b3);
+  background:rgba(46,118,184,.1);border:1px solid var(--sep);border-radius:100px;
+  padding:3px 10px;margin-bottom:6px;font-family:'Cinzel Decorative',serif;letter-spacing:1px}
+.bv-time.editable{cursor:pointer;border-color:var(--sep2);color:var(--b4)}
+.bv-time.editable:hover{background:rgba(46,118,184,.22);color:var(--g1);border-color:var(--b2)}
+.bv-time-ic{font-size:10px;opacity:.7}
+.bv-time-edit{font-size:9px;color:var(--g2);margin-right:3px}
+.bv-time-wrap{text-align:center;margin-bottom:5px}
+
 .bv-cond-label{font-size:10px;padding:3px 7px;border-radius:2px;text-align:center;margin-top:5px}
 .bv-cond-p{background:rgba(46,118,184,.08);color:var(--b2);border:1px solid var(--sep)}
 .bv-cond-s{background:rgba(30,80,130,.22);color:var(--b4);border:1px solid rgba(30,80,130,.35)}
@@ -1063,6 +1073,8 @@ function applyRemote(d){
   if(d.tournament){
     S.tournament=JSON.parse(JSON.stringify(d.tournament));
     if(typeof S.tournament.votingOpen==='undefined')S.tournament.votingOpen=false;
+    // إضافة أوقات تلقائية للمباريات لو ما كانت موجودة
+    ensureMatchTimes();
   }
   if(d.votes){
     S.votes=JSON.parse(JSON.stringify(d.votes));
@@ -1233,6 +1245,9 @@ function avHTML(id,size=24){
 }
 
 // ── TOURNAMENT ──
+const MATCH_GAP=10; // الفجوة بين القيم بالدقائق
+const FIRST_MATCH_TIME=8*60; // ٨:٠٠ صباحاً بالدقائق من منتصف الليل
+
 function buildBracket(pids){
   const rounds=['r32','r16','r8','r4','r2'],sizes=[16,8,4,2,1];
   const b={};
@@ -1241,10 +1256,88 @@ function buildBracket(pids){
       id:`${r}_${i}`,round:r,matchNum:i+1,
       p1:ri===0?(pids[i*2]??null):null,
       p2:ri===0?(pids[i*2+1]??null):null,
-      winner:null,condId:null
+      winner:null,condId:null,startTime:null
     }));
   });
+  // إعطاء أوقات افتراضية لكل المباريات: ٨:٠٠ ثم ١٠ دقائق بين كل واحدة
+  const all=[];
+  rounds.forEach(r=>b[r].forEach(m=>all.push(m)));
+  all.forEach((m,i)=>{m.startTime=FIRST_MATCH_TIME+i*MATCH_GAP;});
   b.done=null;return b;
+}
+
+// مساعد: يرجع كل المباريات بالترتيب الزمني
+function getAllMatchesInOrder(){
+  const b=S.tournament&&S.tournament.bracket;if(!b)return[];
+  const rounds=['r32','r16','r8','r4','r2'];
+  const all=[];
+  rounds.forEach(r=>{
+    const arr=b[r];if(!arr)return;
+    const items=Array.isArray(arr)?arr:Object.values(arr);
+    items.forEach(m=>{if(m)all.push(m);});
+  });
+  return all;
+}
+
+// يضمن إن كل المباريات لها أوقات (لأي بطولة قديمة بدون أوقات)
+function ensureMatchTimes(){
+  const all=getAllMatchesInOrder();
+  if(!all.length)return;
+  const missing=all.some(m=>typeof m.startTime!=='number');
+  if(!missing)return;
+  all.forEach((m,i)=>{
+    if(typeof m.startTime!=='number')m.startTime=FIRST_MATCH_TIME+i*MATCH_GAP;
+  });
+}
+
+// تعديل وقت قيم معين، وكل اللي بعده تتعدل تلقائياً بفجوة ١٠ دقائق
+async function setMatchTime(matchId,newMinutes){
+  if(!adminMode)return;
+  const all=getAllMatchesInOrder();
+  const idx=all.findIndex(m=>m.id===matchId);
+  if(idx<0)return;
+  all[idx].startTime=newMinutes;
+  // كل القيم اللي بعدها = السابقة + ١٠
+  for(let i=idx+1;i<all.length;i++){
+    all[i].startTime=all[i-1].startTime+MATCH_GAP;
+  }
+  await forceSave();
+  renderTrn();
+}
+
+// تنسيق الوقت (دقائق → "HH:MM" بالأرقام العربية)
+function fmtTime(mins){
+  if(typeof mins!=='number')return '—';
+  const h=Math.floor(mins/60)%24,m=Math.floor(mins)%60;
+  return ar(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
+}
+
+// فتح مودال تعديل الوقت (للإدارة)
+function editMatchTime(matchId){
+  if(!adminMode)return;
+  const all=getAllMatchesInOrder();
+  const m=all.find(x=>x.id===matchId);
+  if(!m)return;
+  const cur=typeof m.startTime==='number'?m.startTime:FIRST_MATCH_TIME;
+  const h=Math.floor(cur/60)%24,mn=Math.floor(cur)%60;
+  const pad=n=>String(n).padStart(2,'0');
+  const iso=`${pad(h)}:${pad(mn)}`;
+  document.getElementById('modal-title').textContent='📍 تعديل وقت القيم';
+  document.getElementById('modal-body').innerHTML=`
+    <p style="font-size:12px;color:var(--g2);margin-bottom:9px">القيم ${RN[m.round]} #${ar(m.matchNum)}</p>
+    <input type="time" id="mt-input" value="${iso}" style="width:100%;background:rgba(255,255,255,.04);border:1px solid var(--sep2);border-radius:var(--r);padding:10px;color:var(--g1);font-family:'Amiri',serif;font-size:18px;outline:none;color-scheme:dark;text-align:center;letter-spacing:3px">
+    <p style="font-size:11px;color:var(--b3);margin-top:8px">⚙️ القيم اللي بعده يتعدل تلقائياً بفجوة ١٠ دقائق</p>`;
+  modalCb=async()=>{
+    const v=document.getElementById('mt-input').value;
+    if(!v)return;
+    const[hh,mm]=v.split(':').map(n=>parseInt(n,10));
+    if(isNaN(hh)||isNaN(mm))return;
+    await setMatchTime(matchId,hh*60+mm);
+  };
+  document.getElementById('modal-cancel').style.display='flex';
+  document.getElementById('modal-ok').textContent='حفظ';
+  document.getElementById('modal-ok').style.display='block';
+  document.getElementById('modal').classList.add('open');
 }
 
 function advanceWinner(bracket,matchId,winnerId){
@@ -1372,7 +1465,11 @@ function renderTrn(){
           if(m.p1===null&&m.p2===null)return;
           const info=getVoteInfo(m.matchNum);
           const cond=CONDS.find(c=>c.id===m.condId);
+          const timeChip = typeof m.startTime==='number'
+            ? `<div class="bv-time-wrap"><span class="bv-time${adminMode?' editable':''}" ${adminMode?`onclick="editMatchTime('${m.id}')"`:''}><span class="bv-time-ic">⏰</span>${fmtTime(m.startTime)}${adminMode?'<span class="bv-time-edit">✎</span>':''}</span></div>`
+            : '';
           vhtml+=`<div class="bv-match">
+            ${timeChip}
             <div class="bv-player" onclick="openVM(${m.matchNum})" style="cursor:pointer">
               ${avHTML(m.p1,24)}<span class="bv-name">${pName(m.p1)}</span>
             </div>
@@ -1472,7 +1569,11 @@ function renderTrn(){
         : '';
       const ptr = !m.winner&&(m.p1!==null||m.p2!==null) ? 'cursor:pointer' : '';
 
+      const timeChip = typeof m.startTime==='number'
+        ? `<div class="bv-time-wrap"><span class="bv-time${adminMode?' editable':''}" ${adminMode?`onclick="editMatchTime('${m.id}')"`:''}><span class="bv-time-ic">⏰</span>${fmtTime(m.startTime)}${adminMode?'<span class="bv-time-edit">✎</span>':''}</span></div>`
+        : '';
       html+=`<div class="bv-match${m.winner?' done':''}">
+        ${timeChip}
         <div class="bv-player ${cl1}${m.p1===null?' empty-p':''}" ${oc1} style="${ptr}">
           ${avHTML(m.p1,24)}<span class="bv-name">${pName(m.p1)}</span>
           <span class="bv-win">🏆</span>
