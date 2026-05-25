@@ -601,7 +601,7 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
       <div class="ck-body">
         <div class="bigtime" id="bt">٠٨:٠٠</div>
         <div class="timelbl" id="tl">وقت البطولة</div>
-        <div class="simbtns">
+        <div class="simbtns admin-only" style="display:none">
           <button class="simbtn" onclick="tick(-60)">◀ دقيقة</button>
           <button class="simbtn" onclick="tick(300)">+٥ د</button>
           <button class="simbtn" onclick="tick(600)">+قيم</button>
@@ -686,7 +686,8 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
 const ar=n=>String(n).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
 const fmt=m=>`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;
 
-const CONDS=[
+// الشروط الافتراضية — تُحفظ في Firebase وتقدر الإدارة تضيف/تحذف منها
+const DEFAULT_CONDS=[
   {id:1,name:'الحمراء وغطاها تربيع جدارين',icon:'🔴'},
   {id:2,name:'حمراء جدار والأخير جدارين',icon:'🟥'},
   {id:3,name:'لعب مسار كامل القيم',icon:'🌀'},
@@ -696,6 +697,7 @@ const CONDS=[
   {id:7,name:'التربيع بعيد عن الحمراء',icon:'⬜'},
   {id:8,name:'ثابت ومتحرك',icon:'↔'},
 ];
+let CONDS=DEFAULT_CONDS.map(c=>({...c}));
 const TITLES=['أسد الرقعة','سيد الأركان','حارق الحمراء','عرّاب التربيع','فيلسوف الكيرم','ظل الجدار','صيّاد الأحجار','خفي الحركة','ملك المسار','صاحب اللحظة'];
 const DAYS=['اليوم الأول','اليوم الثاني','اليوم الثالث'];
 const RN={r32:'دور الـ٣٢',r16:'دور الـ١٦',r8:'دور الـ٨',r4:'نصف النهائي',r2:'النهائي'};
@@ -1045,7 +1047,7 @@ async function fbLoad(){
     _fbReady=true;
   }catch(e){console.error(e);}
   hideBar();
-  updCtr();renderList();buildPGrid();refreshSlots();
+  updCtr();renderList();buildPGrid();refreshSlots();renderRules();
   const tv=document.getElementById('totalVotes');
   if(tv&&S.totalVotes)tv.textContent=ar(S.totalVotes);
 }
@@ -1072,6 +1074,14 @@ function applyRemote(d){
     });
   }
   if(typeof d.totalVotes==='number')S.totalVotes=d.totalVotes;
+  if(typeof d.simMin==='number')simM=d.simMin;
+  // تحميل الشروط من Firebase (لو الإدارة عدّلت عليها)
+  if(d.conditions){
+    const arr=Array.isArray(d.conditions)?d.conditions:Object.values(d.conditions);
+    const cleaned=arr.filter(c=>c&&c.id&&c.name).map(c=>({id:c.id,name:c.name,icon:c.icon||'⚪'}));
+    if(cleaned.length)CONDS=cleaned;
+  }
+  // تحميل الجدول الزمني
   if(typeof d.simMin==='number')simM=d.simMin;
 }
 
@@ -1663,6 +1673,38 @@ function renderAdmin(){
         <button class="btn red" onclick="confirmNuke()">☢ مسح</button></div>
     </div>
     <div class="admin-section" style="grid-column:1/-1">
+      <h4>📜 إدارة الشروط</h4>
+      <div style="display:flex;gap:7px;margin-bottom:10px;flex-wrap:wrap">
+        <input id="newCondIcon" maxlength="2" placeholder="🔴" style="width:54px;text-align:center;font-size:18px;background:rgba(255,255,255,.04);border:1px solid var(--sep);border-radius:var(--r);padding:8px;color:var(--g1);outline:none">
+        <input id="newCondName" placeholder="اسم الشرط الجديد..." style="flex:1;min-width:140px;background:rgba(255,255,255,.04);border:1px solid var(--sep);border-radius:var(--r);padding:8px 10px;color:var(--g1);font-family:'Amiri',serif;font-size:13px;outline:none;direction:rtl">
+        <button class="btn green" onclick="addCondition()">➕ إضافة</button>
+        <button class="btn" onclick="resetConditions()" title="استعادة الشروط الأصلية">🔄</button>
+      </div>
+      <div id="condsAdminList" style="max-height:220px;overflow-y:auto;border-top:1px solid var(--sep);padding-top:8px"></div>
+    </div>
+    <div class="admin-section" style="grid-column:1/-1">
+      <h4>⏱ إدارة الوقت الكاملة</h4>
+      <div style="font-size:12px;color:var(--g2);margin-bottom:9px">الوقت الحالي: <span style="color:var(--b4);font-family:'Cinzel Decorative',serif;font-size:14px" id="adminClockNow">٠٨:٠٠</span> · يوم <span id="adminClockDay">١</span></div>
+      <div style="display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap">
+        <button class="simbtn" onclick="tick(-3600)">◀ ساعة</button>
+        <button class="simbtn" onclick="tick(-600)">◀ ١٠د</button>
+        <button class="simbtn" onclick="tick(-60)">◀ دقيقة</button>
+        <button class="simbtn" onclick="tick(60)">دقيقة ▶</button>
+        <button class="simbtn" onclick="tick(600)">١٠د ▶</button>
+        <button class="simbtn" onclick="tick(3600)">ساعة ▶</button>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+        <input type="number" id="adminTickMins" placeholder="عدد الدقائق" style="flex:1;min-width:90px;background:rgba(255,255,255,.04);border:1px solid var(--sep);border-radius:var(--r);padding:7px 9px;color:var(--g1);font-family:'Amiri',serif;font-size:13px;outline:none;direction:ltr;text-align:center">
+        <button class="btn green" onclick="adminTickCustom(1)">➕ إضافة</button>
+        <button class="btn red" onclick="adminTickCustom(-1)">➖ حذف</button>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+        <input type="time" id="adminSetTime" style="background:rgba(255,255,255,.04);border:1px solid var(--sep);border-radius:var(--r);padding:7px 9px;color:var(--g1);font-family:'Amiri',serif;font-size:13px;outline:none;color-scheme:dark">
+        <button class="btn gold" onclick="adminSetClock()">📍 ضبط الوقت</button>
+        <button class="btn red" onclick="adminResetClock()">🔄 إعادة (٠٨:٠٠)</button>
+      </div>
+    </div>
+    <div class="admin-section" style="grid-column:1/-1">
       <h4>👥 اللاعبون المسجّلون</h4>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:5px;max-height:260px;overflow-y:auto">
         ${reg.map((p,i)=>{const[bg,fg]=pal(p.id);return`<div class="li">
@@ -1675,6 +1717,68 @@ function renderAdmin(){
       </div>
     </div>
   </div>`;
+  // بعد الرسم، نملي قائمة الشروط ووقت الإدارة
+  renderCondsAdmin();
+  updateAdminClockDisplay();
+}
+
+// ── إدارة الشروط ──
+async function saveCondsToFB(){
+  try{await fbWrite('conditions',CONDS);}catch(e){}
+}
+async function addCondition(){
+  if(!adminMode)return;
+  const nameEl=document.getElementById('newCondName');
+  const iconEl=document.getElementById('newCondIcon');
+  const name=(nameEl.value||'').trim();
+  const icon=(iconEl.value||'⚪').trim()||'⚪';
+  if(!name){nameEl.focus();nameEl.style.borderColor='rgba(220,80,80,.6)';setTimeout(()=>nameEl.style.borderColor='',1500);return;}
+  // id جديد فريد
+  const maxId=CONDS.reduce((m,c)=>Math.max(m,c.id||0),0);
+  CONDS.push({id:maxId+1,name,icon});
+  nameEl.value='';iconEl.value='';
+  await saveCondsToFB();
+  // إعادة بناء صفحة الشروط
+  renderRules();
+  renderCondsAdmin();
+}
+async function deleteCondition(id){
+  if(!adminMode)return;
+  showModal('حذف الشرط','متأكد تبي تحذف هذا الشرط؟ سيُحذف من جميع المباريات.',async()=>{
+    CONDS=CONDS.filter(c=>c.id!==id);
+    // إزالة الشرط من أي مباراة معتمدة عليه
+    if(S.tournament&&S.tournament.bracket){
+      ['r32','r16','r8','r4','r2'].forEach(r=>{
+        const arr=S.tournament.bracket[r];if(!arr)return;
+        const items=Array.isArray(arr)?arr:Object.values(arr);
+        items.forEach(m=>{if(m&&m.condId===id)m.condId=null;});
+      });
+    }
+    await saveCondsToFB();
+    save();
+    renderRules();
+    renderCondsAdmin();
+    renderTrn();
+  });
+}
+async function resetConditions(){
+  if(!adminMode)return;
+  showModal('استعادة الشروط الافتراضية','هل تريد استعادة الشروط الثمانية الأصلية؟',async()=>{
+    CONDS=DEFAULT_CONDS.map(c=>({...c}));
+    await saveCondsToFB();
+    renderRules();
+    renderCondsAdmin();
+  });
+}
+function renderCondsAdmin(){
+  const el=document.getElementById('condsAdminList');if(!el)return;
+  el.innerHTML=CONDS.map(c=>`<div class="aa" style="padding:7px 9px">
+    <div style="display:flex;align-items:center;gap:9px;flex:1;min-width:0">
+      <span style="font-size:18px">${c.icon}</span>
+      <span style="font-size:13px;color:var(--g1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.name}</span>
+    </div>
+    <button class="btn red" style="padding:3px 8px;font-size:11px;flex-shrink:0" onclick="deleteCondition(${c.id})">🗑</button>
+  </div>`).join('')||'<div class="empty" style="padding:14px">لا توجد شروط — أضف الأول</div>';
 }
 
 async function setStartDate(){
@@ -1720,10 +1824,55 @@ async function setStartDate(){
 
 function checkPin(){
   const v=document.getElementById('pinInput').value;
-  if(v===ADMIN_PIN){adminMode=true;renderAdmin();if(S.tournament.started)renderTrn();}
+  if(v===ADMIN_PIN){
+    adminMode=true;
+    document.body.classList.add('admin-mode');
+    renderAdmin();
+    if(S.tournament.started)renderTrn();
+  }
   else{const e=document.getElementById('pinErr');if(e){e.style.display='block';setTimeout(()=>e.style.display='none',2000);}}
 }
-function logoutAdmin(){adminMode=false;renderAdmin();renderTrn();}
+function logoutAdmin(){
+  adminMode=false;
+  document.body.classList.remove('admin-mode');
+  renderAdmin();renderTrn();
+}
+
+// ── إدارة الوقت ──
+function updateAdminClockDisplay(){
+  const el=document.getElementById('adminClockNow');
+  const eld=document.getElementById('adminClockDay');
+  if(!el)return;
+  const now=START+simM,h=Math.floor(now/60)%24,m=Math.floor(now)%60;
+  el.textContent=ar(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
+  if(eld)eld.textContent=ar(aDay+1);
+}
+function adminTickCustom(dir){
+  if(!adminMode)return;
+  const el=document.getElementById('adminTickMins');
+  const mins=parseFloat(el.value);
+  if(isNaN(mins)||mins<=0){el.focus();el.style.borderColor='rgba(220,80,80,.6)';setTimeout(()=>el.style.borderColor='',1500);return;}
+  // tick يأخذ ثواني — نحوّل الدقائق
+  tick(dir*mins*60);
+  el.value='';
+  updateAdminClockDisplay();
+}
+function adminSetClock(){
+  if(!adminMode)return;
+  const el=document.getElementById('adminSetTime');
+  const v=el.value;if(!v)return;
+  const[h,m]=v.split(':').map(n=>parseInt(n,10));
+  if(isNaN(h)||isNaN(m))return;
+  const target=h*60+m;
+  simM=Math.max(0,target-START);
+  save();clock();updateAdminClockDisplay();
+}
+function adminResetClock(){
+  if(!adminMode)return;
+  showModal('إعادة الوقت','هل تريد إعادة الوقت إلى ٠٨:٠٠؟',()=>{
+    simM=0;save();clock();updateAdminClockDisplay();
+  });
+}
 function removePlayer(id){showModal('حذف لاعب',`حذف ${S.players[id].name}؟`,()=>{S.players[id]={id,slot:id+1,name:null,photo:null,registered:false};save();updCtr();renderList();buildPGrid();renderAdmin();refreshSlots();});}
 function confirmClearPlayers(){showModal('مسح اللاعبين','مسح جميع اللاعبين؟',()=>{S.players.forEach(p=>{p.name=null;p.photo=null;p.registered=false;});save();updCtr();renderList();buildPGrid();renderAdmin();refreshSlots();});}
 function confirmClearVotes(){showModal('مسح التصويت','مسح جميع التصويتات؟',async()=>{S.votes={};S.totalVotes=0;await fbWrite('votes',null);await fbWrite('totalVotes',0);save();renderAdmin();const tv=document.getElementById('totalVotes');if(tv)tv.textContent=ar(0);});}
@@ -1739,6 +1888,8 @@ function getSlot(d){const now=START+simM,dm=CM.filter(m=>m.day===d);for(let i=0;
 function clock(){
   const now=START+simM,h=Math.floor(now/60)%24,m=Math.floor(now)%60;
   const bt=document.getElementById('bt');if(bt)bt.textContent=ar(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
+  // تحديث ساعة الإدارة إن كانت ظاهرة
+  updateAdminClockDisplay();
   const sl=getSlot(aDay),bdg=document.getElementById('sbdg'),pf=document.getElementById('pf');if(!bdg)return;
   const gN=idx=>{if(idx===null||idx===undefined||idx<0||idx>=S.players.length)return '—';const p=S.players[idx];return p&&p.registered?p.name:`لاعب ${ar(idx+1)}`;};
   if(sl.type==='game'){const mt=sl.m;document.getElementById('mbLbl').textContent=`قيم ${ar(mt.num)} — ${DAYS[mt.day]}`;document.getElementById('mbGame').textContent=`${gN(mt.p1)} ضد ${gN(mt.p2)}`;const cid=S.tournament.bracket?.r32?.[mt.num-1]?.condId;const cond=CONDS.find(c=>c.id===cid);document.getElementById('mbCond').textContent=cond?cond.icon+' '+cond.name:'🗳 بانتظار التصويت';bdg.textContent='🔴 جاري';bdg.className='sbdg sb-live';document.getElementById('mbSt').textContent=`${ar(GAME-sl.el)} دقيقة متبقية`;pf.style.width=Math.round(sl.el/sl.tot*100)+'%';pf.className='pf pf-l';document.getElementById('tl').textContent='وقت القيم';}
@@ -1757,8 +1908,12 @@ startClockTick();clock();
 // ── TITLES & RULES ──
 const tb=document.getElementById('tbody');
 for(let i=0;i<10;i++){const rc=i===0?'r1':i===1?'r2':i===2?'r3':'ro';const row=document.createElement('tr');row.innerHTML=`<td><span class="rb ${rc}">${i+1}</span></td><td class="mys">مجهول ···</td><td style="color:var(--g1)">${TITLES[i]}</td>`;tb.appendChild(row);}
-const rl=document.getElementById('rlist');
-CONDS.forEach(c=>{const li=document.createElement('li');li.className='ri';li.innerHTML=`<span class="ri-ic">${c.icon}</span><span class="ri-tx">${c.name}</span>`;rl.appendChild(li);});
+function renderRules(){
+  const rl=document.getElementById('rlist');if(!rl)return;
+  rl.innerHTML='';
+  CONDS.forEach(c=>{const li=document.createElement('li');li.className='ri';li.innerHTML=`<span class="ri-ic">${c.icon}</span><span class="ri-tx">${c.name}</span>`;rl.appendChild(li);});
+}
+renderRules();
 
 // ── MODAL ──
 function showModal(title,body,cb){
