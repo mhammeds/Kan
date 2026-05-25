@@ -446,6 +446,21 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
   border-radius:100px;color:var(--g1)}
 .pp-cond-tag.won{background:rgba(30,110,60,.18);border-color:rgba(30,150,80,.32);color:#90E0A0}
 
+/* DAYS OVERVIEW in tournament */
+.days-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:14px}
+.day-card{background:var(--card);border:1px solid var(--sep);border-top:2px solid var(--b2);
+  border-radius:var(--r2);padding:11px;backdrop-filter:blur(6px);position:relative;overflow:hidden}
+.day-card.done{border-top-color:#80D090}
+.day-card.live{border-top-color:#D4A840;background:linear-gradient(180deg,rgba(180,130,30,.08),var(--card))}
+.day-lbl{font-size:10px;color:var(--g2);letter-spacing:2px;margin-bottom:5px}
+.day-title{font-size:13px;color:var(--b4);font-weight:700;margin-bottom:6px;font-family:'Amiri',serif}
+.day-stat{font-size:10px;color:var(--g1);line-height:1.5}
+.day-prog{height:3px;background:rgba(255,255,255,.06);border-radius:2px;margin-top:6px;overflow:hidden}
+.day-pf{height:100%;background:var(--b2);transition:width .5s}
+.day-card.done .day-pf{background:#80D090}
+.day-card.live .day-pf{background:#D4A840}
+@media(max-width:520px){.days-grid{grid-template-columns:1fr}}
+
 /* INSIGHTS DASHBOARD */
 .insights{margin-bottom:18px}
 .insights-title{font-size:12px;color:var(--b3);letter-spacing:3px;margin-bottom:9px;
@@ -648,7 +663,6 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
     <div class="ni" onclick="ST('clips',this)" data-t="clips"><span class="ic">🎥</span><span>لقطات التحكيم</span></div>
     <div class="ni" onclick="ST('vote',this)" data-t="vote"><span class="ic">🗳</span><span>التصويت</span></div>
     <div class="ni" onclick="ST('rules',this)" data-t="rules"><span class="ic">📜</span><span>الشروط</span></div>
-    <div class="ni" onclick="ST('titles',this)" data-t="titles"><span class="ic">👑</span><span>الألقاب</span></div>
     <div class="ni" onclick="ST('admin',this)" data-t="admin"><span class="ic">🔐</span><span>الإدارة</span></div>
   </nav>
   <div class="sb-foot"><div class="ctr"><span class="dot"></span><span id="regCount">٠</span> / ٦٤</div></div>
@@ -657,8 +671,8 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
 <main class="main">
   <div class="stats">
     <div class="sc"><div class="v" id="scReg">٠</div><div class="l">مسجّل</div></div>
-    <div class="sc"><div class="v">٦٤</div><div class="l">مقعد</div></div>
-    <div class="sc"><div class="v">٣٢</div><div class="l">قيم</div></div>
+    <div class="sc"><div class="v">٦٤</div><div class="l">لاعب</div></div>
+    <div class="sc"><div class="v">٦٣</div><div class="l">قيم</div></div>
     <div class="sc"><div class="v">٣</div><div class="l">أيام</div></div>
     <div class="sc lv"><div class="v"><span class="dot"></span><span id="totalVotes">٠</span></div><div class="l">تصويت</div></div>
   </div>
@@ -700,9 +714,9 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
   <div id="trn" class="sec">
     <div class="pt">
       <div><div class="pt-t">🏆 البطولة</div><div class="pt-s" id="trnStat">لم تبدأ بعد</div></div>
-      <!-- Admin controls: hidden until login -->
       <div id="trnAdminBar" style="display:none;gap:7px;flex-wrap:wrap"></div>
     </div>
+    <div id="trnDaysOverview"></div>
     <div id="trnRoundTabs" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px"></div>
     <div id="trnContent"></div>
   </div>
@@ -725,13 +739,6 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
       <div><div class="pt-t">🗳 التصويت</div><div class="pt-s" id="voteStat">اختر شرط كل قيم</div></div>
     </div>
     <div id="voteContent"></div>
-  </div>
-
-  <!-- TITLES -->
-  <div id="titles" class="sec">
-    <div class="pt"><div><div class="pt-t">👑 حمله الألقاب</div></div></div>
-    <div class="tnote"><div style="font-size:13px;margin-bottom:2px">🔒 عشرة لاعبين سريّين</div><div style="color:var(--g2);font-size:11px">هوياتهم مجهولة حتى يُكشف عنها</div></div>
-    <table class="lt"><thead><tr><th style="width:40px">#</th><th>اللاعب</th><th>اللقب</th></tr></thead><tbody id="tbody"></tbody></table>
   </div>
 
   <!-- ADMIN -->
@@ -811,9 +818,16 @@ const DEFAULT_CONDS=[
   {id:8,name:'ثابت ومتحرك',icon:'↔'},
 ];
 let CONDS=DEFAULT_CONDS.map(c=>({...c}));
-const TITLES=['أسد الرقعة','سيد الأركان','حارق الحمراء','عرّاب التربيع','فيلسوف الكيرم','ظل الجدار','صيّاد الأحجار','خفي الحركة','ملك المسار','صاحب اللحظة'];
 const DAYS=['اليوم الأول','اليوم الثاني','اليوم الثالث'];
-const RN={r32:'دور الـ٣٢',r16:'دور الـ١٦',r8:'دور الـ٨',r4:'نصف النهائي',r2:'النهائي'};
+const RN={
+  r64:'اليوم الأول · دور الـ٦٤',
+  r32:'اليوم الثاني · دور الـ٣٢',
+  r16:'اليوم الثاني · دور الـ١٦',
+  r8:'اليوم الثاني · دور الـ٨',
+  r4:'اليوم الثالث · نصف النهائي',
+  r2:'اليوم الثالث · النهائي'
+};
+const SURPRISE_ROUNDS=['r4','r2']; // أدوار شرطها مفاجأة (بدون تصويت)
 const PAL=[['#081420','#4880A8'],['#081018','#386078'],['#0C1828','#5090B0'],['#081420','#286090'],['#081828','#5888A8'],['#081018','#387090'],['#0C1828','#487898'],['#081828','#507090'],['#081420','#3888A8'],['#081018','#508898'],['#0C1828','#286878'],['#081828','#4080A8'],['#081420','#3870A0'],['#081828','#5090A8'],['#0C1018','#387890'],['#0A1828','#4878A0']];
 const GAME=10,BRK=5,SLOT=15,START=480,DIST=[11,11,10];
 const ADMIN_PIN='1234';
@@ -840,7 +854,7 @@ let CM=[];
 function initS(){return{players:Array.from({length:64},(_,i)=>({id:i,slot:i+1,name:null,photo:null,story:null,registered:false})),tournament:{started:false,bracket:null,champion:null,votingOpen:false},votes:{},totalVotes:0,simMin:0,clips:{},events:[],cheers:{}};}
 let S=initS();
 let _fbReady=false,_saveT=null,simM=0,aDay=0,adminMode=false;
-let dragPid=null,selPid=null,drawAssign={},activeRound='r32';
+let dragPid=null,selPid=null,drawAssign={},activeRound='r64';
 let vmMN=null,vmPending=null;
 let modalCb=null;
 let pPhoto=null;
@@ -871,7 +885,7 @@ function computeInsights(){
   };
   const b=S.tournament&&S.tournament.bracket;
   if(b){
-    const rounds=['r32','r16','r8','r4','r2'];
+    const rounds=['r64','r32','r16','r8','r4','r2'];
     const winsByPlayer={};
     rounds.forEach(r=>{
       const arr=b[r];if(!arr)return;
@@ -1245,7 +1259,7 @@ function renderClips(){
     </div>`;
     return;
   }
-  const rounds=['r32','r16','r8','r4','r2'];
+  const rounds=['r64','r32','r16','r8','r4','r2'];
   let html='';
   rounds.forEach(r=>{
     const arr=b[r];if(!arr)return;
@@ -1305,7 +1319,7 @@ function getPlayerStats(pid){
   const stats={matches:0,wins:0,losses:0,pending:0,journey:[],condsWon:[],condsLost:[]};
   const b=S.tournament&&S.tournament.bracket;
   if(!b)return stats;
-  const rounds=['r32','r16','r8','r4','r2'];
+  const rounds=['r64','r32','r16','r8','r4','r2'];
   rounds.forEach(r=>{
     const arr=b[r];if(!arr)return;
     const items=Array.isArray(arr)?arr:Object.values(arr);
@@ -1552,9 +1566,28 @@ setInterval(()=>{
 },1000);
 
 // ── VOTE HELPERS ──
+// مساعد: يحدد لو القيم في دور المفاجأة (نصف النهائي/النهائي)
+function isSurpriseMatch(matchNum){
+  const b=S.tournament&&S.tournament.bracket;if(!b)return false;
+  for(const r of SURPRISE_ROUNDS){
+    const arr=b[r];if(!arr)continue;
+    const items=Array.isArray(arr)?arr:Object.values(arr);
+    if(items.some(m=>m&&m.matchNum===matchNum))return true;
+  }
+  return false;
+}
+
 // يبني HTML لنتائج التصويت — يظهر لكل الزوار (يصوتوا أو ما يصوتوا)
 function voteResultsHTML(matchNum, opts){
   opts = opts || {};
+  // نصف النهائي والنهائي — شرط مفاجأة (بدون تصويت)
+  if(isSurpriseMatch(matchNum)){
+    return `<div class="bv-results" style="text-align:center;background:linear-gradient(180deg,rgba(180,130,30,.08),rgba(4,8,14,.45));border-color:rgba(220,170,40,.3)">
+      <div style="font-size:18px;margin-bottom:4px">🎁</div>
+      <div style="font-size:11px;color:#D4A840;letter-spacing:2px;font-weight:700">شرط مفاجأة</div>
+      <div style="font-size:9px;color:var(--g2);margin-top:3px">يُكشف عند بداية المباراة</div>
+    </div>`;
+  }
   const info = getVoteInfo(matchNum);
   // لو ما فيه أصوات
   if(info.tot === 0){
@@ -1847,7 +1880,7 @@ const MATCH_GAP=10; // الفجوة بين القيم بالدقائق
 const FIRST_MATCH_TIME=8*60; // ٨:٠٠ صباحاً بالدقائق من منتصف الليل
 
 function buildBracket(pids){
-  const rounds=['r32','r16','r8','r4','r2'],sizes=[16,8,4,2,1];
+  const rounds=['r64','r32','r16','r8','r4','r2'],sizes=[32,16,8,4,2,1];
   const b={};
   rounds.forEach((r,ri)=>{
     b[r]=Array.from({length:sizes[ri]},(_,i)=>({
@@ -1867,7 +1900,7 @@ function buildBracket(pids){
 // مساعد: يرجع كل المباريات بالترتيب الزمني
 function getAllMatchesInOrder(){
   const b=S.tournament&&S.tournament.bracket;if(!b)return[];
-  const rounds=['r32','r16','r8','r4','r2'];
+  const rounds=['r64','r32','r16','r8','r4','r2'];
   const all=[];
   rounds.forEach(r=>{
     const arr=b[r];if(!arr)return;
@@ -1886,6 +1919,32 @@ function ensureMatchTimes(){
   all.forEach((m,i)=>{
     if(typeof m.startTime!=='number')m.startTime=FIRST_MATCH_TIME+i*MATCH_GAP;
   });
+}
+
+// الإدارة تختار شرط المفاجأة لمباراة نصف نهائي/نهائي
+function adminSetSurpriseCond(matchId){
+  if(!adminMode)return;
+  const all=getAllMatchesInOrder();
+  const m=all.find(x=>x.id===matchId);
+  if(!m)return;
+  document.getElementById('modal-title').textContent='🎁 اختر شرط المفاجأة';
+  const opts=CONDS.map(c=>`<option value="${c.id}" ${m.condId===c.id?'selected':''}>${c.icon} ${c.name}</option>`).join('');
+  document.getElementById('modal-body').innerHTML=`
+    <p style="font-size:12px;color:var(--g2);margin-bottom:9px">${RN[m.round]} — قيم ${ar(m.matchNum)}</p>
+    <select id="sc-input" style="width:100%;background:rgba(255,255,255,.04);border:1px solid var(--sep2);border-radius:var(--r);padding:10px;color:var(--g1);font-family:'Amiri',serif;font-size:14px;outline:none">
+      <option value="">— بدون —</option>
+      ${opts}
+    </select>
+    <p style="font-size:11px;color:#D4A840;margin-top:8px">⚠️ هذا الشرط لن يظهر للزوار إلا عند بداية المباراة</p>`;
+  modalCb=async()=>{
+    const v=document.getElementById('sc-input').value;
+    m.condId=v?parseInt(v):null;
+    await forceSave();renderTrn();
+  };
+  document.getElementById('modal-cancel').style.display='flex';
+  document.getElementById('modal-ok').textContent='حفظ';
+  document.getElementById('modal-ok').style.display='block';
+  document.getElementById('modal').classList.add('open');
 }
 
 // تعديل وقت قيم معين، وكل اللي بعده تتعدل تلقائياً بفجوة ١٠ دقائق
@@ -1939,12 +1998,12 @@ function editMatchTime(matchId){
 }
 
 function advanceWinner(bracket,matchId,winnerId){
-  const rounds=['r32','r16','r8','r4','r2'];
+  const rounds=['r64','r32','r16','r8','r4','r2'];
   let match=null,ri=-1;
   for(let i=0;i<rounds.length;i++){const m=bracket[rounds[i]].find(x=>x.id===matchId);if(m){match=m;ri=i;break;}}
   if(!match||match.winner)return false;
   match.winner=winnerId;
-  if(ri<4){const nm=bracket[rounds[ri+1]][Math.floor((match.matchNum-1)/2)];if(nm){if(match.matchNum%2===1)nm.p1=winnerId;else nm.p2=winnerId;}}
+  if(ri<rounds.length-1){const nm=bracket[rounds[ri+1]][Math.floor((match.matchNum-1)/2)];if(nm){if(match.matchNum%2===1)nm.p1=winnerId;else nm.p2=winnerId;}}
   else{bracket.done=winnerId;}
   return true;
 }
@@ -1964,7 +2023,7 @@ function renderDraw(){
   document.getElementById('trnRoundTabs').innerHTML='';
   document.getElementById('trnAdminBar').style.display='none';
   let sH='';
-  for(let i=0;i<32;i++){
+  for(let i=0;i<64;i++){
     const pid=drawAssign[i]??null,p=pid!==null?S.players[pid]:null;
     const[bg,fg]=p?pal(p.id):['#0A1420','#3A6888'];
     sH+=`<div class="ds${p?' filled':''}" id="ds_${i}" ondragover="dragOver(event)" ondrop="dropSlot(event,${i})" onclick="slotClick(${i})">
@@ -2010,23 +2069,55 @@ document.addEventListener('dragend',()=>{dragPid=null;document.querySelectorAll(
 function autoFill(){
   const used=new Set(Object.values(drawAssign));
   const avail=S.players.filter(p=>p.registered&&!used.has(p.id)).sort(()=>Math.random()-.5);
-  let ai=0;for(let i=0;i<32&&ai<avail.length;i++){if(drawAssign[i]===undefined){drawAssign[i]=avail[ai++].id;}}
+  let ai=0;for(let i=0;i<64&&ai<avail.length;i++){if(drawAssign[i]===undefined){drawAssign[i]=avail[ai++].id;}}
   renderDraw();
 }
 async function startTrn(){
   if(!adminMode)return;
-  const slots=Array.from({length:32},(_,i)=>drawAssign[i]??null);
+  const slots=Array.from({length:64},(_,i)=>drawAssign[i]??null);
   if(slots.filter(x=>x!==null).length<2){alert('أضف لاعبين على الأقل!');return;}
   S.tournament.bracket=buildBracket(slots);S.tournament.started=true;
-  activeRound='r32';
+  activeRound='r64';
   // Force immediate save to Firebase
   await forceSave();
   addEvent('tournament-start',{});
   renderTrn();
 }
 
+// نظرة عامة على أيام البطولة (ملخص للزوار)
+function renderDaysOverview(){
+  const el=document.getElementById('trnDaysOverview');
+  if(!el)return;
+  const b=S.tournament&&S.tournament.bracket;
+  if(!b||!b.r64){el.innerHTML='';return;}
+  // تجميع الأدوار حسب اليوم
+  const days=[
+    {label:'اليوم الأول',name:'دور الـ٦٤',rounds:['r64'],icon:'🌅'},
+    {label:'اليوم الثاني',name:'دور الـ٣٢ → الـ٨',rounds:['r32','r16','r8'],icon:'⚔️'},
+    {label:'اليوم الثالث',name:'نصف النهائي والنهائي',rounds:['r4','r2'],icon:'👑'}
+  ];
+  const dayHTML=days.map(d=>{
+    let total=0,done=0;
+    d.rounds.forEach(r=>{
+      const arr=b[r];if(!arr)return;
+      const items=Array.isArray(arr)?arr:Object.values(arr);
+      items.forEach(m=>{if(m&&(m.p1!==null||m.p2!==null)){total++;if(m.winner!==null&&m.winner!==undefined)done++;}});
+    });
+    const pct=total>0?Math.round(done/total*100):0;
+    const cls=total>0&&done===total?'done':(done>0?'live':'');
+    return `<div class="day-card ${cls}">
+      <div class="day-lbl">${d.icon} ${d.label}</div>
+      <div class="day-title">${d.name}</div>
+      <div class="day-stat">${ar(done)} / ${ar(total)} ${total===1?'مباراة':'مباراة'} ${total>0&&done===total?'✓':''}</div>
+      <div class="day-prog"><div class="day-pf" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+  el.innerHTML=`<div class="days-grid">${dayHTML}</div>`;
+}
+
 // ── RENDER TOURNAMENT ──
 function renderTrn(){
+  renderDaysOverview();
   const b=S.tournament.bracket;
   const stat=document.getElementById('trnStat');
   const tabs=document.getElementById('trnRoundTabs');
@@ -2095,7 +2186,7 @@ function renderTrn(){
     return;
   }
 
-  const rounds=['r32','r16','r8','r4','r2'];
+  const rounds=['r64','r32','r16','r8','r4','r2'];
   const curRound = b.done ? 'done' : (rounds.find(r=>b[r]&&b[r].some(m=>m.p1!==null&&!m.winner)) || 'r32');
   stat.textContent = b.done ? `🏆 البطل: ${pName(b.done)}` : (RN[curRound]||'جارية');
 
@@ -2135,7 +2226,7 @@ function renderTrn(){
   }
 
   // Make sure activeRound is valid
-  if(!b[activeRound]||!b[activeRound].length){activeRound='r32';}
+  if(!b[activeRound]||!b[activeRound].length){activeRound='r64';}
 
   // Build bracket visual — scrollable horizontal tree
   const visRounds=rounds.filter(r=>b[r]&&b[r].some(m=>m.p1!==null||m.p2!==null));
@@ -2185,13 +2276,17 @@ function renderTrn(){
           ${canWin?'<span style="font-size:9px;color:var(--b3);margin-right:auto;opacity:.7">اضغط للفوز</span>':''}
         </div>
         ${voteResultsHTML(m.matchNum)}
-        <button class="bv-vote-btn${info.voted?' voted':''}" onclick="openVM(${m.matchNum})">
-          ${cond
-            ? '🔒 '+cond.icon+' '+cond.name
-            : info.voted
-              ? '✅ صوّتت'
-              : '🗳 صوّت على شرط القيم'}
-        </button>
+        ${SURPRISE_ROUNDS.includes(m.round)
+          ? (adminMode
+              ? `<button class="bv-vote-btn" onclick="adminSetSurpriseCond('${m.id}')">${cond?'🔒 '+cond.icon+' '+cond.name:'🎁 حدد شرط المفاجأة'}</button>`
+              : (cond?`<button class="bv-vote-btn voted" style="cursor:default">🔒 ${cond.icon} ${cond.name}</button>`:''))
+          : `<button class="bv-vote-btn${info.voted?' voted':''}" onclick="openVM(${m.matchNum})">
+              ${cond
+                ? '🔒 '+cond.icon+' '+cond.name
+                : info.voted
+                  ? '✅ صوّتت'
+                  : '🗳 صوّت على شرط القيم'}
+            </button>`}
       </div>`;
     });
     html+='</div></div>';
@@ -2229,7 +2324,7 @@ function setWin(matchId,winnerId){
   if(!adminMode)return;
   showModal('تأكيد الفوز',`هل تؤكد أن ${pName(winnerId)} هو الفائز؟`,async()=>{
     // نلتقط معلومات الخصم قبل التحديث
-    const rounds=['r32','r16','r8','r4','r2'];
+    const rounds=['r64','r32','r16','r8','r4','r2'];
     let mInfo=null;
     rounds.forEach(r=>{
       const arr=S.tournament.bracket[r];if(!arr)return;
@@ -2269,7 +2364,7 @@ function openVM(matchNum){
   const info=getVoteInfo(matchNum);
   const b=S.tournament.bracket;
   let m=null;
-  if(b){for(const r of ['r32','r16','r8','r4','r2']){const f=b[r]&&b[r].find(x=>x.matchNum===matchNum);if(f){m=f;break;}}}
+  if(b){for(const r of ['r64','r32','r16','r8','r4','r2']){const f=b[r]&&b[r].find(x=>x.matchNum===matchNum);if(f){m=f;break;}}}
   const cm=CM.find(x=>x.num===matchNum);
   const pid1=m?m.p1:cm?cm.p1:null,pid2=m?m.p2:cm?cm.p2:null;
   const p1=pById(pid1),p2=pById(pid2);
@@ -2470,7 +2565,7 @@ async function deleteCondition(id){
     CONDS=CONDS.filter(c=>c.id!==id);
     // إزالة الشرط من أي مباراة معتمدة عليه
     if(S.tournament&&S.tournament.bracket){
-      ['r32','r16','r8','r4','r2'].forEach(r=>{
+      ['r64','r32','r16','r8','r4','r2'].forEach(r=>{
         const arr=S.tournament.bracket[r];if(!arr)return;
         const items=Array.isArray(arr)?arr:Object.values(arr);
         items.forEach(m=>{if(m&&m.condId===id)m.condId=null;});
@@ -2627,9 +2722,7 @@ function stopClockTick(){if(_clockTick){clearInterval(_clockTick);_clockTick=nul
 document.addEventListener('visibilitychange',()=>{document.hidden?stopClockTick():startClockTick();});
 startClockTick();clock();
 
-// ── TITLES & RULES ──
-const tb=document.getElementById('tbody');
-for(let i=0;i<10;i++){const rc=i===0?'r1':i===1?'r2':i===2?'r3':'ro';const row=document.createElement('tr');row.innerHTML=`<td><span class="rb ${rc}">${i+1}</span></td><td class="mys">مجهول ···</td><td style="color:var(--g1)">${TITLES[i]}</td>`;tb.appendChild(row);}
+// ── RULES ──
 function renderRules(){
   const rl=document.getElementById('rlist');if(!rl)return;
   rl.innerHTML='';
@@ -2756,18 +2849,18 @@ function getVoteMatches(){
   const b = S.tournament && S.tournament.bracket;
   const result = [];
   if(b){
-    const rounds=['r32','r16','r8','r4','r2'];
+    const rounds=['r64','r32','r16','r8','r4','r2'];
     for(const r of rounds){
+      // استبعاد أدوار المفاجأة من التصويت
+      if(SURPRISE_ROUNDS.includes(r))continue;
       const arr = b[r];
       if(!arr) continue;
       const items = Array.isArray(arr) ? arr : Object.values(arr);
       items.forEach(m=>{
         if(!m) return;
-        // Firebase drops null values — treat missing as null
         const p1 = m.p1 !== undefined ? m.p1 : null;
         const p2 = m.p2 !== undefined ? m.p2 : null;
         const winner = m.winner !== undefined ? m.winner : null;
-        // Only show match if at least p1 exists and no winner yet
         if(p1 !== null && p2 !== null && !winner){
           result.push({
             matchNum: m.matchNum,
