@@ -446,6 +446,50 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
   border-radius:100px;color:var(--g1)}
 .pp-cond-tag.won{background:rgba(30,110,60,.18);border-color:rgba(30,150,80,.32);color:#90E0A0}
 
+/* CLIPS PAGE */
+.clips-round{margin-bottom:18px}
+.clips-round-title{font-size:13px;color:var(--b3);letter-spacing:3px;margin-bottom:10px;
+  padding:7px 13px;background:rgba(46,118,184,.08);border:1px solid var(--sep);
+  border-right:3px solid var(--b2);border-radius:var(--r);display:flex;align-items:center;justify-content:space-between}
+.clips-round-title .clips-count{font-size:10px;color:var(--g2);font-family:'Cinzel Decorative',serif}
+.clips-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:10px}
+.clip-card{background:var(--card);border:1px solid var(--sep);border-radius:var(--r2);
+  padding:12px;backdrop-filter:blur(6px);transition:all .2s}
+.clip-card.has-clip{border-top:2px solid var(--b2)}
+.clip-card:hover{border-color:var(--sep2)}
+.clip-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--sep)}
+.clip-num{font-size:11px;color:var(--b3);font-family:'Cinzel Decorative',serif;
+  background:rgba(46,118,184,.1);border:1px solid var(--sep);border-radius:100px;
+  padding:3px 9px;min-width:38px;text-align:center;flex-shrink:0}
+.clip-time{font-size:11px;color:var(--b4);font-family:'Cinzel Decorative',serif;letter-spacing:1px;
+  display:inline-flex;align-items:center;gap:4px;flex-shrink:0}
+.clip-players{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:13px;color:var(--g1)}
+.clip-pl{display:flex;align-items:center;gap:5px;flex:1;min-width:0}
+.clip-pl-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.clip-pl-r{justify-content:flex-end}
+.clip-vs{font-size:10px;color:var(--b2);letter-spacing:2px;flex-shrink:0}
+.clip-cond{font-size:11px;color:var(--b4);padding:5px 9px;background:rgba(46,118,184,.06);
+  border:1px solid var(--sep);border-radius:var(--r);margin:8px 0;display:flex;align-items:center;gap:6px}
+.clip-winner{font-size:11px;color:#80D090;padding:5px 9px;background:rgba(30,150,80,.1);
+  border:1px solid rgba(30,150,80,.25);border-radius:var(--r);margin-top:6px;display:flex;align-items:center;gap:6px}
+.clip-link{display:flex;align-items:center;gap:8px;margin-top:10px;padding:9px 11px;
+  background:rgba(46,118,184,.12);border:1px solid var(--sep2);border-radius:var(--r);
+  color:var(--b4);text-decoration:none;font-size:13px;font-family:'Amiri',serif;
+  transition:all .2s;cursor:pointer}
+.clip-link:hover{background:rgba(46,118,184,.22);color:var(--g1);border-color:var(--b2)}
+.clip-link-ic{font-size:16px}
+.clip-link-tx{flex:1}
+.clip-empty{text-align:center;padding:14px 10px;color:var(--g2);font-size:12px;font-style:italic;
+  background:rgba(255,255,255,.02);border:1px dashed var(--sep);border-radius:var(--r);margin-top:10px}
+.clip-admin{display:flex;gap:5px;margin-top:8px}
+.clip-admin input{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--sep);
+  border-radius:var(--r);padding:7px 9px;color:var(--g1);font-family:'Amiri',serif;
+  font-size:12px;outline:none;direction:ltr}
+.clip-admin input:focus{border-color:var(--sep2)}
+.clip-admin .btn{padding:6px 11px;font-size:11px}
+.clip-embed{margin-top:10px;border-radius:var(--r);overflow:hidden;background:#000;aspect-ratio:16/9;position:relative}
+.clip-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+
 /* COUNTDOWN BIG */
 .cd-banner{margin-bottom:14px;padding:18px;border:1px solid var(--sep2);border-radius:var(--r2);
   background:radial-gradient(ellipse at center,rgba(46,118,184,.18),rgba(4,8,14,.65));
@@ -535,7 +579,7 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
     <div class="ni on" onclick="ST('reg',this)" data-t="reg"><span class="ic">📝</span><span>تسجيل</span></div>
     <div class="ni" onclick="ST('players',this)" data-t="players"><span class="ic">👥</span><span>اللاعبون</span><span class="bdg" id="navBdg">٠</span></div>
     <div class="ni" onclick="ST('trn',this)" data-t="trn"><span class="ic">🏆</span><span>البطولة</span></div>
-    <div class="ni" onclick="ST('timer',this)" data-t="timer"><span class="ic">⏱</span><span>الوقت</span></div>
+    <div class="ni" onclick="ST('clips',this)" data-t="clips"><span class="ic">🎥</span><span>لقطات التحكيم</span></div>
     <div class="ni" onclick="ST('vote',this)" data-t="vote"><span class="ic">🗳</span><span>التصويت</span></div>
     <div class="ni" onclick="ST('rules',this)" data-t="rules"><span class="ic">📜</span><span>الشروط</span></div>
     <div class="ni" onclick="ST('titles',this)" data-t="titles"><span class="ic">👑</span><span>الألقاب</span></div>
@@ -595,30 +639,10 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
     <div id="trnContent"></div>
   </div>
 
-  <!-- TIMER -->
-  <div id="timer" class="sec">
-    <div class="pt"><div><div class="pt-t">⏱ الجدول الزمني</div><div class="pt-s">٠٨:٠٠ · ١٠ د قيم · ٥ د استراحة</div></div></div>
-    <div id="cd-timer"></div>
-    <div class="ck">
-      <div class="ck-hdr"><div class="ck-hdr-t">اختر اليوم</div><div class="dtabs" id="dtabs"></div></div>
-      <div class="mb">
-        <div class="mb-lbl" id="mbLbl">القيم الحالي</div>
-        <div class="mb-game" id="mbGame">—</div>
-        <div class="mb-cond" id="mbCond"></div>
-        <div class="mb-row"><span class="sbdg" id="sbdg">—</span><span class="mb-st" id="mbSt"></span></div>
-        <div class="prog"><div class="pf" id="pf" style="width:0%"></div></div>
-      </div>
-      <div class="ck-body">
-        <div class="bigtime" id="bt">٠٨:٠٠</div>
-        <div class="timelbl" id="tl">وقت البطولة</div>
-        <div class="simbtns admin-only" style="display:none">
-          <button class="simbtn" onclick="tick(-60)">◀ دقيقة</button>
-          <button class="simbtn" onclick="tick(300)">+٥ د</button>
-          <button class="simbtn" onclick="tick(600)">+قيم</button>
-          <button class="simbtn" onclick="tick(900)">+قيم+استراحة</button>
-        </div>
-      </div>
-    </div>
+  <!-- CLIPS (لقطات التحكيم) -->
+  <div id="clips" class="sec">
+    <div class="pt"><div><div class="pt-t">🎥 لقطات التحكيم</div><div class="pt-s">روابط فيديو لقطات كل قيم</div></div></div>
+    <div id="clipsContent"></div>
   </div>
 
   <!-- RULES -->
@@ -655,7 +679,7 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
   <div class="mni on" onclick="ST('reg',this)" data-t="reg"><span class="m-ic">📝</span><span class="m-lb">تسجيل</span></div>
   <div class="mni" onclick="ST('players',this)" data-t="players"><span class="m-ic">👥</span><span class="m-lb">لاعبون</span></div>
   <div class="mni" onclick="ST('trn',this)" data-t="trn"><span class="m-ic">🏆</span><span class="m-lb">بطولة</span></div>
-  <div class="mni" onclick="ST('timer',this)" data-t="timer"><span class="m-ic">⏱</span><span class="m-lb">وقت</span></div>
+  <div class="mni" onclick="ST('clips',this)" data-t="clips"><span class="m-ic">🎥</span><span class="m-lb">لقطات</span></div>
   <div class="mni" onclick="ST('vote',this)" data-t="vote"><span class="m-ic">🗳</span><span class="m-lb">تصويت</span></div>
   <div class="mni" onclick="ST('admin',this)" data-t="admin"><span class="m-ic">🔐</span><span class="m-lb">إدارة</span></div>
 </nav>
@@ -734,7 +758,7 @@ let CM=[];
 (()=>{let mi=0;for(let d=0;d<3;d++)for(let g=0;g<DIST[d];g++){const s=START+(g*SLOT);CM.push({day:d,num:mi+1,p1:mi*2,p2:mi*2+1,s,e:s+GAME,be:s+SLOT,st:fmt(s)});mi++;}})();
 
 // State
-function initS(){return{players:Array.from({length:64},(_,i)=>({id:i,slot:i+1,name:null,photo:null,story:null,registered:false})),tournament:{started:false,bracket:null,champion:null,votingOpen:false},votes:{},totalVotes:0,simMin:0};}
+function initS(){return{players:Array.from({length:64},(_,i)=>({id:i,slot:i+1,name:null,photo:null,story:null,registered:false})),tournament:{started:false,bracket:null,champion:null,votingOpen:false},votes:{},totalVotes:0,simMin:0,clips:{}};}
 let S=initS();
 let _fbReady=false,_saveT=null,simM=0,aDay=0,adminMode=false;
 let dragPid=null,selPid=null,drawAssign={},activeRound='r32';
@@ -755,6 +779,110 @@ function hideBar(){const b=document.getElementById('_bar');if(b){b.style.opacity
 async function fbRead(path=''){try{const r=await fetch(`${FB_URL}/${path}.json`);return await r.json();}catch(e){return null;}}
 async function fbWrite(path,data){try{await fetch(`${FB_URL}/${path}.json`,{method:'PUT',body:JSON.stringify(data),headers:{'Content-Type':'application/json'}});}catch(e){}}
 async function fbMerge(data){try{await fetch(`${FB_URL}.json`,{method:'PATCH',body:JSON.stringify(data),headers:{'Content-Type':'application/json'}});}catch(e){}}
+
+// ── لقطات التحكيم (CLIPS) ──
+// استخراج معرّف YouTube من رابط (للعرض المضمَّن)
+function ytId(url){
+  if(!url)return null;
+  try{
+    const u=new URL(url);
+    if(u.hostname==='youtu.be')return u.pathname.slice(1).split(/[?&]/)[0]||null;
+    if(u.hostname.includes('youtube.com')){
+      if(u.pathname==='/watch')return u.searchParams.get('v');
+      const m=u.pathname.match(/\/(embed|shorts|v)\/([^\/?]+)/);
+      if(m)return m[2];
+    }
+  }catch(e){}
+  return null;
+}
+
+async function setClip(matchId){
+  if(!adminMode)return;
+  const inp=document.getElementById(`clip-in-${matchId}`);
+  if(!inp)return;
+  const url=(inp.value||'').trim();
+  if(!url){removeClip(matchId);return;}
+  S.clips=S.clips||{};
+  S.clips[matchId]=url;
+  try{await fbWrite(`clips/${matchId}`,url);}catch(e){}
+  renderClips();
+}
+
+async function removeClip(matchId){
+  if(!adminMode)return;
+  if(!S.clips||!S.clips[matchId]){renderClips();return;}
+  showModal('حذف الرابط','احذف رابط هذه اللقطة؟',async()=>{
+    delete S.clips[matchId];
+    try{await fbWrite(`clips/${matchId}`,null);}catch(e){}
+    renderClips();
+  });
+}
+
+function renderClips(){
+  const cont=document.getElementById('clipsContent');
+  if(!cont)return;
+  const b=S.tournament&&S.tournament.bracket;
+  if(!b||!b.r32){
+    cont.innerHTML=`<div style="text-align:center;padding:60px 20px;color:var(--g2)">
+      <div style="font-size:48px;margin-bottom:12px">⏳</div>
+      <div style="font-size:16px">لم يتم توزيع اللاعبين بعد</div>
+      <div style="font-size:12px;margin-top:6px">روابط لقطات التحكيم تظهر بعد إنشاء الجدول</div>
+    </div>`;
+    return;
+  }
+  const rounds=['r32','r16','r8','r4','r2'];
+  let html='';
+  rounds.forEach(r=>{
+    const arr=b[r];if(!arr)return;
+    const items=Array.isArray(arr)?arr:Object.values(arr);
+    const visible=items.filter(m=>m&&(m.p1!==null||m.p2!==null));
+    if(!visible.length)return;
+    const withClipsCnt=visible.filter(m=>S.clips&&S.clips[m.id]).length;
+    html+=`<div class="clips-round">
+      <div class="clips-round-title">
+        <span>${RN[r]}</span>
+        <span class="clips-count">${ar(withClipsCnt)} / ${ar(visible.length)} لقطة</span>
+      </div>
+      <div class="clips-grid">`;
+    visible.forEach(m=>{
+      const url=S.clips&&S.clips[m.id]?S.clips[m.id]:'';
+      const yid=ytId(url);
+      const cond=CONDS.find(c=>c.id===m.condId);
+      const winName=m.winner!==null&&m.winner!==undefined?pName(m.winner):null;
+      html+=`<div class="clip-card${url?' has-clip':''}">
+        <div class="clip-head">
+          <div class="clip-num">قيم ${ar(m.matchNum)}</div>
+          <div class="clip-time">⏰ ${typeof m.startTime==='number'?fmtTime(m.startTime):'—'}</div>
+        </div>
+        <div class="clip-players">
+          <div class="clip-pl">
+            ${avHTML(m.p1,20)}<span class="clip-pl-name">${pName(m.p1)}</span>
+          </div>
+          <span class="clip-vs">ضد</span>
+          <div class="clip-pl clip-pl-r">
+            <span class="clip-pl-name">${pName(m.p2)}</span>${avHTML(m.p2,20)}
+          </div>
+        </div>
+        ${cond?`<div class="clip-cond">${cond.icon} ${cond.name}</div>`:''}
+        ${winName?`<div class="clip-winner">🏆 الفائز: ${winName}</div>`:''}
+        ${url
+          ?(yid
+            ?`<div class="clip-embed"><iframe src="https://www.youtube.com/embed/${yid}" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`
+            :`<a class="clip-link" href="${url}" target="_blank" rel="noopener"><span class="clip-link-ic">🎬</span><span class="clip-link-tx">شاهد اللقطة</span><span style="font-size:10px;opacity:.6">↗</span></a>`)
+          :(adminMode?'':'<div class="clip-empty">📹 لم تُرفع لقطة بعد</div>')}
+        ${adminMode
+          ?`<div class="clip-admin">
+              <input id="clip-in-${m.id}" type="url" placeholder="ألصق رابط الفيديو..." value="${url}">
+              <button class="btn green" onclick="setClip('${m.id}')">💾</button>
+              ${url?`<button class="btn red" onclick="removeClip('${m.id}')">🗑</button>`:''}
+            </div>`
+          :''}
+      </div>`;
+    });
+    html+='</div></div>';
+  });
+  cont.innerHTML=html||'<div style="text-align:center;padding:40px;color:var(--g2)">لا توجد مباريات</div>';
+}
 
 // ── PLAYER PROFILE ──
 // يحسب إحصائيات اللاعب من جدول البطولة
@@ -907,20 +1035,22 @@ function getCountdownInfo(){
       return {type:'start',ms:diff,title:'🏆 بداية البطولة',sub:'كان يـاما كان'};
     }
   }
-  // أولوية ٢: القيم القادم (في الجدول الزمني المحاكي)
-  const now=START+simM;
-  for(let d=0;d<3;d++){
-    const dm=CM.filter(m=>m.day===d);
-    for(let i=0;i<dm.length;i++){
-      const m=dm[i];
-      if(now<m.s){
-        // القيم لسه ما بدأ — نحسب الوقت المتبقي (بالدقائق)
-        const minsLeft=m.s-now;
+  // أولوية ٢: القيم القادم — نستخدم startTime من جدول البطولة (لو موجود)
+  const all=getAllMatchesInOrder();
+  if(all.length){
+    const nowD=new Date(),nowMins=nowD.getHours()*60+nowD.getMinutes();
+    // ابحث عن أول قيم وقته أكبر من الوقت الحالي (نفس اليوم)
+    for(let i=0;i<all.length;i++){
+      const m=all[i];
+      if(typeof m.startTime!=='number')continue;
+      if(m.winner!==null&&m.winner!==undefined)continue;
+      if(m.startTime>nowMins){
+        const minsLeft=m.startTime-nowMins;
         return {
           type:'next-match',
           mins:minsLeft,
           ms:minsLeft*60*1000,
-          title:`القيم ${ar(m.num)} — ${DAYS[m.day]}`,
+          title:`${RN[m.round]||''} — قيم ${ar(m.matchNum)}`,
           sub:`${pName(m.p1)} ضد ${pName(m.p2)}`
         };
       }
@@ -1087,6 +1217,8 @@ function applyRemote(d){
   }
   if(typeof d.totalVotes==='number')S.totalVotes=d.totalVotes;
   if(typeof d.simMin==='number')simM=d.simMin;
+  // تحميل لقطات التحكيم
+  if(d.clips&&typeof d.clips==='object')S.clips=JSON.parse(JSON.stringify(d.clips));
   // تحميل الشروط من Firebase (لو الإدارة عدّلت عليها)
   if(d.conditions){
     const arr=Array.isArray(d.conditions)?d.conditions:Object.values(d.conditions);
@@ -1134,7 +1266,8 @@ async function fbPoll(){
       d.tournament&&d.tournament.bracket?JSON.stringify(d.tournament.bracket).length:0,
       votersCount,
       d.totalVotes||0,
-      playersCount
+      playersCount,
+      d.clips?Object.keys(d.clips).length:0
     ]);
     if(sig===_lastSig)return;
     _lastSig=sig;
@@ -1143,6 +1276,9 @@ async function fbPoll(){
     if(document.getElementById('trn')?.classList.contains('on'))renderTrn();
     if(document.getElementById('vote')?.classList.contains('on')){
       buildVotePage();
+    }
+    if(document.getElementById('clips')?.classList.contains('on')){
+      renderClips();
     }
     const tv=document.getElementById('totalVotes');
     if(tv)tv.textContent=ar(S.totalVotes||0);
@@ -1984,7 +2120,7 @@ function importJSON(e){const f=e.target.files[0];if(!f)return;const r=new FileRe
 
 // ── CLOCK ──
 const dtEl=document.getElementById('dtabs');
-['١','٢','٣'].forEach((l,i)=>{const b=document.createElement('button');b.className='dtb'+(i===0?' on':'');b.textContent='اليوم '+l;b.onclick=()=>{document.querySelectorAll('.dtb').forEach(x=>x.classList.remove('on'));b.classList.add('on');aDay=i;clock();};dtEl.appendChild(b);});
+if(dtEl)['١','٢','٣'].forEach((l,i)=>{const b=document.createElement('button');b.className='dtb'+(i===0?' on':'');b.textContent='اليوم '+l;b.onclick=()=>{document.querySelectorAll('.dtb').forEach(x=>x.classList.remove('on'));b.classList.add('on');aDay=i;clock();};dtEl.appendChild(b);});
 function getSlot(d){const now=START+simM,dm=CM.filter(m=>m.day===d);for(let i=0;i<dm.length;i++){const m=dm[i];if(now>=m.s&&now<m.e)return{type:'game',m,el:Math.floor(now-m.s),tot:GAME};if(now>=m.e&&now<m.be)return{type:'break',m,el:Math.floor(now-m.e),tot:BRK};}return now<START?{type:'before'}:{type:'done'};}
 function clock(){
   const now=START+simM,h=Math.floor(now/60)%24,m=Math.floor(now)%60;
@@ -2216,6 +2352,7 @@ function ST(tab,btn){
   if(tab==='players')buildPGrid();
   if(tab==='admin')renderAdmin();
   if(tab==='vote'){buildVotePage();}
+  if(tab==='clips')renderClips();
   window.scrollTo(0,0);
 }
 
