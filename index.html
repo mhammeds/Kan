@@ -446,6 +446,72 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
   border-radius:100px;color:var(--g1)}
 .pp-cond-tag.won{background:rgba(30,110,60,.18);border-color:rgba(30,150,80,.32);color:#90E0A0}
 
+/* INSIGHTS DASHBOARD */
+.insights{margin-bottom:18px}
+.insights-title{font-size:12px;color:var(--b3);letter-spacing:3px;margin-bottom:9px;
+  display:flex;align-items:center;gap:8px}
+.insights-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}
+.ins{background:var(--card);border:1px solid var(--sep);border-top:2px solid var(--b2);
+  border-radius:var(--r2);padding:13px;backdrop-filter:blur(6px);position:relative;overflow:hidden}
+.ins-lbl{font-size:10px;color:var(--g2);letter-spacing:2px;margin-bottom:6px}
+.ins-v{font-family:'Cinzel Decorative',serif;font-size:22px;color:var(--b4);line-height:1.2;margin-bottom:3px}
+.ins-sub{font-size:11px;color:var(--g1);line-height:1.4}
+.ins-icon{position:absolute;top:8px;left:8px;font-size:18px;opacity:.35}
+.ins-empty{color:var(--g2);font-style:italic;font-size:13px}
+.ins.champ{border-top-color:#D4A840;background:linear-gradient(180deg,rgba(180,130,30,.08),var(--card))}
+.ins.champ .ins-v{color:#D4A840}
+.ins-mini-row{display:flex;align-items:center;gap:8px;margin-top:5px}
+.ins-mini-av{width:28px;height:28px;border-radius:50%;flex-shrink:0;border:1.5px solid var(--sep2);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.ins-mini-av img{width:100%;height:100%;object-fit:cover}
+
+/* ACTIVITY FEED */
+.feed{margin-bottom:18px;background:var(--card);border:1px solid var(--sep);
+  border-radius:var(--r2);overflow:hidden;backdrop-filter:blur(6px)}
+.feed-hdr{padding:9px 13px;border-bottom:1px solid var(--sep);
+  display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--b3);letter-spacing:2px}
+.feed-hdr .dot{margin-left:6px}
+.feed-list{max-height:200px;overflow-y:auto}
+.feed-list::-webkit-scrollbar{width:3px}
+.feed-list::-webkit-scrollbar-thumb{background:rgba(46,118,184,.2);border-radius:2px}
+.feed-item{padding:8px 13px;border-bottom:1px solid rgba(46,118,184,.07);
+  display:flex;align-items:center;gap:9px;font-size:12px;color:var(--g1);
+  transition:background .2s;animation:feedIn .35s ease}
+.feed-item:last-child{border-bottom:none}
+.feed-item:hover{background:rgba(46,118,184,.06)}
+.feed-ic{font-size:14px;flex-shrink:0;width:22px;text-align:center}
+.feed-tx{flex:1;line-height:1.5;overflow:hidden;text-overflow:ellipsis}
+.feed-tx b{color:var(--b4)}
+.feed-time{font-size:10px;color:var(--g2);font-family:'Cinzel Decorative',serif;flex-shrink:0}
+.feed-empty{padding:18px;text-align:center;color:var(--g2);font-size:12px;font-style:italic}
+@keyframes feedIn{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:translateX(0)}}
+
+/* CHEERS in player profile */
+.pp-cheers{display:flex;flex-direction:column;gap:7px;margin-bottom:10px}
+.pp-cheer{background:rgba(46,118,184,.07);border:1px solid var(--sep);
+  border-right:3px solid var(--b3);border-radius:var(--r);padding:8px 11px}
+.pp-cheer-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;font-size:10px;color:var(--g2)}
+.pp-cheer-author{color:var(--b3);font-weight:700;font-size:11px}
+.pp-cheer-msg{font-size:12px;color:var(--g1);line-height:1.6;white-space:pre-wrap;word-break:break-word}
+.pp-cheer-form{background:rgba(255,255,255,.02);border:1px solid var(--sep);
+  border-radius:var(--r);padding:9px;margin-top:8px}
+.pp-cheer-form input,.pp-cheer-form textarea{width:100%;background:rgba(255,255,255,.04);
+  border:1px solid var(--sep);border-radius:var(--r);padding:7px 9px;color:var(--g1);
+  font-family:'Amiri',serif;font-size:12px;outline:none;direction:rtl;resize:vertical;margin-bottom:7px}
+.pp-cheer-form input:focus,.pp-cheer-form textarea:focus{border-color:var(--sep2)}
+.pp-cheer-mine{background:rgba(30,150,80,.08);border-color:rgba(30,150,80,.25)}
+.pp-cheer-mine .pp-cheer-author{color:#80D090}
+.pp-cheer-empty{text-align:center;padding:11px;color:var(--g2);font-size:12px;font-style:italic;
+  background:rgba(255,255,255,.02);border:1px dashed var(--sep);border-radius:var(--r)}
+
+/* CERTIFICATE preview modal */
+.cert-bg{display:none;position:fixed;inset:0;z-index:450;background:rgba(0,0,0,.88);
+  align-items:center;justify-content:center;padding:16px}
+.cert-bg.open{display:flex}
+.cert-wrap{background:#0a1018;border:1px solid var(--sep2);border-radius:var(--r2);
+  padding:14px;max-width:920px;width:100%;max-height:92vh;overflow:auto}
+.cert-wrap canvas{display:block;max-width:100%;height:auto;border-radius:var(--r);margin:0 auto}
+.cert-actions{display:flex;gap:7px;margin-top:12px;justify-content:center;flex-wrap:wrap}
+
 /* CLIPS PAGE */
 .clips-round{margin-bottom:18px}
 .clips-round-title{font-size:13px;color:var(--b3);letter-spacing:3px;margin-bottom:10px;
@@ -600,6 +666,8 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
   <!-- REGISTER -->
   <div id="reg" class="sec on">
     <div id="cd-home"></div>
+    <div id="insightsHome"></div>
+    <div id="feedHome"></div>
     <div class="pt"><div><div class="pt-t">📝 تسجيل لاعب</div><div class="pt-s">أدخل بياناتك واختر مقعدك</div></div></div>
     <div class="reg-grid">
       <div class="card">
@@ -699,6 +767,17 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
   </div>
 </div>
 
+<!-- CERTIFICATE MODAL -->
+<div class="cert-bg" id="cert-modal">
+  <div class="cert-wrap">
+    <canvas id="cert-canvas" width="1200" height="850"></canvas>
+    <div class="cert-actions">
+      <button class="btn green" onclick="downloadCert()">⬇️ تحميل الشهادة (PNG)</button>
+      <button class="btn" onclick="closeCert()">إغلاق</button>
+    </div>
+  </div>
+</div>
+
 <!-- PLAYER PROFILE MODAL -->
 <div class="pp-bg" id="pp-modal">
   <div class="pp-card" id="pp-card-body"></div>
@@ -758,7 +837,7 @@ let CM=[];
 (()=>{let mi=0;for(let d=0;d<3;d++)for(let g=0;g<DIST[d];g++){const s=START+(g*SLOT);CM.push({day:d,num:mi+1,p1:mi*2,p2:mi*2+1,s,e:s+GAME,be:s+SLOT,st:fmt(s)});mi++;}})();
 
 // State
-function initS(){return{players:Array.from({length:64},(_,i)=>({id:i,slot:i+1,name:null,photo:null,story:null,registered:false})),tournament:{started:false,bracket:null,champion:null,votingOpen:false},votes:{},totalVotes:0,simMin:0,clips:{}};}
+function initS(){return{players:Array.from({length:64},(_,i)=>({id:i,slot:i+1,name:null,photo:null,story:null,registered:false})),tournament:{started:false,bracket:null,champion:null,votingOpen:false},votes:{},totalVotes:0,simMin:0,clips:{},events:[],cheers:{}};}
 let S=initS();
 let _fbReady=false,_saveT=null,simM=0,aDay=0,adminMode=false;
 let dragPid=null,selPid=null,drawAssign={},activeRound='r32';
@@ -779,6 +858,342 @@ function hideBar(){const b=document.getElementById('_bar');if(b){b.style.opacity
 async function fbRead(path=''){try{const r=await fetch(`${FB_URL}/${path}.json`);return await r.json();}catch(e){return null;}}
 async function fbWrite(path,data){try{await fetch(`${FB_URL}/${path}.json`,{method:'PUT',body:JSON.stringify(data),headers:{'Content-Type':'application/json'}});}catch(e){}}
 async function fbMerge(data){try{await fetch(`${FB_URL}.json`,{method:'PATCH',body:JSON.stringify(data),headers:{'Content-Type':'application/json'}});}catch(e){}}
+
+// ── إحصائيات البطولة ──
+function computeInsights(){
+  const ins={
+    matchesDone:0,
+    totalMatches:0,
+    topCondId:null,topCondVotes:0,
+    topPlayerId:null,topPlayerWins:0,
+    hotMatchNum:null,hotMatchVotes:0,
+    champId:null
+  };
+  const b=S.tournament&&S.tournament.bracket;
+  if(b){
+    const rounds=['r32','r16','r8','r4','r2'];
+    const winsByPlayer={};
+    rounds.forEach(r=>{
+      const arr=b[r];if(!arr)return;
+      const items=Array.isArray(arr)?arr:Object.values(arr);
+      items.forEach(m=>{
+        if(!m)return;
+        if(m.p1!==null||m.p2!==null)ins.totalMatches++;
+        if(m.winner!==null&&m.winner!==undefined){
+          ins.matchesDone++;
+          winsByPlayer[m.winner]=(winsByPlayer[m.winner]||0)+1;
+        }
+      });
+    });
+    // أكثر لاعب فوزاً
+    Object.entries(winsByPlayer).forEach(([pid,w])=>{
+      if(w>ins.topPlayerWins){ins.topPlayerWins=w;ins.topPlayerId=parseInt(pid);}
+    });
+    if(b.done!==null&&b.done!==undefined)ins.champId=b.done;
+  }
+  // أكثر شرط تصويتاً + المباراة الأكثر إثارة
+  const condTotals={};
+  if(S.votes){
+    Object.entries(S.votes).forEach(([mn,v])=>{
+      if(!v||!v.voters)return;
+      const votes=Object.values(v.voters);
+      const mTot=votes.length;
+      if(mTot>ins.hotMatchVotes){ins.hotMatchVotes=mTot;ins.hotMatchNum=parseInt(mn);}
+      votes.forEach(cid=>{condTotals[cid]=(condTotals[cid]||0)+1;});
+    });
+  }
+  Object.entries(condTotals).forEach(([cid,c])=>{
+    if(c>ins.topCondVotes){ins.topCondVotes=c;ins.topCondId=parseInt(cid);}
+  });
+  return ins;
+}
+
+function renderInsights(){
+  const el=document.getElementById('insightsHome');
+  if(!el)return;
+  const ins=computeInsights();
+  const cond=CONDS.find(c=>c.id===ins.topCondId);
+  const champ=ins.champId!==null?pById(ins.champId):null;
+  const topP=ins.topPlayerId!==null?pById(ins.topPlayerId):null;
+  // بطاقات
+  const cards=[];
+  // بطاقة البطل (لو موجود)
+  if(champ){
+    const[bg,fg]=pal(ins.champId);
+    cards.push(`<div class="ins champ">
+      <span class="ins-icon">👑</span>
+      <div class="ins-lbl">البطل</div>
+      <div class="ins-mini-row">
+        <div class="ins-mini-av" style="background:${bg};color:${fg};border-color:#D4A840">
+          ${champ.photo?`<img src="${champ.photo}">`:init(champ.name)}
+        </div>
+        <div>
+          <div class="ins-v" style="font-size:16px;color:#D4A840">${champ.name}</div>
+          <div class="ins-sub" style="font-size:10px">بطل كان يـاما كان</div>
+        </div>
+      </div>
+    </div>`);
+  }
+  // أكثر لاعب فوزاً
+  if(topP){
+    const[bg,fg]=pal(ins.topPlayerId);
+    cards.push(`<div class="ins">
+      <span class="ins-icon">⚔️</span>
+      <div class="ins-lbl">أكثر فوزاً</div>
+      <div class="ins-mini-row">
+        <div class="ins-mini-av" style="background:${bg};color:${fg}">
+          ${topP.photo?`<img src="${topP.photo}">`:init(topP.name)}
+        </div>
+        <div>
+          <div class="ins-v" style="font-size:16px">${topP.name}</div>
+          <div class="ins-sub" style="font-size:10px">${ar(ins.topPlayerWins)} انتصار</div>
+        </div>
+      </div>
+    </div>`);
+  }
+  // أكثر شرط تصويتاً
+  if(cond){
+    cards.push(`<div class="ins">
+      <span class="ins-icon">📜</span>
+      <div class="ins-lbl">الشرط الأشهر</div>
+      <div class="ins-v" style="font-size:24px">${cond.icon}</div>
+      <div class="ins-sub">${cond.name}<br><span style="color:var(--g2);font-size:10px">${ar(ins.topCondVotes)} صوت</span></div>
+    </div>`);
+  }
+  // مباراة أكثر إثارة
+  if(ins.hotMatchNum&&ins.hotMatchVotes>0){
+    cards.push(`<div class="ins">
+      <span class="ins-icon">🔥</span>
+      <div class="ins-lbl">الأكثر إثارة</div>
+      <div class="ins-v">قيم ${ar(ins.hotMatchNum)}</div>
+      <div class="ins-sub">${ar(ins.hotMatchVotes)} صوت</div>
+    </div>`);
+  }
+  // تقدم البطولة
+  if(ins.totalMatches){
+    const pct=Math.round(ins.matchesDone/ins.totalMatches*100);
+    cards.push(`<div class="ins">
+      <span class="ins-icon">📊</span>
+      <div class="ins-lbl">تقدم البطولة</div>
+      <div class="ins-v">${ar(pct)}%</div>
+      <div class="ins-sub">${ar(ins.matchesDone)} من ${ar(ins.totalMatches)} مباراة</div>
+    </div>`);
+  }
+  if(!cards.length){el.innerHTML='';return;}
+  el.innerHTML=`<div class="insights">
+    <div class="insights-title">📊 لمحات عن البطولة <span class="dot"></span></div>
+    <div class="insights-grid">${cards.join('')}</div>
+  </div>`;
+}
+
+// ── سجل الأحداث ──
+function addEvent(type,data){
+  if(!S.events)S.events=[];
+  const ev={t:Date.now(),type,data};
+  S.events.unshift(ev);
+  // الإبقاء على آخر ٣٠ حدث فقط
+  if(S.events.length>30)S.events=S.events.slice(0,30);
+  // كتابة atomic للحدث
+  try{fbWrite('events/'+ev.t,ev);}catch(e){}
+  renderFeed();
+}
+
+function fmtRelTime(t){
+  const diff=Date.now()-t;
+  const m=Math.floor(diff/60000);
+  if(m<1)return 'الآن';
+  if(m<60)return `قبل ${ar(m)} د`;
+  const h=Math.floor(m/60);
+  if(h<24)return `قبل ${ar(h)} س`;
+  return `قبل ${ar(Math.floor(h/24))} يوم`;
+}
+
+function renderFeed(){
+  const el=document.getElementById('feedHome');
+  if(!el)return;
+  const evs=(S.events||[]).slice(0,10);
+  if(!evs.length){
+    el.innerHTML='';
+    return;
+  }
+  const formatEvent=ev=>{
+    const d=ev.data||{};
+    if(ev.type==='register')return{ic:'📝',tx:`سجّل <b>${d.name||'لاعب'}</b> في مقعد ${ar(d.slot||0)}`};
+    if(ev.type==='win'){
+      const w=d.winner||'لاعب';
+      const o=d.loser||'الخصم';
+      return{ic:'🏆',tx:`<b>${w}</b> فاز على ${o}${d.round?` في ${d.round}`:''}`};
+    }
+    if(ev.type==='tournament-start')return{ic:'🚀',tx:'انطلقت البطولة!'};
+    if(ev.type==='voting-open')return{ic:'🗳',tx:'فُتح التصويت على الشروط'};
+    if(ev.type==='champion')return{ic:'👑',tx:`تُوّج <b>${d.name||'البطل'}</b> بطلاً لكان يـاما كان!`};
+    if(ev.type==='cheer')return{ic:'💌',tx:`رسالة تشجيع جديدة لـ <b>${d.name||'لاعب'}</b>`};
+    return{ic:'•',tx:'حدث'};
+  };
+  el.innerHTML=`<div class="feed">
+    <div class="feed-hdr"><span><span class="dot"></span> آخر الأحداث</span><span style="font-family:'Cinzel Decorative',serif">${ar(evs.length)}</span></div>
+    <div class="feed-list">${evs.map(ev=>{const f=formatEvent(ev);return`<div class="feed-item"><span class="feed-ic">${f.ic}</span><span class="feed-tx">${f.tx}</span><span class="feed-time">${fmtRelTime(ev.t)}</span></div>`;}).join('')}</div>
+  </div>`;
+}
+
+// ── رسائل التشجيع ──
+async function submitCheer(pid){
+  const msgEl=document.getElementById('cheer-msg');
+  const nameEl=document.getElementById('cheer-author');
+  if(!msgEl)return;
+  const msg=(msgEl.value||'').trim();
+  if(!msg){msgEl.focus();msgEl.style.borderColor='rgba(220,80,80,.6)';setTimeout(()=>msgEl.style.borderColor='',1500);return;}
+  const author=(nameEl?nameEl.value:'').trim()||'مشجّع';
+  S.cheers=S.cheers||{};
+  S.cheers[pid]=S.cheers[pid]||{};
+  S.cheers[pid][USER_ID]={msg:msg.slice(0,300),author:author.slice(0,40),t:Date.now()};
+  try{await fbWrite(`cheers/${pid}/${USER_ID}`,S.cheers[pid][USER_ID]);}catch(e){}
+  const p=pById(pid);
+  if(p)addEvent('cheer',{name:p.name});
+  openPlayerProfile(pid);
+}
+
+// ── الشهادة ──
+let _certPid=null;
+function openCert(pid){
+  _certPid=pid;
+  const p=pById(pid);if(!p||!p.registered)return;
+  const stats=getPlayerStats(pid);
+  const c=document.getElementById('cert-canvas');
+  const ctx=c.getContext('2d');
+  const W=c.width,H=c.height;
+  // الخلفية المتدرجة
+  const grd=ctx.createLinearGradient(0,0,0,H);
+  grd.addColorStop(0,'#05101A');
+  grd.addColorStop(1,'#081828');
+  ctx.fillStyle=grd;ctx.fillRect(0,0,W,H);
+  // إطار خارجي
+  const isChamp=stats.isChampion;
+  ctx.strokeStyle=isChamp?'#D4A840':'#2E76B8';
+  ctx.lineWidth=6;
+  ctx.strokeRect(30,30,W-60,H-60);
+  // إطار داخلي خفيف
+  ctx.strokeStyle=isChamp?'rgba(212,168,64,.3)':'rgba(46,118,184,.3)';
+  ctx.lineWidth=1;
+  ctx.strokeRect(50,50,W-100,H-100);
+  // زوايا زخرفية
+  ['◆','◆','◆','◆'].forEach((ch,i)=>{
+    ctx.fillStyle=isChamp?'#D4A840':'#5AA0CC';
+    ctx.font='28px serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    const x=i%2===0?70:W-70;
+    const y=i<2?70:H-70;
+    ctx.fillText(ch,x,y);
+  });
+  // العنوان الرئيسي
+  ctx.fillStyle='#9CC4E0';
+  ctx.font='bold 32px serif';
+  ctx.textAlign='center';
+  ctx.fillText('كان يـاما كان', W/2, 130);
+  ctx.fillStyle='#628090';
+  ctx.font='16px serif';
+  ctx.fillText('بطولة الكيرم الأسطورية', W/2, 162);
+  // خط فاصل
+  ctx.strokeStyle='rgba(46,118,184,.4)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(W/2-160,190);ctx.lineTo(W/2+160,190);ctx.stroke();
+  // التتويج
+  const title = isChamp ? '🏆 شهادة البطل 🏆'
+              : stats.matches>0 ? '🏅 شهادة مشارك'
+              : '📜 شهادة تسجيل';
+  ctx.fillStyle=isChamp?'#D4A840':'#5AA0CC';
+  ctx.font='bold 28px serif';
+  ctx.fillText(title, W/2, 232);
+  // تُمنح إلى
+  ctx.fillStyle='#628090';
+  ctx.font='18px serif';
+  ctx.fillText('تُمنح هذه الشهادة إلى', W/2, 290);
+  // اسم اللاعب — بارز
+  ctx.fillStyle='#D8E8F2';
+  ctx.font='bold 56px serif';
+  ctx.fillText(p.name, W/2, 360);
+  // الصورة (دائرية)
+  const photoY=460;
+  const radius=80;
+  if(p.photo){
+    const img=new Image();
+    img.onload=function(){
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(W/2,photoY,radius,0,Math.PI*2);
+      ctx.clip();
+      ctx.drawImage(img,W/2-radius,photoY-radius,radius*2,radius*2);
+      ctx.restore();
+      // حلقة حول الصورة
+      ctx.strokeStyle=isChamp?'#D4A840':'#5AA0CC';
+      ctx.lineWidth=4;
+      ctx.beginPath();ctx.arc(W/2,photoY,radius,0,Math.PI*2);ctx.stroke();
+      drawCertBottom(ctx,W,H,p,stats,isChamp);
+    };
+    img.src=p.photo;
+  }else{
+    const[bg,fg]=pal(pid);
+    ctx.fillStyle=bg;
+    ctx.beginPath();ctx.arc(W/2,photoY,radius,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle=isChamp?'#D4A840':'#5AA0CC';
+    ctx.lineWidth=4;
+    ctx.beginPath();ctx.arc(W/2,photoY,radius,0,Math.PI*2);ctx.stroke();
+    ctx.fillStyle=fg;
+    ctx.font='bold 64px serif';
+    ctx.textBaseline='middle';
+    ctx.fillText(init(p.name),W/2,photoY);
+    drawCertBottom(ctx,W,H,p,stats,isChamp);
+  }
+  document.getElementById('cert-modal').classList.add('open');
+}
+
+function drawCertBottom(ctx,W,H,p,stats,isChamp){
+  ctx.textBaseline='alphabetic';
+  // العبارة
+  ctx.fillStyle='#9CC4E0';
+  ctx.font='20px serif';
+  ctx.textAlign='center';
+  const phrase = isChamp
+    ? 'أكتمل المشوار، وعلى قمة الجبل وقف وحده، حاملاً تاج البطولة.'
+    : stats.wins>0
+      ? `خاض ${stats.matches} مباراة، وأذاق خصومه طعم الهزيمة ${stats.wins} مرة.`
+      : 'صاحب مقعد وحكاية، وشاهد على بطولة لن تُنسى.';
+  ctx.fillText(phrase, W/2, 600);
+  // الإحصائيات
+  ctx.fillStyle='#628090';
+  ctx.font='15px serif';
+  const stats1 = stats.matches>0 ? `${stats.matches} مباراة · ${stats.wins} فوز · ${stats.losses} خسارة` : `مقعد رقم ${p.slot}`;
+  ctx.fillText(stats1, W/2, 640);
+  // التاريخ
+  const d=new Date();
+  const dateStr=d.toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'});
+  ctx.fillStyle='#628090';
+  ctx.font='13px serif';
+  ctx.fillText(dateStr, W/2, 730);
+  // التوقيع
+  ctx.fillStyle=isChamp?'#D4A840':'#5AA0CC';
+  ctx.font='italic 14px serif';
+  ctx.fillText('— إدارة بطولة كان يـاما كان —', W/2, 770);
+}
+
+function closeCert(){
+  document.getElementById('cert-modal').classList.remove('open');
+  _certPid=null;
+}
+
+function downloadCert(){
+  const c=document.getElementById('cert-canvas');
+  const p=_certPid!==null?pById(_certPid):null;
+  const fname=`certificate_${p?p.name.replace(/\s+/g,'_'):'player'}.png`;
+  const a=document.createElement('a');
+  a.href=c.toDataURL('image/png');
+  a.download=fname;a.click();
+}
+
+// إغلاق الشهادة بالضغط خارجها
+document.addEventListener('DOMContentLoaded',()=>{
+  const m=document.getElementById('cert-modal');
+  if(m)m.addEventListener('click',e=>{if(e.target===e.currentTarget)closeCert();});
+});
 
 // ── لقطات التحكيم (CLIPS) ──
 // استخراج معرّف YouTube من رابط (للعرض المضمَّن)
@@ -962,6 +1377,30 @@ function openPlayerProfile(pid){
   const editBtn=canEdit
     ?`<div style="text-align:left;margin-top:6px"><button class="btn" style="font-size:11px;padding:4px 10px" onclick="editStory(${pid})">✏️ ${story?'تعديل':'إضافة'} القصة</button></div>`
     :'';
+  // التشجيعات
+  const playerCheers=(S.cheers&&S.cheers[pid])||{};
+  const cheersList=Object.entries(playerCheers).map(([uid,ch])=>({uid,...ch})).sort((a,b)=>(b.t||0)-(a.t||0));
+  const userCheer=playerCheers[USER_ID];
+  const cheersHTML=cheersList.length
+    ?`<div class="pp-cheers">${cheersList.slice(0,8).map(ch=>`
+      <div class="pp-cheer${ch.uid===USER_ID?' pp-cheer-mine':''}">
+        <div class="pp-cheer-head">
+          <span class="pp-cheer-author">${(ch.author||'مشجّع').replace(/</g,'&lt;')}${ch.uid===USER_ID?' (أنت)':''}</span>
+          <span>${fmtRelTime(ch.t||Date.now())}</span>
+        </div>
+        <div class="pp-cheer-msg">${(ch.msg||'').replace(/</g,'&lt;')}</div>
+      </div>`).join('')}${cheersList.length>8?`<div style="text-align:center;font-size:11px;color:var(--g2);padding:5px">و ${ar(cheersList.length-8)} رسالة أخرى</div>`:''}</div>`
+    :`<div class="pp-cheer-empty">💌 كن أول من يشجّع ${p.registered?p.name:'هذا اللاعب'}</div>`;
+  const cheerForm=p.registered&&!userCheer?`
+    <div class="pp-cheer-form">
+      <input id="cheer-author" placeholder="اسمك (اختياري)" maxlength="40">
+      <textarea id="cheer-msg" placeholder="اكتب رسالة تشجيع..." maxlength="300" rows="2"></textarea>
+      <button class="btn green" style="width:100%;font-size:12px;padding:6px" onclick="submitCheer(${pid})">💌 إرسال التشجيع</button>
+    </div>`:'';
+  // زر الشهادة (للاعب المسجل بعد البطولة أو خلالها)
+  const certBtn=p.registered
+    ?`<div style="text-align:center;margin-top:10px"><button class="btn gold" onclick="openCert(${pid})">🏅 احصل على شهادتك</button></div>`
+    :'';
   // الشروط
   let condsHTML='';
   if(stats.condsWon.length||stats.condsLost.length){
@@ -995,7 +1434,13 @@ function openPlayerProfile(pid){
     <div class="pp-section">
       <h4>📖 قصة اللاعب</h4>
       <div id="pp-story-area">${storyHTML}${editBtn}</div>
-    </div>`;
+    </div>
+    ${p.registered?`<div class="pp-section">
+      <h4>💌 رسائل التشجيع ${cheersList.length?`<span style="color:var(--g2);font-size:10px;margin-right:auto">${ar(cheersList.length)}</span>`:''}</h4>
+      ${cheersHTML}
+      ${cheerForm}
+    </div>`:''}
+    ${certBtn}`;
   document.getElementById('pp-modal').classList.add('open');
 }
 function closePlayerProfile(){document.getElementById('pp-modal').classList.remove('open');}
@@ -1187,7 +1632,7 @@ async function fbLoad(){
     _fbReady=true;
   }catch(e){console.error(e);}
   hideBar();
-  updCtr();renderList();buildPGrid();refreshSlots();renderRules();
+  updCtr();renderList();buildPGrid();refreshSlots();renderRules();renderInsights();renderFeed();
   const tv=document.getElementById('totalVotes');
   if(tv&&S.totalVotes)tv.textContent=ar(S.totalVotes);
 }
@@ -1219,6 +1664,14 @@ function applyRemote(d){
   if(typeof d.simMin==='number')simM=d.simMin;
   // تحميل لقطات التحكيم
   if(d.clips&&typeof d.clips==='object')S.clips=JSON.parse(JSON.stringify(d.clips));
+  // تحميل الأحداث
+  if(d.events&&typeof d.events==='object'){
+    const list=Object.values(d.events).filter(e=>e&&e.t);
+    list.sort((a,b)=>b.t-a.t);
+    S.events=list.slice(0,30);
+  }
+  // تحميل التشجيعات
+  if(d.cheers&&typeof d.cheers==='object')S.cheers=JSON.parse(JSON.stringify(d.cheers));
   // تحميل الشروط من Firebase (لو الإدارة عدّلت عليها)
   if(d.conditions){
     const arr=Array.isArray(d.conditions)?d.conditions:Object.values(d.conditions);
@@ -1260,6 +1713,8 @@ async function fbPoll(){
     const playersCount = Array.isArray(d.players)
       ? d.players.filter(p=>p&&p.registered).length
       : (d.players&&typeof d.players==='object'? Object.values(d.players).filter(p=>p&&p.registered).length : 0);
+    let cheersCount=0;
+    if(d.cheers){Object.values(d.cheers).forEach(o=>{if(o)cheersCount+=Object.keys(o).length;});}
     const sig=JSON.stringify([
       d.tournament&&d.tournament.started?1:0,
       d.tournament&&d.tournament.votingOpen?1:0,
@@ -1267,7 +1722,9 @@ async function fbPoll(){
       votersCount,
       d.totalVotes||0,
       playersCount,
-      d.clips?Object.keys(d.clips).length:0
+      d.clips?Object.keys(d.clips).length:0,
+      d.events?Object.keys(d.events).length:0,
+      cheersCount
     ]);
     if(sig===_lastSig)return;
     _lastSig=sig;
@@ -1279,6 +1736,10 @@ async function fbPoll(){
     }
     if(document.getElementById('clips')?.classList.contains('on')){
       renderClips();
+    }
+    // تحديث الإحصائيات والسجل الحي (في الصفحة الرئيسية)
+    if(document.getElementById('reg')?.classList.contains('on')){
+      renderInsights();renderFeed();
     }
     const tv=document.getElementById('totalVotes');
     if(tv)tv.textContent=ar(S.totalVotes||0);
@@ -1338,6 +1799,7 @@ function regPlayer(){
   suc.textContent=`✅ تم تسجيل ${name} في المقعد ${ar(S.players[id].slot)}!`;suc.style.display='block';
   setTimeout(()=>suc.style.display='none',3000);
   refreshSlots();updCtr();renderList();buildPGrid();save();
+  addEvent('register',{name,slot:S.players[id].slot});
 }
 
 function renderList(f=''){
@@ -1559,6 +2021,7 @@ async function startTrn(){
   activeRound='r32';
   // Force immediate save to Firebase
   await forceSave();
+  addEvent('tournament-start',{});
   renderTrn();
 }
 
@@ -1747,6 +2210,7 @@ async function openVoting(){
   showModal('تأكيد','هل تريد فتح التصويت للجمهور؟ سيتمكنون من التصويت على شرط كل قيم.',async()=>{
     S.tournament.votingOpen=true;
     await forceSave();
+    addEvent('voting-open',{});
     renderTrn();
     renderAdmin();
     showModal('✅ تم','التصويت مفتوح الآن — الجمهور يرى الجدول ويصوت على شرط كل قيم.',null);
@@ -1764,11 +2228,32 @@ async function closeVoting(){
 function setWin(matchId,winnerId){
   if(!adminMode)return;
   showModal('تأكيد الفوز',`هل تؤكد أن ${pName(winnerId)} هو الفائز؟`,async()=>{
+    // نلتقط معلومات الخصم قبل التحديث
+    const rounds=['r32','r16','r8','r4','r2'];
+    let mInfo=null;
+    rounds.forEach(r=>{
+      const arr=S.tournament.bracket[r];if(!arr)return;
+      const items=Array.isArray(arr)?arr:Object.values(arr);
+      const fm=items.find(x=>x&&x.id===matchId);
+      if(fm)mInfo={loser:fm.p1===winnerId?fm.p2:fm.p1,round:r};
+    });
     if(advanceWinner(S.tournament.bracket,matchId,winnerId)){
-      const rounds=['r32','r16','r8','r4','r2'];
       const rIdx=rounds.find(r=>S.tournament.bracket[r].find(m=>m.id===matchId));
       if(rIdx){const allDone=S.tournament.bracket[rIdx].every(m=>m.winner!==null);if(allDone){const ni=rounds.indexOf(rIdx)+1;activeRound=ni<rounds.length?rounds[ni]:'done';}}
-      if(S.tournament.bracket.done)S.tournament.champion=S.tournament.bracket.done;
+      if(S.tournament.bracket.done){
+        S.tournament.champion=S.tournament.bracket.done;
+        // حدث التتويج
+        const champ=pById(S.tournament.bracket.done);
+        if(champ)addEvent('champion',{name:champ.name});
+      }
+      // حدث الفوز
+      if(mInfo){
+        addEvent('win',{
+          winner:pName(winnerId),
+          loser:mInfo.loser!==null?pName(mInfo.loser):'الخصم',
+          round:RN[mInfo.round]||''
+        });
+      }
       await forceSave();
       renderTrn();
     }
