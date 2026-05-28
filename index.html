@@ -466,14 +466,33 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
 .day-card.live .day-pf{background:#D4A840}
 @media(max-width:520px){.days-grid{grid-template-columns:1fr}}
 
-/* Bracket - تنسيق متناسق للأقيام داخل اليوم المختار */
+/* Bracket - رأس اليوم النشط */
 .day-header{margin-bottom:12px;padding:10px 14px;background:var(--card);border:1px solid var(--sep);
   border-right:3px solid var(--b2);border-radius:var(--r);display:flex;align-items:center;
-  justify-content:space-between;backdrop-filter:blur(4px)}
+  justify-content:space-between;backdrop-filter:blur(4px);flex-wrap:wrap;gap:8px}
 .day-header-t{font-family:'Amiri',serif;font-size:15px;color:var(--g1);font-weight:700}
 .day-header-s{font-size:11px;color:var(--g2);margin-top:2px}
-.day-header-rounds{display:flex;gap:5px;font-size:10px;color:var(--b3);letter-spacing:1px;
-  font-family:'Cinzel Decorative',serif;flex-wrap:wrap;justify-content:flex-end}
+
+/* أزرار اختيار الدور داخل اليوم */
+.round-picker{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.rpk{padding:7px 14px;background:rgba(46,118,184,.06);border:1px solid var(--sep);
+  border-radius:100px;color:var(--g2);font-family:'Amiri',serif;font-size:12px;
+  cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.rpk:hover{background:rgba(46,118,184,.14);color:var(--b4);border-color:var(--sep2)}
+.rpk.on{background:rgba(46,118,184,.25);border-color:var(--b2);color:var(--g1);font-weight:700}
+.rpk.done{border-color:rgba(30,150,80,.4)}
+.rpk.done.on{background:rgba(30,150,80,.18);color:#90E0A0}
+.rpk-count{font-size:9px;color:var(--g2);font-family:'Cinzel Decorative',serif;
+  background:rgba(0,0,0,.3);padding:1px 6px;border-radius:100px}
+.rpk.on .rpk-count{color:var(--b4)}
+
+/* شبكة المباريات */
+.matches-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:10px;margin-bottom:14px}
+.matches-grid .bv-match{margin:0}
+.round-title-big{font-family:'Amiri',serif;font-size:14px;color:var(--b4);font-weight:700;
+  margin-bottom:11px;padding:7px 13px;background:rgba(46,118,184,.08);border:1px solid var(--sep);
+  border-right:3px solid var(--b2);border-radius:var(--r);display:flex;align-items:center;justify-content:space-between}
+.round-title-big .rt-count{font-size:10px;color:var(--g2);font-family:'Cinzel Decorative',serif}
 
 /* INSIGHTS DASHBOARD */
 .insights{margin-bottom:18px}
@@ -880,7 +899,7 @@ let CM=[];
 function initS(){return{players:Array.from({length:64},(_,i)=>({id:i,slot:i+1,name:null,photo:null,story:null,registered:false})),tournament:{started:false,bracket:null,champion:null,votingOpen:false},votes:{},totalVotes:0,simMin:0,clips:{},events:[],cheers:{}};}
 let S=initS();
 let _fbReady=false,_saveT=null,simM=0,aDay=0,adminMode=false;
-let dragPid=null,selPid=null,drawAssign={},activeRound='r64',activeDay=1;
+let dragPid=null,selPid=null,drawAssign={},activeRound='r64',activeDay=1,activeRoundInDay='r64';
 let vmMN=null,vmPending=null;
 let modalCb=null;
 let pPhoto=null;
@@ -2113,8 +2132,30 @@ async function startTrn(){
 // نظرة عامة على أيام البطولة + تبديل اليوم النشط
 function setActiveDay(d){
   activeDay=d;
+  // ضبط الدور الافتراضي داخل اليوم — أول دور فيه مباريات أو الأول
+  const rounds=DAY_ROUNDS[d]||[];
+  const b=S.tournament&&S.tournament.bracket;
+  if(rounds.length){
+    let chosen=rounds[0];
+    if(b){
+      // ابحث عن أول دور فيه مباريات لم تنتهِ
+      const pending=rounds.find(r=>b[r]&&b[r].some(m=>m&&(m.p1!==null||m.p2!==null)&&!m.winner));
+      if(pending)chosen=pending;
+      else{
+        // أو آخر دور فيه مباريات
+        const withMatches=rounds.filter(r=>b[r]&&b[r].some(m=>m&&(m.p1!==null||m.p2!==null)));
+        if(withMatches.length)chosen=withMatches[withMatches.length-1];
+      }
+    }
+    activeRoundInDay=chosen;
+  }
   renderTrn();
   window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function setActiveRoundInDay(r){
+  activeRoundInDay=r;
+  renderTrn();
 }
 
 function renderDaysOverview(){
@@ -2237,23 +2278,37 @@ function renderTrn(){
 
   // فلترة الأدوار حسب اليوم النشط
   const allowedRounds = DAY_ROUNDS[activeDay] || rounds;
-  const visRounds = allowedRounds.filter(r=>b[r]&&b[r].some(m=>m.p1!==null||m.p2!==null));
+  // تأكد أن activeRoundInDay من ضمن اليوم النشط
+  if(!allowedRounds.includes(activeRoundInDay))activeRoundInDay=allowedRounds[0];
 
-  // رأس اليوم النشط (عنوان واضح)
   const di = DAY_INFO[activeDay];
   let html = '';
   if(di){
-    const roundLabels = allowedRounds.map(r=>RN[r]).join(' · ');
     html += `<div class="day-header">
       <div>
         <div class="day-header-t">${di.icon} ${di.label}</div>
         <div class="day-header-s">${di.name}</div>
       </div>
-      <div class="day-header-rounds">${roundLabels}</div>
     </div>`;
   }
 
-  // عرض شريط البطل لو موجود (يظهر دائماً مع جدول اليوم الثالث)
+  // أزرار اختيار الدور داخل اليوم (تظهر فقط لو اليوم فيه أكثر من دور)
+  if(allowedRounds.length>1){
+    const pickerHTML = allowedRounds.map(r=>{
+      const arr=b[r]||[];
+      const items=Array.isArray(arr)?arr:Object.values(arr);
+      const visible=items.filter(m=>m&&(m.p1!==null||m.p2!==null));
+      const done=visible.length>0&&visible.every(m=>m.winner!==null&&m.winner!==undefined);
+      const cls='rpk'+(r===activeRoundInDay?' on':'')+(done?' done':'');
+      return `<button class="${cls}" onclick="setActiveRoundInDay('${r}')">
+        ${RN[r]}${done?' ✓':''}
+        <span class="rpk-count">${ar(visible.length)}</span>
+      </button>`;
+    }).join('');
+    html += `<div class="round-picker">${pickerHTML}</div>`;
+  }
+
+  // عرض البطل (لو خلصت البطولة) فوق اليوم الثالث
   if(b.done&&activeDay===3){
     const p=pById(b.done);const[bg,fg]=pal(b.done);
     html+=`<div class="champ-card" style="margin-bottom:14px">
@@ -2264,47 +2319,77 @@ function renderTrn(){
     </div>`;
   }
 
-  // لو ما فيه مباريات في اليوم المختار
-  if(!visRounds.length){
+  // عرض الدور المختار فقط
+  const r = activeRoundInDay;
+  const roundArr = b[r];
+  if(!roundArr || !roundArr.length || !roundArr.some(m=>m&&(m.p1!==null||m.p2!==null))){
     html += `<div style="text-align:center;padding:50px 20px;color:var(--g2);background:var(--card);border:1px solid var(--sep);border-radius:var(--r2)">
       <div style="font-size:42px;margin-bottom:10px">⏳</div>
-      <div style="font-size:14px">لا توجد مباريات في ${di?di.label:'هذا اليوم'} بعد</div>
+      <div style="font-size:14px">لا توجد مباريات في ${RN[r]||'هذا الدور'} بعد</div>
     </div>`;
     cont.innerHTML = html;
     return;
   }
 
-  html+='<div class="bracket-wrap"><div class="bracket-visual">';
+  // عنوان الدور + عداد
+  const items=Array.isArray(roundArr)?roundArr:Object.values(roundArr);
+  const visibleM=items.filter(m=>m&&(m.p1!==null||m.p2!==null));
+  const doneM=visibleM.filter(m=>m.winner!==null&&m.winner!==undefined).length;
+  html += `<div class="round-title-big">
+    <span>${RN[r]}</span>
+    <span class="rt-count">${ar(doneM)} / ${ar(visibleM.length)} مباراة</span>
+  </div>`;
 
-  visRounds.forEach(r=>{
-    html+=`<div class="bv-round">
-      <div class="bv-round-title">${RN[r]}</div>
-      <div class="bv-matches">`;
+  // شبكة المباريات
+  html += '<div class="matches-grid">';
+  // forEach في حلقة وهمية بدور وحيد
+  {
 
-    b[r].forEach(m=>{
-      const info=getVoteInfo(m.matchNum);
-      const cond=CONDS.find(c=>c.id===m.condId);
+    items.forEach(m=>{
+      const isSurprise = SURPRISE_ROUNDS.includes(m.round);
+      const info = isSurprise ? null : getVoteInfo(m.matchNum);
+      const cond = !isSurprise ? CONDS.find(c=>c.id===m.condId) : null;
       const canWin=adminMode&&!m.winner&&m.p1!==null&&m.p2!==null;
       const cl1=m.winner===m.p1?'won':m.winner?'lost':'';
       const cl2=m.winner===m.p2?'won':m.winner?'lost':'';
 
       if(m.p1===null&&m.p2===null){
-        html+=`<div class="bv-match"><div style="text-align:center;padding:10px;color:var(--g2);font-size:11px;opacity:.5">ينتظر الفائزين</div></div>`;
+        html+=`<div class="bv-match"><div style="text-align:center;padding:14px;color:var(--g2);font-size:11px;opacity:.5">ينتظر الفائزين</div></div>`;
         return;
       }
 
-      // Player row onclick: admin→setWin, visitor→openVM
-      const oc1 = m.p1!==null&&!m.winner
-        ? (canWin ? `onclick="setWin('${m.id}',${m.p1})"` : `onclick="openVM(${m.matchNum})"`)
-        : '';
-      const oc2 = m.p2!==null&&!m.winner
-        ? (canWin ? `onclick="setWin('${m.id}',${m.p2})"` : `onclick="openVM(${m.matchNum})"`)
-        : '';
+      // اللاعب onclick: للإدارة لاختيار الفائز، للزائر يفتح التصويت (إلا في المفاجأة)
+      const oc1 = m.p1!==null&&!m.winner&&canWin
+        ? `onclick="setWin('${m.id}',${m.p1})"`
+        : (m.p1!==null&&!m.winner&&!isSurprise?`onclick="openVM(${m.matchNum})"`:'');
+      const oc2 = m.p2!==null&&!m.winner&&canWin
+        ? `onclick="setWin('${m.id}',${m.p2})"`
+        : (m.p2!==null&&!m.winner&&!isSurprise?`onclick="openVM(${m.matchNum})"`:'');
       const ptr = !m.winner&&(m.p1!==null||m.p2!==null) ? 'cursor:pointer' : '';
 
       const timeChip = typeof m.startTime==='number'
         ? `<div class="bv-time-wrap"><span class="bv-time${adminMode?' editable':''}" ${adminMode?`onclick="editMatchTime('${m.id}')"`:''}><span class="bv-time-ic">⏰</span>${fmtTime(m.startTime)}${adminMode?'<span class="bv-time-edit">✎</span>':''}</span></div>`
         : '';
+
+      // شرط المباراة — لنصف النهائي والنهائي يظهر "مفاجأة" فقط، بدون أي زر تصويت
+      let condBlock = '';
+      if(isSurprise){
+        condBlock = `<div class="bv-results" style="text-align:center;background:linear-gradient(180deg,rgba(180,130,30,.10),rgba(4,8,14,.55));border-color:rgba(220,170,40,.35);border-top:2px solid #D4A840">
+          <div style="font-size:20px;margin-bottom:4px">🎁</div>
+          <div style="font-size:12px;color:#D4A840;letter-spacing:3px;font-weight:700">الشرط: مفاجأة</div>
+          <div style="font-size:9px;color:var(--g2);margin-top:4px">يُكشف عند بداية المباراة</div>
+        </div>`;
+      } else {
+        condBlock = voteResultsHTML(m.matchNum)
+          + `<button class="bv-vote-btn${info.voted?' voted':''}" onclick="openVM(${m.matchNum})">
+              ${cond
+                ? '🔒 '+cond.icon+' '+cond.name
+                : info.voted
+                  ? '✅ صوّتت'
+                  : '🗳 صوّت على شرط القيم'}
+            </button>`;
+      }
+
       html+=`<div class="bv-match${m.winner?' done':''}">
         ${timeChip}
         <div class="bv-player ${cl1}${m.p1===null?' empty-p':''}" ${oc1} style="${ptr}">
@@ -2318,24 +2403,11 @@ function renderTrn(){
           <span class="bv-win">🏆</span>
           ${canWin?'<span style="font-size:9px;color:var(--b3);margin-right:auto;opacity:.7">اضغط للفوز</span>':''}
         </div>
-        ${voteResultsHTML(m.matchNum)}
-        ${SURPRISE_ROUNDS.includes(m.round)
-          ? (adminMode
-              ? `<button class="bv-vote-btn" onclick="adminSetSurpriseCond('${m.id}')">${cond?'🔒 '+cond.icon+' '+cond.name:'🎁 حدد شرط المفاجأة'}</button>`
-              : (cond?`<button class="bv-vote-btn voted" style="cursor:default">🔒 ${cond.icon} ${cond.name}</button>`:''))
-          : `<button class="bv-vote-btn${info.voted?' voted':''}" onclick="openVM(${m.matchNum})">
-              ${cond
-                ? '🔒 '+cond.icon+' '+cond.name
-                : info.voted
-                  ? '✅ صوّتت'
-                  : '🗳 صوّت على شرط القيم'}
-            </button>`}
+        ${condBlock}
       </div>`;
     });
-    html+='</div></div>';
-  });
-
-  html+='</div></div>';
+  }
+  html+='</div>';
   cont.innerHTML=html;
 }
 
@@ -2400,6 +2472,8 @@ function setWin(matchId,winnerId){
 
 // ── VOTE MODAL ──
 function openVM(matchNum){
+  // نصف النهائي والنهائي بدون تصويت
+  if(isSurpriseMatch(matchNum))return;
   vmMN=matchNum;vmPending=null;
   if(!S.votes)S.votes={};
   if(!S.votes[matchNum])S.votes[matchNum]={voters:{}};
