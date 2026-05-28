@@ -2401,7 +2401,7 @@ function renderTrn(){
 
 async function openVoting(){
   if(!adminMode)return;
-  if(!S.tournament.bracket||!S.tournament.bracket.r32){
+  if(!S.tournament.bracket||!S.tournament.bracket.r64){
     showModal('تنبيه','وزّع اللاعبين على الجدول أولاً قبل فتح التصويت.',null);
     return;
   }
@@ -2474,7 +2474,6 @@ function openVM(matchNum){
   if(!S.votes[matchNum])S.votes[matchNum]={voters:{}};
   if(!S.votes[matchNum].voters)S.votes[matchNum].voters={};
   const info=getVoteInfo(matchNum);
-  const b=S.tournament.bracket;
   let m=null;
   if(b){for(const r of ['r64','r32','r16','r8','r4','r2']){const f=b[r]&&b[r].find(x=>x.matchNum===matchNum);if(f){m=f;break;}}}
   const cm=CM.find(x=>x.num===matchNum);
@@ -2830,7 +2829,6 @@ function tick(s){simM=Math.max(0,simM+(s/60));save();clock();}
 let _clockTick=null;
 function startClockTick(){if(_clockTick)return;_clockTick=setInterval(()=>{if(document.hidden)return;simM+=1/60;clock();},1000);}
 function stopClockTick(){if(_clockTick){clearInterval(_clockTick);_clockTick=null;}}
-// شغّل العداد فقط لما الصفحة ظاهرة
 document.addEventListener('visibilitychange',()=>{document.hidden?stopClockTick():startClockTick();});
 startClockTick();clock();
 
@@ -2847,7 +2845,6 @@ function showModal(title,body,cb){
   document.getElementById('modal-title').textContent=title;
   document.getElementById('modal-body').textContent=body;
   modalCb=cb;
-  // If no callback = info only, hide cancel show only OK
   document.getElementById('modal-cancel').style.display=cb?'flex':'none';
   document.getElementById('modal-ok').textContent=cb?'تأكيد':'حسناً';
   document.getElementById('modal-ok').style.display='block';
@@ -2856,10 +2853,8 @@ function showModal(title,body,cb){
 function closeModal(){
   document.getElementById('modal').classList.remove('open');
   modalCb=null;
-  // استعادة زر الإلغاء الافتراضي
   const cancelBtn=document.getElementById('modal-cancel');
   if(cancelBtn){cancelBtn.textContent='إلغاء';cancelBtn.onclick=closeModal;}
-  // مسح أي HTML مخصص داخل النص
   const body=document.getElementById('modal-body');
   if(body)body.innerHTML='';
 }
@@ -2871,40 +2866,24 @@ async function buildVotePage(){
   const cont = document.getElementById('voteContent');
   const stat = document.getElementById('voteStat');
   if(!cont) return;
-
-  // Always get fresh data from Firebase first
   showBar('🔄 تحميل التصويت...');
   try{
     const fresh = await fbRead();
     if(fresh) applyRemote(fresh);
   }catch(e){}
   hideBar();
-
   const vo = S.tournament && S.tournament.votingOpen;
   const ts = S.tournament && S.tournament.started;
-
-  // Get matches from bracket OR generate from players
   let matches = getVoteMatches();
-
   if(!matches.length){
-    cont.innerHTML=`<div style="text-align:center;padding:60px 20px;color:var(--g2)">
-      <div style="font-size:48px;margin-bottom:12px">⏳</div>
-      <div style="font-size:16px">لم يتم توزيع اللاعبين بعد</div>
-    </div>`;
+    cont.innerHTML=`<div style="text-align:center;padding:60px 20px;color:var(--g2)"><div style="font-size:48px;margin-bottom:12px">⏳</div><div style="font-size:16px">لم يتم توزيع اللاعبين بعد</div></div>`;
     return;
   }
-
   if(!vo && !ts){
-    cont.innerHTML=`<div style="text-align:center;padding:60px 20px;color:var(--g2)">
-      <div style="font-size:48px;margin-bottom:12px">🔒</div>
-      <div style="font-size:16px">التصويت لم يُفتح بعد</div>
-      <div style="font-size:12px;margin-top:6px">انتظر حتى يفتح المنظم التصويت</div>
-    </div>`;
+    cont.innerHTML=`<div style="text-align:center;padding:60px 20px;color:var(--g2)"><div style="font-size:48px;margin-bottom:12px">🔒</div><div style="font-size:16px">التصويت لم يُفتح بعد</div><div style="font-size:12px;margin-top:6px">انتظر حتى يفتح المنظم التصويت</div></div>`;
     return;
   }
-
   stat.textContent = ar(matches.length) + ' قيم — اختر شرط كل قيم';
-
   let h = '<div class="vgrid">';
   matches.forEach(m=>{
     if(!S.votes) S.votes={};
@@ -2915,43 +2894,7 @@ async function buildVotePage(){
     const p1=pById(m.p1), p2=pById(m.p2);
     const[bg1,fg1]=pal(m.p1??0);
     const[bg2,fg2]=pal(m.p2??0);
-
-    h+=`<div class="vc">
-      <div class="vl">قيم ${ar(key)}</div>
-      <div style="display:flex;align-items:center;gap:8px;padding:9px;background:rgba(46,118,184,.06);border-radius:var(--r);margin-bottom:10px">
-        <div style="display:flex;align-items:center;gap:6px;flex:1">
-          ${p1&&p1.photo
-            ?`<img src="${p1.photo}" style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:1.5px solid var(--sep2);flex-shrink:0">`
-            :`<div style="width:34px;height:34px;border-radius:50%;background:${bg1};color:${fg1};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">${init(pName(m.p1))}</div>`}
-          <span style="font-size:13px;font-weight:700;color:var(--g1)">${pName(m.p1)}</span>
-        </div>
-        <span style="font-size:10px;color:var(--b2)">ضد</span>
-        <div style="display:flex;align-items:center;gap:6px;flex:1;justify-content:flex-end">
-          <span style="font-size:13px;font-weight:700;color:var(--g1)">${pName(m.p2)}</span>
-          ${p2&&p2.photo
-            ?`<img src="${p2.photo}" style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:1.5px solid var(--sep2);flex-shrink:0">`
-            :`<div style="width:34px;height:34px;border-radius:50%;background:${bg2};color:${fg2};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">${init(pName(m.p2))}</div>`}
-        </div>
-      </div>
-      ${info.voted?`<div style="text-align:center;padding:5px 8px;background:rgba(30,150,80,.1);border:1px solid rgba(30,150,80,.25);border-radius:var(--r);color:#70D090;font-size:11px;margin-bottom:8px">✅ صوّتت${info.topCond&&info.tot>0?' — الأعلى: '+info.topCond.icon+' '+info.topCond.name+' ('+ar(info.topPct)+'%)':''}</div>`:''}
-      <div class="cg">
-        ${CONDS.map(c=>{
-          const cnt=info.counts[c.id]||0;
-          const pct=info.tot>0?Math.round(cnt/info.tot*100):0;
-          const isTop=info.topCond&&info.topCond.id===c.id&&info.tot>0;
-          const isUserVote=info.userVote===c.id;
-          return`<div class="co${isUserVote?' sel':''}${info.voted?' voted':''}"
-            id="vp-${key}-${c.id}"
-            ${info.voted?'':`onclick="castVote(${key},${c.id},this)"`}
-            style="${isTop?'border-color:rgba(46,118,184,.55);':''}" >
-            <span>${c.icon} ${c.name}${isUserVote?' ✓':''}</span>
-            <span class="vcnt" id="vpcnt-${key}-${c.id}">${ar(pct)}% · ${ar(cnt)}${isTop?' 🏆':''}</span>
-            <div class="vbar" style="width:${pct}%;background:${isTop?'var(--b2)':'rgba(46,118,184,.35)'}"></div>
-          </div>`;
-        }).join('')}
-      </div>
-      ${!info.voted?`<button class="vbtn" id="vbtn-${key}" onclick="castVoteSubmit(${key})">تأكيد التصويت</button>`:''}
-    </div>`;
+    h+=`<div class="vc"><div class="vl">قيم ${ar(key)}</div><div style="display:flex;align-items:center;gap:8px;padding:9px;background:rgba(46,118,184,.06);border-radius:var(--r);margin-bottom:10px"><div style="display:flex;align-items:center;gap:6px;flex:1">${p1&&p1.photo?`<img src="${p1.photo}" style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:1.5px solid var(--sep2);flex-shrink:0">`:`<div style="width:34px;height:34px;border-radius:50%;background:${bg1};color:${fg1};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">${init(pName(m.p1))}</div>`}<span style="font-size:13px;font-weight:700;color:var(--g1)">${pName(m.p1)}</span></div><span style="font-size:10px;color:var(--b2)">ضد</span><div style="display:flex;align-items:center;gap:6px;flex:1;justify-content:flex-end"><span style="font-size:13px;font-weight:700;color:var(--g1)">${pName(m.p2)}</span>${p2&&p2.photo?`<img src="${p2.photo}" style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:1.5px solid var(--sep2);flex-shrink:0">`:`<div style="width:34px;height:34px;border-radius:50%;background:${bg2};color:${fg2};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">${init(pName(m.p2))}</div>`}</div></div>${info.voted?`<div style="text-align:center;padding:5px 8px;background:rgba(30,150,80,.1);border:1px solid rgba(30,150,80,.25);border-radius:var(--r);color:#70D090;font-size:11px;margin-bottom:8px">✅ صوّتت${info.topCond&&info.tot>0?' — الأعلى: '+info.topCond.icon+' '+info.topCond.name+' ('+ar(info.topPct)+'%)':''}</div>`:''}<div class="cg">${CONDS.map(c=>{const cnt=info.counts[c.id]||0;const pct=info.tot>0?Math.round(cnt/info.tot*100):0;const isTop=info.topCond&&info.topCond.id===c.id&&info.tot>0;const isUserVote=info.userVote===c.id;return`<div class="co${isUserVote?' sel':''}${info.voted?' voted':''}" id="vp-${key}-${c.id}" ${info.voted?'':`onclick="castVote(${key},${c.id},this)"`} style="${isTop?'border-color:rgba(46,118,184,.55);':''}"><span>${c.icon} ${c.name}${isUserVote?' ✓':''}</span><span class="vcnt" id="vpcnt-${key}-${c.id}">${ar(pct)}% · ${ar(cnt)}${isTop?' 🏆':''}</span><div class="vbar" style="width:${pct}%;background:${isTop?'var(--b2)':'rgba(46,118,184,.35)'}"></div></div>`;}).join('')}</div>${!info.voted?`<button class="vbtn" id="vbtn-${key}" onclick="castVoteSubmit(${key})">تأكيد التصويت</button>`:''}</div>`;
   });
   h+='</div>';
   cont.innerHTML=h;
@@ -2963,7 +2906,6 @@ function getVoteMatches(){
   if(b){
     const rounds=['r64','r32','r16','r8','r4','r2'];
     for(const r of rounds){
-      // استبعاد أدوار المفاجأة من التصويت
       if(SURPRISE_ROUNDS.includes(r))continue;
       const arr = b[r];
       if(!arr) continue;
@@ -2974,14 +2916,7 @@ function getVoteMatches(){
         const p2 = m.p2 !== undefined ? m.p2 : null;
         const winner = m.winner !== undefined ? m.winner : null;
         if(p1 !== null && p2 !== null && !winner){
-          result.push({
-            matchNum: m.matchNum,
-            p1: p1,
-            p2: p2,
-            round: m.round,
-            winner: winner,
-            condId: m.condId || null
-          });
+          result.push({matchNum: m.matchNum, p1: p1, p2: p2, round: m.round, winner: winner, condId: m.condId || null});
         }
       });
     }
@@ -3001,24 +2936,20 @@ function castVote(mn,cid,el){
 async function castVoteSubmit(mn){
   const cid=_pendingVotes[mn];
   if(!cid){
-    // highlight that user needs to pick
     const btn=document.getElementById(`vbtn-${mn}`);
     if(btn){btn.style.borderColor='rgba(220,80,80,.6)';setTimeout(()=>btn.style.borderColor='',1500);}
     return;
   }
   const info=getVoteInfo(mn);
   if(info.voted)return;
-  // disable submit button while writing
   const btn=document.getElementById(`vbtn-${mn}`);
   if(btn){btn.disabled=true;btn.textContent='...جاري التصويت';}
-  // atomic write — كل مستخدم له مفتاحه الخاص في Firebase
   const ok=await fbWriteVote(mn,cid);
   if(!ok){
     if(btn){btn.disabled=false;btn.textContent='تأكيد التصويت';}
     alert('فشل التصويت — جرّب مره ثانية');
     return;
   }
-  // تحديث الحالة المحلية
   if(!S.votes)S.votes={};
   if(!S.votes[mn])S.votes[mn]={voters:{}};
   if(!S.votes[mn].voters)S.votes[mn].voters={};
@@ -3028,7 +2959,6 @@ async function castVoteSubmit(mn){
   fbWrite('totalVotes',S.totalVotes);
   const tv=document.getElementById('totalVotes');
   if(tv)tv.textContent=ar(S.totalVotes||0);
-  // إعادة بناء الصفحة
   buildVotePage();
 }
 
@@ -3047,10 +2977,10 @@ function ST(tab,btn){
 }
 
 // ── INIT ──
+console.log('[KYK] Script loaded successfully');
 buildPGrid();refreshSlots();
 fbLoad();
 
-// عدّاد أحرف لحقل القصة في التسجيل
 (function(){
   const t=document.getElementById('rstory'),c=document.getElementById('rstory-cnt');
   if(t&&c){t.addEventListener('input',()=>{c.textContent=ar(t.value.length);});}
