@@ -1611,28 +1611,16 @@ setInterval(()=>{
 },1000);
 
 // ── VOTE HELPERS ──
-// مساعد: يحدد لو القيم في دور المفاجأة (نصف النهائي/النهائي)
-function isSurpriseMatch(matchNum){
-  const b=S.tournament&&S.tournament.bracket;if(!b)return false;
-  for(const r of SURPRISE_ROUNDS){
-    const arr=b[r];if(!arr)continue;
-    const items=Array.isArray(arr)?arr:Object.values(arr);
-    if(items.some(m=>m&&m.matchNum===matchNum))return true;
-  }
-  return false;
+// مساعد: يحدد لو القيم في دور المفاجأة — يحتاج معرّف القيم الكامل أو الدور
+function isSurpriseMatchById(matchId){
+  if(!matchId)return false;
+  // معرّف الشكل: r4_0 / r2_0
+  return SURPRISE_ROUNDS.some(r=>matchId.startsWith(r+'_'));
 }
 
-// يبني HTML لنتائج التصويت — يظهر لكل الزوار (يصوتوا أو ما يصوتوا)
+// يبني HTML لنتائج التصويت — للأدوار العادية فقط (المفاجأة يتولاها renderTrn)
 function voteResultsHTML(matchNum, opts){
   opts = opts || {};
-  // نصف النهائي والنهائي — شرط مفاجأة (بدون تصويت)
-  if(isSurpriseMatch(matchNum)){
-    return `<div class="bv-results" style="text-align:center;background:linear-gradient(180deg,rgba(180,130,30,.08),rgba(4,8,14,.45));border-color:rgba(220,170,40,.3)">
-      <div style="font-size:18px;margin-bottom:4px">🎁</div>
-      <div style="font-size:11px;color:#D4A840;letter-spacing:2px;font-weight:700">شرط مفاجأة</div>
-      <div style="font-size:9px;color:var(--g2);margin-top:3px">يُكشف عند بداية المباراة</div>
-    </div>`;
-  }
   const info = getVoteInfo(matchNum);
   // لو ما فيه أصوات
   if(info.tot === 0){
@@ -2472,8 +2460,15 @@ function setWin(matchId,winnerId){
 
 // ── VOTE MODAL ──
 function openVM(matchNum){
-  // نصف النهائي والنهائي بدون تصويت
-  if(isSurpriseMatch(matchNum))return;
+  // ابحث عن المباراة بالـ matchNum مع التأكد من الدور — لو في دور المفاجأة لا تفتح
+  const b=S.tournament&&S.tournament.bracket;
+  if(b){
+    for(const r of SURPRISE_ROUNDS){
+      const arr=b[r];if(!arr)continue;
+      const items=Array.isArray(arr)?arr:Object.values(arr);
+      if(items.some(m=>m&&m.matchNum===matchNum&&m.round===r))return;
+    }
+  }
   vmMN=matchNum;vmPending=null;
   if(!S.votes)S.votes={};
   if(!S.votes[matchNum])S.votes[matchNum]={voters:{}};
