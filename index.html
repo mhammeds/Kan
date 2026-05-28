@@ -2633,13 +2633,19 @@ function renderAdmin(){
       </div>
     </div>
     <div class="admin-section" style="grid-column:1/-1">
-      <h4>👥 اللاعبون المسجّلون</h4>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:5px;max-height:260px;overflow-y:auto">
-        ${reg.map((p,i)=>{const[bg,fg]=pal(p.id);return`<div class="li">
-          <div class="li-n">${ar(i+1)}</div>
+      <h4>👥 اللاعبون المسجّلون <span style="font-size:11px;color:var(--g2);font-weight:400">(${ar(reg.length)} لاعب)</span></h4>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px;align-items:center">
+        <button class="btn" id="bulk-toggle" onclick="bulkMode=!bulkMode;renderAdmin()">${bulkMode?'إلغاء الاختيار':'☑ اختيار مجموعة للحذف'}</button>
+        ${bulkMode?`<button class="btn red" onclick="bulkDeleteSelected()">🗑 حذف المحدد (${ar(bulkSelected.size)})</button>
+        <button class="btn" onclick="bulkSelectAll()">تحديد الكل</button>
+        <button class="btn" onclick="bulkClearSelection()">إلغاء التحديد</button>`:''}
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:5px;max-height:340px;overflow-y:auto">
+        ${reg.map((p,i)=>{const[bg,fg]=pal(p.id);const checked=bulkSelected.has(p.id);return`<div class="li" style="${bulkMode?'cursor:pointer;'+(checked?'background:rgba(200,60,60,.1);border:1px solid rgba(200,60,60,.3)':''):''}" ${bulkMode?`onclick="bulkToggle(${p.id})"`:''}>
+          ${bulkMode?`<input type="checkbox" ${checked?'checked':''} style="margin-left:4px;cursor:pointer" onclick="event.stopPropagation();bulkToggle(${p.id})">`:`<div class="li-n">${ar(i+1)}</div>`}
           ${p.photo?`<img class="li-av" src="${p.photo}">`:`<div class="li-av-i" style="background:${bg};color:${fg}">${init(p.name)}</div>`}
           <div class="li-info"><div class="li-name">${p.name}</div><div class="li-sub">مقعد ${ar(p.slot)}</div></div>
-          <button class="btn red" style="padding:2px 7px;font-size:11px" onclick="removePlayer(${p.id})">حذف</button>
+          ${bulkMode?'':`<button class="btn red" style="padding:2px 7px;font-size:11px" onclick="removePlayer(${p.id})">حذف</button>`}
         </div>`;}).join('')}
         ${!reg.length?'<div class="empty">لا يوجد</div>':''}
       </div>
@@ -2801,8 +2807,72 @@ function adminResetClock(){
     simM=0;save();clock();updateAdminClockDisplay();
   });
 }
-function removePlayer(id){showModal('حذف لاعب',`حذف ${S.players[id].name}؟`,()=>{S.players[id]={id,slot:id+1,name:null,photo:null,registered:false};save();updCtr();renderList();buildPGrid();renderAdmin();refreshSlots();});}
-function confirmClearPlayers(){showModal('مسح اللاعبين','مسح جميع اللاعبين؟',()=>{S.players.forEach(p=>{p.name=null;p.photo=null;p.registered=false;});save();updCtr();renderList();buildPGrid();renderAdmin();refreshSlots();});}
+// ── وضع الاختيار الجماعي للحذف ──
+let bulkMode=false;
+let bulkSelected=new Set();
+function bulkToggle(id){
+  if(bulkSelected.has(id))bulkSelected.delete(id);
+  else bulkSelected.add(id);
+  renderAdmin();
+}
+function bulkSelectAll(){
+  S.players.forEach(p=>{if(p.registered)bulkSelected.add(p.id);});
+  renderAdmin();
+}
+function bulkClearSelection(){
+  bulkSelected.clear();
+  renderAdmin();
+}
+async function bulkDeleteSelected(){
+  if(!bulkSelected.size){alert('ما اخترت أي لاعب');return;}
+  const ids=Array.from(bulkSelected);
+  showModal('حذف '+ar(ids.length)+' لاعب',`متأكد تبي تحذف ${ar(ids.length)} لاعب نهائياً من قاعدة البيانات؟`,async()=>{
+    showBar('🗑 جاري حذف '+ar(ids.length)+' لاعب...');
+    for(const id of ids){
+      S.players[id]={id,slot:id+1,name:null,photo:null,story:null,registered:false};
+      try{
+        await fbWrite('players/'+id,S.players[id]);
+        await fbWrite('cheers/'+id,null);
+        if(S.cheers&&S.cheers[id])delete S.cheers[id];
+      }catch(e){console.error(e);}
+    }
+    bulkSelected.clear();
+    bulkMode=false;
+    hideBar();
+    updCtr();renderList();buildPGrid();renderAdmin();refreshSlots();renderInsights();renderFeed();
+  });
+}
+
+async function removePlayer(id){
+  const pName=S.players[id]?.name||'هذا اللاعب';
+  showModal('حذف لاعب',`حذف ${pName}؟ سيُمسح من قاعدة البيانات نهائياً مع كل معلوماته (التشجيعات، القصة).`,async()=>{
+    showBar('🗑 جاري الحذف من قاعدة البيانات...');
+    // مسح محلي
+    S.players[id]={id,slot:id+1,name:null,photo:null,story:null,registered:false};
+    // مسح من Firebase مباشرة بدون انتظار debounce
+    try{
+      await fbWrite('players/'+id,S.players[id]);
+      // مسح رسائل التشجيع المرتبطة
+      await fbWrite('cheers/'+id,null);
+      if(S.cheers&&S.cheers[id])delete S.cheers[id];
+    }catch(e){console.error('Delete failed:',e);}
+    hideBar();
+    updCtr();renderList();buildPGrid();renderAdmin();refreshSlots();renderInsights();renderFeed();
+  });
+}
+async function confirmClearPlayers(){
+  showModal('مسح كل اللاعبين','مسح جميع اللاعبين من قاعدة البيانات نهائياً؟',async()=>{
+    showBar('🗑 جاري المسح الكامل...');
+    S.players.forEach(p=>{p.name=null;p.photo=null;p.story=null;p.registered=false;});
+    try{
+      await fbWrite('players',S.players.map(p=>({...p})));
+      await fbWrite('cheers',null);
+      S.cheers={};
+    }catch(e){console.error('Clear failed:',e);}
+    hideBar();
+    updCtr();renderList();buildPGrid();renderAdmin();refreshSlots();renderInsights();renderFeed();
+  });
+}
 function confirmClearVotes(){showModal('مسح التصويت','مسح جميع التصويتات؟',async()=>{S.votes={};S.totalVotes=0;await fbWrite('votes',null);await fbWrite('totalVotes',0);save();renderAdmin();const tv=document.getElementById('totalVotes');if(tv)tv.textContent=ar(0);});}
 function confirmResetTrn(){showModal('إعادة البطولة','حذف جميع نتائج البطولة؟',()=>{S.tournament={started:false,bracket:null,champion:null,votingOpen:false};save();renderAdmin();renderTrn();});}
 function confirmNuke(){showModal('⚠️ مسح كامل','حذف كل شيء؟',()=>{S=initS();save();updCtr();renderList();buildPGrid();refreshSlots();renderAdmin();renderTrn();const tv=document.getElementById('totalVotes');if(tv)tv.textContent=ar(0);});}
