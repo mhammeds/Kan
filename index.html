@@ -560,6 +560,71 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
 .cert-wrap canvas{display:block;max-width:100%;height:auto;border-radius:var(--r);margin:0 auto}
 .cert-actions{display:flex;gap:7px;margin-top:12px;justify-content:center;flex-wrap:wrap}
 
+/* FAMILY (عائلتي) */
+.fam-hero{background:radial-gradient(ellipse at center,rgba(140,90,180,.18),rgba(4,8,14,.65));
+  border:1px solid rgba(180,140,220,.3);border-radius:var(--r2);padding:22px 18px;
+  margin-bottom:14px;text-align:center;backdrop-filter:blur(10px);position:relative;overflow:hidden}
+.fam-hero::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+  background:radial-gradient(circle at 20% 30%,rgba(150,100,200,.12) 0%,transparent 50%),radial-gradient(circle at 80% 70%,rgba(80,60,140,.1) 0%,transparent 50%);
+  pointer-events:none}
+.fam-logo{width:120px;height:140px;margin:0 auto 12px;position:relative;display:flex;align-items:center;justify-content:center}
+.fam-logo svg{width:100%;height:100%;filter:drop-shadow(0 4px 14px rgba(180,140,220,.4))}
+.fam-msg{font-family:'Amiri',serif;font-size:15px;color:#E8D8F2;line-height:1.7;max-width:600px;
+  margin:0 auto;white-space:pre-wrap;word-break:break-word;padding:0 12px}
+.fam-msg.empty{color:var(--g2);font-style:italic;font-size:12px}
+.fam-msg-edit{display:inline-block;margin-top:8px;font-size:11px;color:#C8A8DC;cursor:pointer;
+  padding:4px 12px;border:1px solid rgba(180,140,220,.3);border-radius:100px;background:rgba(140,90,180,.1)}
+.fam-msg-edit:hover{background:rgba(140,90,180,.2)}
+
+.fam-status-bar{display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;background:var(--card);border:1px solid var(--sep);border-radius:var(--r);
+  margin-bottom:12px;font-size:12px;flex-wrap:wrap;gap:8px}
+.fam-status-open{color:#80D090}
+.fam-status-closed{color:#E08080}
+
+.fam-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:14px;align-items:start}
+@media(max-width:720px){.fam-grid{grid-template-columns:1fr}}
+
+.fam-reg{background:var(--card);border:1px solid var(--sep);border-top:2px solid #9C7AC8;
+  border-radius:var(--r2);padding:16px;backdrop-filter:blur(6px)}
+.fam-reg-title{font-size:14px;color:#C8A8DC;font-weight:700;margin-bottom:13px;text-align:center}
+.fam-reg .upl:hover{border-color:#9C7AC8}
+.fam-reg .upl{border-color:rgba(180,140,220,.3)}
+.fam-reg-closed{text-align:center;padding:28px 16px;color:var(--g2)}
+.fam-reg-closed .icon{font-size:36px;margin-bottom:8px}
+
+.fam-list{background:var(--card2);border:1px solid var(--sep);border-radius:var(--r2);
+  overflow:hidden;backdrop-filter:blur(6px)}
+.fam-list-hdr{padding:11px 14px;border-bottom:1px solid var(--sep);display:flex;
+  align-items:center;justify-content:space-between;background:rgba(140,90,180,.05)}
+.fam-list-t{font-size:13px;color:var(--g1);font-weight:700;font-family:'Amiri',serif}
+.fam-list-c{font-size:11px;color:#C8A8DC;font-family:'Cinzel Decorative',serif}
+.fam-list-sc{max-height:420px;overflow-y:auto}
+.fam-list-sc::-webkit-scrollbar{width:3px}
+.fam-list-sc::-webkit-scrollbar-thumb{background:rgba(140,90,180,.3);border-radius:2px}
+
+.fmi{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid rgba(140,90,180,.08);
+  cursor:pointer;transition:background .2s}
+.fmi:hover{background:rgba(140,90,180,.06)}
+.fmi:last-child{border-bottom:none}
+.fmi.pending{background:rgba(218,165,32,.06);border-right:3px solid rgba(218,165,32,.4)}
+.fmi-av{width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid rgba(180,140,220,.4);flex-shrink:0}
+.fmi-av-i{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:700;flex-shrink:0;border:2px solid rgba(180,140,220,.4)}
+.fmi-info{flex:1;min-width:0}
+.fmi-name{font-size:14px;color:var(--g1);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fmi-story{font-size:11px;color:var(--g2);margin-top:2px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fmi-actions{display:flex;gap:5px;flex-shrink:0}
+.fmi-bdg{font-size:9px;padding:2px 8px;border-radius:100px;background:rgba(218,165,32,.16);
+  color:#D4A840;border:1px solid rgba(218,165,32,.3);font-weight:700}
+.fmi-bdg.approved{background:rgba(30,150,80,.15);color:#80D090;border-color:rgba(30,150,80,.3)}
+
+.fam-empty{text-align:center;padding:30px 16px;color:var(--g2);font-size:13px;font-style:italic}
+
+/* Family Profile Modal — uses same .pp-* styles as player profile */
+.fam-success{display:none;text-align:center;padding:11px;background:rgba(30,150,80,.1);
+  border:1px solid rgba(30,150,80,.25);border-radius:var(--r);color:#80D090;font-size:13px;margin-top:8px}
+
 /* CLIPS PAGE */
 .clips-round{margin-bottom:18px}
 .clips-round-title{font-size:13px;color:var(--b3);letter-spacing:3px;margin-bottom:10px;
@@ -679,7 +744,7 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
 <div id="_bar"></div>
 <div class="bg"></div>
 <div class="bg-fade"></div>
-<div class="ghost"><div class="gt">كان يـاما كان</div><div class="gs">بطولة عائلة انفنتي</div></div>
+<div class="ghost"><div class="gt">كان يـاما كان</div><div class="gs">بطولة الكيرم الأسطورية</div></div>
 
 <div class="app" id="appRoot">
 <!-- SIDEBAR -->
@@ -687,7 +752,7 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
   <div class="sb-head">
     <img class="sb-pt" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAsICAoIBwsKCQoNDAsNERwSEQ8PESIZGhQcKSQrKigkJyctMkA3LTA9MCcnOEw5PUNFSElIKzZPVU5GVEBHSEX/2wBDAQwNDREPESESEiFFLicuRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUX/wAARCANjAZADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDyKiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKXFJXW/bvD/8Awhn2fyV/tLbj/V/Pvz97d6YrOpUcLWTd3bQuEVK+tjkqKD1orQgKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigApc0lFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRQKACiuo/tLwp/bWnTDR7r+z4oAt1D5uWkkwfmHPTOO4z7VSS80IaRqcTadOb6WYNZy+b8sMefut6nHtz7UAYlFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAXI9JvJdKl1KOHfaQyCOR1IOwkcZHUA+vSi30m8ubC6vooSbW1x5spIABJwBz1PsOa3vBKXdvezai0yW2kwLtvpJl3RyIf+We3+Nm7D8at+KwNT0a1vNAG3QLb5DaIMNaynqZBk5Ldn/CgDiqKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAl+0zfZ/s/mv5G7f5e47d2MZx6470R3M0UciRyuiSjbIqsQHGc4I781FRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRUqW8j9sD1NAEVGM1eSzjX/Wufwq5EEtyoSIb89cZxQBQg0u8ueYrdyPUjA/WrUfh+6ZgHaJM/7Wf5VqRy3U7ZmLlF7k1v6BpBuJRJIXC5ztA5Yf0oAw7HwPLdLukugi/wCymf61qp8N4JIsxakXfsuzGa66dYbOIRhMZP3Qf1JrIS+VZTDbsWnf+JOiD0oAzI/hvGMeaLs84yjL/hVuP4ZadISn2i8Rx1Dbf8K7KwvJUgjXdvx13c5rV3iTl4jux2pjPN2+Flm3CajPH7vGDWXffDK4tjmG/jlX1MZH8s16vOWAyR5iY+6eCKzpnhiU7XaInsaAPHr3wZqlnk7Y5QP+ebf41jS2VzDkyQuoHBOK9ruFN1F8wjcMcbhwa5jVNOWF3CDBY9/utSEeaUV1s2mxTTbXjALf3vWq83hlGDGJyhXqOooA5qir9xo13ACyx+ag53R81QIweaACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKligaTnoPU0ARAZqeO1ZuW+UfrVqKBU6dfU0/kGgBIoUjHC8+pqT8KesD7lwPlbvW8bKGO2DARlwCGz6jpSEY1vahjulyE9O5NTebF5m5vkXHCkc/jUi5LBzuK/dJU/pTIkeQGUoQq/L8w6+mKYF2w867ukCqSDwoAwD716dpmmtbWIMh8vIyWHf/CuN8J2vn3igZKj+Ed/rXY65fRwW4iVgzqMFc/Ln3oGc9qt0l7dG2tFLxZwXX+KtTTtOhtIlUxopHUgc1BplkoP2u5clyPlB6Aew7VdkkB5LY3dfagDQtpER9sMS/XvWihYj0Nc/BdBHwBketbEE525K8fWmMtFWwcgH8KqXFv5gO7a49GGas+dkdz7Cqks7+Z8qE0xmTPp6JuKAozdkOBWLJbTRysPvqezV1Fwsr/OEIIHTNZ8kXnA7hz6nrSYmc4bSCR2SZSqM3AP8NUhBJbz4Ry+OAG7j0BrfuYOSse0t/GD0rOkRxJsf5VY8YPH/ANakIqyBVZpI49hYBtuOc1nXml22oxtI8Kq4GSU4P1q/IoUsPMD4GVbP3arOAHVjJkNwaAOVutBmi3tbkTIp6fxflWUysjFWBBHUGu/iMEdw+d21u/pVa80y21OEyvhXz98DDfjQBxFFXL3TpbRjn5488MKp0AFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUAZOBTkQuwCjJNXobdYhk8t60ARQ2uMGQfhVkD0FPozQAgGKUgqeRSgZqaEoTsmJ2Hp7UAWrCMzEIjAgnlG7/Sr8toRHuYbc5xk8/SlsQbdVESLMwOUZR19qsR3bJLKJQpllHzgj5QaBGdYxt5p35xzgY5J9qJ5XjdlxtLfwg5A/wDr1duL63jLCLcXIzu9PpWbZf6bqUasfkLZY0Adz4ejltdNN0x5bhABy1WRpL38/m3JY85CKeKtQoZIEO4IqL8gUdAPQetaSSLDbFEjMYIyB3PuTQMz5SkSBeEjUfWo4HM65SMsCeppsy+fKGky39yMd/rSywanJGBbrFCv+22OKAJxHcKw/dgL9auRFz0Bz61jrp2sO3y31sT/AHeauRW+s27DzIlkHrG+aYzXVmJwSBj3xUUoLODvC/Q0xNzgmaKVSB6VBNLb5+ZypHZhigC2WC43Pms64uY2dlSn3EhZMKQePWsmQRhvnco3c0hDzGobzN2Ceuao3SeY21SB24qdlLHCybh61Yg0meZw3AHrQBz0lpIjgfw9M1Wa1kC42kj1rtJ7WBCMgEr1NZ0wiZgF7n8qAOXlTIVXJPbNID32tsztOD1rcvLFJfmHJUZwKy5Y8q+F6dqAMu6SNidh49GFYF3p45eDr3X/AAroJdquCwyvpmqtxHGnOCc9MGkI5ggqcEYNJWreWwkO8ccdcfzrMeNo22uCDTGNooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigApyI0jBVGSaRVLsFUZJrRhhWJcfxHqaAFhhWJcDk9zUlKBSgUAJijFLS/hQAgqSFA7YLYpij1p6fKwpCOgtIksLRt7bmchlI/lUUrrcIwcbdw+UryT7VHHbSXUDqgYiNd2B1/ColkexjJlJ3Y2hvQmgCtftIqiMlVXGMqOtaHhy0R5o/LIJZsZPb1JrBaZ5HZ3O5z0B710/hmPDbgMN/CKYzuYJ44IxKoJA+VB6EVG96rBV3bnc52iqt7eR2VpCGw078hR29TSWbSzIgEYWQjCZ6/jQBNd3zROttZRefdsPm2/wANMTQ9XuAGur9IB/cQFsVuaVZWulRuzMDI/LyHqTVwatYyNtN1s9sCgDCh0KROBqrbh6pVqK31az+aF4rtO4B2mtSa0Mq77WaN884wOaoJcXMEmy7ieL0btTGJLqkkRxeW8sPuVyKq/wBo2dwWzNC47AmteK68xMK4dT6jisbUdHsrh2klttrH+OM4IoAzruO035tbh4JO4zlapvPc2zf6VAJYj/y0UZH41FdaDMrlrS880E58uXg/nSQ6pNp4EN1FLDnruGVP40hGtYalp7Lj92pHvWi18rgrEwUexrMRtKvV3SwxSMe6jBpkthYLGWgkngP+9kflQAXSSsSVkyPrVd5GhRRtB9aimjlijHl3Ykz2YYqtPPdQAFoCy4/h5oAFvsTnAzwefwqjNOSxINAvIGkJBCnpg1TmnVmO1wc0ARzlWl+Yjb7U2WONoSN3I5FZ1xIVc5NRtclUxmkIe53IFXnPWtCz0ePVbMwyMVZQTG+OVbuD7VlQPu6dfSut8KjzC6nBdcMD3FMZ5/d2ktlcPBOu11P51BXU+MogdRLY6gc1yx4NABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUVbs4Nx8xhwOlAEtrB5Y3N94/pVnHNHSlwaAEop200gxnmkIUDvTqMUUxhSUtKoOaQGzo87urxGQAbTgntTdTtUeMTmXzFIwMHo1RaWjPLtCgHGQ/pVa9mkd5It4Cg9QMA0xFS0QTzMVHfABrrrd4tOgDsPnK9q53T4R5iKB1xj/ABqa7me71KKCN+hycdgKQzo7Nxfah9qcEhkAVfTFbk8jRQPKuAwGSTxgVW0iw8q1EuOen0qtq9wJUKbyFzt2r3ApgYcviK8lkZ3k+QDgZxUMWs2s7hXMgc981S1WNxcNAmAExnPYntWbJpbABllH50AeiaR4jhtIVEhJ7cmuqi1/T7mLEd1G3HKseleEFrq2fbuJx2qePUnRhhTuHfpQFz2C71Ao4+zqQjdCOlVBrDGNlkznPauEsdauQBhm57ZrasNQMsu116n86ALst3vnHzlRmujtZo5LZEcJKuPm38iuO1JSJh5Y59qlW41C1iAERPAxxzQBv3ej6bdSBoUNu/8AehOOfpVWTRNRhXdBcxzx9lYYNN0pbmc7pbdwPWteaaK2QebOYx6UAc/PcG1Vl1HT5k9JAMr+lZk16rndZ3GRj7rV0Fxrtuq7VnLr0w2K5+5msbh/njU5OdyjB/SgDPuJopB+/T5/Xv8AnWbNEyfPEdy+ner93ZIQDb3GV67HrLkJich8p9aAK7SBxjvUTLxVlkVhwOfUVXm4WkIahKH5c810/hCUteTxEkbkJ/KuagUuDjrXUeGYSlzJIeCqED3yKYyl4sHmEuDnGDXI4zXV626vIUzhc4/SucZPJkIIz6UhFailYYPNJTGFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAPhjMsgUfjWsiBQFHAFQWcXlx7iPmb+VW+3SgBu2nUUZoAQZoIFKOaXbQIaMmnbfelUdqdspDGgZ6Uo+9S/dp3bNMRqaMN8xXGMDOaoawSb1lwAgbp3NbvhW3Ezzb16bcn2zUet2QTUJxJjhiVyMUAZiMySmViq+XHwFPepvCdjJdzz3+0vhuR/Oqcjbr5gSFQrkjHSun8Ipc2VkslrC7lydwIwKBnYQS29tbmUqZLSVRkoMmP6iuUkurRrqeeJzJDDkIoGS1b72M8wMn2SKJj123Own8K5bWra5e8hslH2aGdtskmATj/AHhQBl6dbrqDyXUsLyO7ngttQVtvpMUtqQUgyvTypRms7/hFttkUS8k3qxDBTyQO+Kxn0O7gnSWJnuYQfmCNhvyoAfqFtHaSEGNgv+13/Gs6a2AG9SD3ps95OkjRTJKIMnCSdRSQsFYgMcHpmgRYtZcEKRyK39OnCOCBye/pXLyOVfIrc0a9cEBQM55zQM6O3JuLuMuON2eR1rpI5YC4aTBx1Arj7jU5VfDnB7YGKiTVZkIKvQB22o6tI4EFko245I7VzF8jyyDzp8n0J6VT/t6SJWCnCHnFZd3qXnuX3HJGKALTwQyybeZWHpxio5dKQ8Qu6t/dNYj3rxPuQn86v2viCQLtVcH1NACy2U8A3PuK+3NNMUVzHsdiT79qc+qSmT5nAB70GeGaIl9pfswGDQBlvDJZS7HOYz901FcEHAq/M3n2ro3VeVNZbPkL3x1pCJ7X/WbeoPBrqtIlFuZV7eVn8a5uziVyrg+1a8smxM9DgDigDJ1KUySkMeGArLnByGXkH9KsXT7m5OccVBvyu3jrQBAQepFNIxUrg9Saty2wksFdB8y8/UUxmdRRRQAUUUUAFFFFABRRRQAUUUUAFS20XnTBe3U1FWlYRbYi56t/KgC0OBS05Yyx9B71MqRopZznFAiFUJ7VGWQHBp08jbeTtFVMrn5ST7mgC4GB6UtV4x8/LDBqYpzwaQEiU+qJunjYhlyKmjvInHJ2/WgZPkUAjPNKhR1yrA08IAwzg54piOn8HsHg1BlTLogIA9q3bvRBq7R36ELuAyprM+HqKtzfqf8AV7R17+tdbbF2Loke1BnYT2oGee3+meVeyoPmZ9q9MV0EE8kMSRQssaRja0rdB/ujvT9fjihulJ/hHzE9zWTpzSahdG9nH7mM4hjH8RHfFAHUW0dp8s1yhkY8gynn8qkuHsLtHihSESYwR0H51Wh0qXUH3XkzIjciNOOKsS+GAEC2qqFX+E9/rQBxV3K8csiRbkuIjypPUeoNU/tglCyyRywt1DovDH6102reGLm7VUNvEhQYDoxBFcrdJrWhqVePzYOzKM4oAZcSSsMySCRe29Kyriwkk5gXGf4asP4gaZQJ4yT9MVVSee5lAgjdiTxgUCI/7Lvh8zxEKOprptA0iS4uYVTiTg+1amj2F3PbKL9Qq44XFdpoGkpBC05QKx6cc4oGcjrllLAWW4t144Bri7y7SCTYhI9u1eo+J1QxuGGPLTcfxrxq8ZmupCeTmgCZ74moTOzc5qAAsec4qRYmP3Rj3NIQvmEjmmk46EirKWJYDM0f0zTnsynfB/SgCoztgYpvmuKlZCHINNMXGTQBYt7gupBPQVScnA+tSxfKx+lRPxigDU00/u2x1BBFWL26AZVB/hqhYvtYjsajml3ytz04FAEcpDsT0BFQZUcZzUgIXrUbRg5K0AKoBI4rZiUCJVxxisiBNzL161tADAxxTAw7uHyJ2X+E8j6VBWtqUO+ESDqn8qyaBhRRRQAUUUUAFFFFABRRRQA5F3uFHUnFbkTQxKFIyQOKyrFN02f7oq2D8xyOlAFx5VHJwaZvyNxz7CoRyaUsd3tQIgvZSSATTY+VFNu1+YGpIuEFIBZcqykVaWTci4HaoJBuX3p8GPLGaAG3KM6ZAzVPymzwDWgxyMA8U0g9STigCGCCY9CUHvVxJ1gIDybsetZ89zt+UEk1DFFJcPx07mgD0bwLfGea8ZBhTtUCvRIV32jqvcdRXjXh/VP7IlaNAT5pAH1r2K2MiaZ5jAJlMkUxnK6tENSvCshzGPvkdT7VNY20cDIY8KFHyL6Cqst2BNI4HU1WXVFySD3oA7C3nAKk4JrWS4BXjFcTDqxfG0fL/KtGDVkVTukGfemM17q7UymFAzPjJwKzv7EluhlyEjP8PU0f21bxHIIJI5NRSeMLaFDnHHvQBFN4QsQ+5rdXI9qfHY29mcRWqIR3C1DB41tJ5djOAzVu28sN4AeDQBmW1s8s+9xtiB5966GFhFaM7HBxuquyKrbMDk0t7JstmTgArgCgDhfFerKqumRuk6n6V5q43Ss/Xmuq8UyCa9VR15rDhhAJJGfT3pCI1sxKoJyvuKuQ6GrEFrjcncZxTlc2S5dNyN0NWUkidMIVU9cE9aQjEvoHsInhktlO5spL1IHpVKG5kQbWJZD1BroJp3Qlcq2B9x6qO0Bj+a0UMfSgDP8AMV3Bz8vbPapJxtbAGcioyixzZxhfQ04nz5QchQBxmgBijZksOagm61amTBHIP0qtMwLDHagCa1bauf73FQSDaxqeJgpCuMYHamyoGBIyaAISeOabzmnEYXBFNXmgC7ZbV+prVUAg1k2ahn57VqocZFADJIw6FT0IxXPSIY5GQ9VOK6Q1janHsudw6OM0xlKiiigAooooAKKKKACiiigCzb5RNw6k1fjImXk4emRWqmBOecc1PHbqMdvekIjKMCfWgVNOq8FOcdaZsBXIIB9KAIZk3pj0psK4SpF9T0FMY/NkdKYx5K7SB1PeltkypHpUWamiOFbsKQhxdY+2aoXN07kqDx6Cn3M23IU1URWkfA6mgB9vA08gHbua1iqRII0429/WoYVEWEX8TUayHfg0AaWj25vtfs4R3kFeza3MLfSwqscsdo968f8ACSSyeJbPyez5J9K9L8WXWfKjXgKuce9MZx1/OyvIobB6VnRzgsdxwg/nU12RLKevPNULrMfKngUAaAvxGAqsdoplxrG0HDYxzwa52XUmyVIB9MVSkuncnnrQBu3OuuQcOfasibUp7g4DHmoYrd53AOa17bSgNrKOfegDd8DeG21GU3NzkIDgEnrXp8dqmn7AnQ+tcp4b1m1sIIrdyFZF5B9a6W5vkuHjYcqOeKYGsyZVXwCK57Xr0QxvhuQM9a0bq+WO1UK2DiuN1i5BRmZsse1AzkrmZ57lpH7ngmrlnbxyMOcgCsm8uNzqiDmgTy2gVmJANIR1D2KXEBQoCuOlc7faPdWeZLfMkfp3re0y/WZFyeMVt29vFNGSTlD+dIDzT7YB8k8RP14IqaN7QgF5pB325ruLzw7bzyErGDxmqH/CO2cY3PATjGR3FMDkz5dy2yCJhk8M3NStZS2wBIzxyeorfdreEtHDEqxnpxWXcTYDIT06UhGNOArZZB9RTLW386fLcIDyaWZ/mIHQmpVfZb7V4z1oAgmYNcOR0zikzgEU0jJyKkQgdelADViLryDirFvZeY3zDitG0NtKgxjcOxqyyADgUAU4rSOI5A5qbFPIptMBGXNZ+qxE26v/AHT/ADrRqC8TzLSRf9nNAznaKKKACiiigAooooAKVRlgPU0lPhXdKg9TQBtptbAx09KC3JA4FRbmSPaRhc/ex1oV9yEgH0oESE571ERt7GnnEQy3LHoPSkEgP3qAGEFx8vWmgf3qczhe9IF38gYpAN+6cUoOEamSSpnGfmpsjYjPvQBTc7349auW8YRNx6mqiDLnFaGNihT1oAVSC/4VA64OVqaPl/wqN6AOh8CiSTX4gnCqMua6rxTdE37AnjHFcv4CiZ9fUliqquTjvXS+I7Bp9SkcHbG2MfWmM5suzPlTz0pt7bvImFHJHatzS/D5a4Z51DRLnCg8k1aFtHGNhjBdn4A7HsPp/hQBxuneFJ7ydvNO2MDJPpT38PxxyskCtL2z1re1/wASwQsLO3URqP8AWMOrH0qLRNdgUSyuAAq4ye59qAKsWgyQfeQfL1Nallp+B8yb2bo3+FX7WcXjozvuLfNtA4rotM09E2vLJgAk4B65oA858RafKgWSFSrr3FaOieJM2Ki46p8rD3rp9asEu0bgRqTkDGScetecapbeQ0ggBAU89qAOnuPEBlb5D8o6ZrG1G+MqnJFc4l9JGPWo5b5mJyfwoA0bKJZrotIRgetGuXCGIKnUVkJdSBuDgUSO0p+Y5pCNXQ74q/lufpXc2NzmMBmHIxxXnFsnlSK9dTZXDKcg0wOwik3MGzgDjPtTbuaPyT0DDnA71hrfOMfPgCop78kEZ3H1oGZ2oYIduhBrHuZASuO1XtQucg4PJrIJ3nJ60AIluZ3HQUtwu0FR0FW7KPhnIGMdagucGRm7HpSEUlBHfijcQcUszDoOopnB5PWgBwJHIJB9RV621RkxHP8AMv8Ae9Kogg0jDNMZ0IZZE3IQRTO9YtvcyW7Dacr3BrXhuI7lcocHuKQiSo3OQV7EYp9MPWmM5pxtYj0NJUtyNtzIP9o1FQAUUUUAFFFFABViyx9rj3dM1Xp8JIlUr1oA3JgJEzIfl7KKgj/dud+QcfL6VXju2X746VI8hnHy8k9PakIdKSyknO6oFJVtzZxSyM4+9xjg0wMpwetAEv2oLL8wyOlSGYt04HoKoPkPzUqNhaAGTriTIqUgGHJ6Co5iSN3pQzFoR6CgBsYzKuPWr0v36p2g3Tr9c1dk5YmgBsX3/wAKYe+akj++foaib7p+lAHUfD9f+JpNISAPLwM9zXa6k6ZGzDStwM9Aa888ISMmrxgHACn8c13kxyWZmA8tc4z3pjLcarFbsIySSCwJrJN35M3mOmF3feP0qY3skVrM8hITI47gelEGkTajcQ3NwGS1j5APAP4UAc3ZeCLzXS13M3kQuxIZupFaGp/D+GwsN1nesZk+Yq3Qmuj1fxLDZgQQFdqDAUVx994jlnJ+fr70Ac5a6rfWcskchLhG+YfSuu0XxTFbwxi53id2y2T2rlQjS3oYqPLmYEk9q35dDS/R5kYbbdcgj1oA3LnW2KyuXBB4QdlHqfWsi9tB/YpkmYK8zZPc4/xNYls13cXDkhnhgYFvcjpU15fecIopJMsoy3tQBRutGIsfOQcb8Z9sVlyWDxHp2yK7Bb2EacsUjZDPkDHaq195TRpIpwHO0DHTuKQjnIbJpA+FGV5+opv2VzHuC1u2SxpAZDjlsAn605xDI04QBASDgdqAMHdtUg9hWxaTq0KsDzjFUriNXjnIXpGMfXNQwOYC0f8AdNAG4bkgYqCS5wKom5JqJpie1ABPIWJyc1GiFyFHU0Y3Gr9jACGdxwKAFKi3t9vUnis+5cIozVueUPMQDwBWPcy+bKcdBwKAE3ljk96kHSolHAqTOOtMBRxRTdwzTs4oGI2cUkcrRPuQ4NPNRt1pCNq1uluE9G7ipGyDWHFK0Th04IrWt7pbhcdH9KBmPfDF3J9ar1Z1AYvZPqP5VWpgFFFFABRRRQAVLbsFnUnpUVKOooAvSx5G5argsDwTUkdzs4xkGphiVcgCkIh8ssOW/OjIQYHNOKHnJqJhtoASSQvJzS5IxUWcvmpZDjH0oAWTmM0zJ8gVIPmiNRjmMA0ATWKkzbvQVZYncc9aisxtRiPXFTFfm9aAFj4Yn0FRsPlJFSr0b6VEwwpoAu6CzJqCurbSvzV3zz/vHZAHzjGRXL+GPCmoaxMJEjMUHQyvxxXol9Y2OhaO0o/ezRL949zTGR6bpUPFzendxkoTxmqus+JY2Se1Q4XbgEdq5yx124mtriWdiC54HpXP31ySGIOSc0AUtQ1MtcMAxbmqqzM5A55qm6kvz1rS0uya6uEQZzQI6ay0pbvSAgwZDyKqreX2jWk9msY2P/E3UGtSKd7FgVXGzg8cGnXk9rexbyoDZoGQWNxpp0nZb3arJjMivwWbvXK3MTTTSvGflJ7VevdHSbc0B2nPQVmrZ3VqWO4rgdBSEMQ3Cyb3DMFGBntTl1GQFfMzhTkCmPqFwIPJZfl9cc1XnmEqqFUjFAF2TVA0e3Hyg8YqWK/V5GA+8/XPasgRsegpGUoR60AbaSB7lkjG6NF/OohGZJWYDBxz9aXSNu3JOPU1oG3jhVWBOXGSDQBmNGVPNM29qszkZqEDPNADok5x3NaFwywWvPQfrUNnDl97H5Vqjqd35sjIp+QcCgCtPeMylVAANV8dKaTk04HP4UAOFKz8UCkJoAXK5680Zz1pAOc0E80APz8tNo7UmaAFpUdo2DKcEUlGaAG3EhlmZ26moqVuppKYwooooAKKKKAClX7wpKKAJ7iEwvjqOxFEMpjbHalkcvGmagPBoEaPEgyKpyg7yB0pYpmQ+1K0m45pARYwRmnSnJFI3Y0jHkUAWIRgEHuKjxgkU9DgZpjcHNAFu1BEOf7zVMAWcKAWY9gKZbRSSmCGIFnY4A9zXsng7wpp+l2yT3YSS6IySw+7TGeVxaRqFydkNpKzMMD5TzXaeFvh3cC4ju9XQCNefKPc16cZoTgQqvHoKlWUSJz1FFhlEJHBH5cSKiLxheK4zxnP/o5gU/e5rq7glJmGcKa47xdau4WVc8DFMDhHmKRGMdqzLl8pitKaM7mBHNZV0jBhx1pCIViLtmuo8NwbJC+zcQMAVz9tExPPSuw8JoGa4HRwvAoA2NTt0kt2Ux4jgTJY8Ak9vrXNtpFz5ImXO05z7e1dLLa3dzIBMCY1beV7e2aZKI0nt7cOfJVTx3ds9qAOQWeWDJZcjOMU57mKZSX+93rUns1kuF80BTPN930XpWJPZbblkjf5gxUAnrjvSERSrCR0Bqo8aHooFX2t1jPlvksOcim2unXOoN5dnbPM+eCBQMoCMcVWkh3yYHavRdP+GGp3MYe7mS3BH3eprRHwotY4iZNSfzPUCgLHA2NssIhCnc7DJHYelWtQBiBViDJ/Fiuun8DGwiZ7WcTkHJDcEiuT1NgiNCM71Pzk9zQBinLHmpYIWlYADjuaWC3eZsL261dkKWNvj+I0CIryVbS12ryWPaufkbLH3NTzXDTMS5yO1VmPNAAq80/HpSLxSigBe1Nz81OpmfmxTGLjmg9aUdKB1pCFFFB4xRQAHgUDpQeaQ8KaAIT1ooopjCiiigAooooAKKKKAJhgwg55B6U0jODTUPUetOXp9KADAHSg9KD0pA1Ag5xQ/akJzilPIzQBOP8AVrimSjO3FSRnMWB1PFd54Q+G9zrCx3WonybXqF7tQMzPClvsla9kjJWIfJkd66aHxBO0zBidufWuy1Hw7b2+mi3s4VRFGOBXHXeitGpEa/OPSgDb0zVyZQN2c109vMHG4GuJs9LlSNZAPnrbtLiZMI4waYzbuIfPQ44NYV9aGeJoJhx2NbcFwGXLHBp1zEkicdTQB5Hqdg1rdujjjsfWucnAafb6V6pr1gJEIdeg4NeY3sBtb1y5wvY0hEUkyW0RJxk9q0fCV8wv8scbziuWuZjNIT2FbPhZ0S/jMmdm7nFAHpb3BkBzIyqFLNtHPHQVitMsDRtJtBjRl2jkr7n3zXWN4eTUI4pbe6aKIAEAd/rWdq3gS4mgA06cEn7wbv8AjQBwcF8I7sTOWfYSRuqPTbK91i8ZrOBpH3FiwHHNdTp3gOaO7zqjoIUOdqn71dZFdafo8Xk2caRLj+EdaAMHS/ATCQTapOMdSi11kV1p2jxiK0hjjA9BXK3/AIkbeyq3XvWBdaw8hJ3HNAHb3nirrtesS68USvkK/wCtchNfkgnJqg97ljgmgDr/APhI5g3zPx9awNWk+2Xm9AADycetZyzu/emzajFEPU0gLzSpZQZP3mOFFc/d3LzTsxYkZ49qS6v3uHznjtUSgMhNAhlR4w1S01hkigBeMUY4oYc4pR0oABTe9OpKAF7UgpaQUAKaQUHrS0AB6U1z8lOqOQ8gUAMooopjCiiigAooooAKKKKAFBwaeDtb61HXS6F4dTWrIyrKQ6PtKgfrQBzhOTSV3yfDhnyTdAe2KbL8OzC6qboMW7AdKAOExTmGFrtZfAMnyiOXJbpkVYT4Y3kqgm4jAPPuKAM3wNpMd9fie5XdDCc4PQmvbbfVokjWNAFQDAA7V5dNpl34dtFggB2dWf1qOPXbnaE3nNAHrNzcGSI4IIPpXFay81pciZAdhqHSPEE7ERzHI9a6OaCHUbUq+MkcUDOKfxfcW0rKAMe9dBpHi+xvsQ3ChJPWuN8RaDd228qm7HRhXL2lzNDcBZMqw6GgR7rLewwjKoSPUVLBewzgYkAb0NcHoHiXcot7tgQOAa6a3ubGQ4VgD2OaYy/qEXmQsTgjpXnmv6KLqOTyzh+3FdvchcZWYtn+EGs2WAMDuA/GkDPGLm2ktZTHKuCK0/Drqt9H5gyu4Zrq/EGixTxE4Afsa4gCSwdwQQQeDQI9j0u7ewYgMWtn5UZztrdbX4YoDgjNeVaL4u+zWjRzgNkd6iufEnm5IOB6A0Bc6zVvEpYuVcc+9ctd64zclq5+61N5WODxVJ5mcYJoA2ptWDnrVZr7OSGNZQz3NSKhagC213v4ziljVpDxTYbXIy3A9TRNdxwoUi5b1pALPcrABGpye9Z0j72J7U1iWbJ6mkpgKOTVhBlCPaoFxVqLGzg5oEREYFA6089ajxSAG+8aB0o6mjFABSCg9aB1oADQKDQKACloyKM0AFQscnNSOcLUVMYUUUUAFFFFABRRRQAUUUUAFdV4B1UWGurbynEN3+756Bux/pXK0qMUYMpIYHII7UAfRJ8pZBGQAe5pn7hbiQ5H4c1yui6+2taTBKQxnT5ZWHZh/jWhbxO9yoL7gxyWHamM1pUVygDA7TmrNrDNcXabGPlqOR2qogURZkbnJyadZ+ILe1cx7hn1oAd4iiD25XaDgelecXFmwnYqpHNeiX2pW86lmbg1ymqXTWoM0SrNF3wOlAjGt7nyHAcFWHeut0jUQUBMma5KXUrTUEyVCMOMU+xtpRIGt5TjrjNIZ6KyR30RyAfWuP8AEfhJCjS264I54re0mWQqEkYqxreazZ4trDcCOtMDwfzptPuTHOGGDwa6Cxvy6grIfzra8W+GtwZ0WvPVebTpyjZ25pCPU9Lu4ntmzIGcepqO51MBD5XzMOpPauEstWeLOx8BqtS6rhcB+KALt/qLOp3NljWU0CXcToQN2ODUbziQ59amtGxJkGgRzMsbwSMjZBBpAx9a6PW9OEyfaIx8wHzD1rnUU7sUAPVcgVIsJPvUqRqqbmOBQ02PuHApAOjgUff4okuoYhtjXJ9aqvIzHls1GSBkCgCSW7llGC2B6CoaSloATvRR3opjHKMg06JyrgZ4NNxhaaOKBFsjBpjDvTldXUdjS44pAR4zSnpigjnihgQKAGGgUZzSjpQAlFITzS0xjW6ilzikYZNDcCgBrtk02iigAooooAKKKKACiiigAooooAKKKKAOj8F64NH1hUnbFpcYSTPRfRvwr2CO3RJwQBtPIx0r58r1r4e+KFv7H+zr1x9ptl/dsx++n+IoA0/FF8+l2EzqPlPGfSvPjqbzPvDHnmvQvFvkXui3MasCwXIryW1kx8jcEUAdNFqk7gIWyKneO4aPdbsTnqvWsa3JVgT0rXs7sxuMHigRy98Lm0uWd025PPpV7TtXfAKPtYds13H9m2ur222RFJI61xmteF59JlMtudyZoGdBZeImV187kg9RXZ6f4iSWMLvHTvXjkV2TjJwRWra6kyjAb9aAPVL+6tbyDDOC2OK831/Rw5cquM9Ku2Go4ALElj056VamkM6nc24n1oA81dXtnKN605WcMMc/jWnriJHKeB1rJ3YcHsaQjTgQycsdoq5Dth53ZNZsJRsENVtCg65oA14pFk4bkHjFYWrWf2K4Eir+7bkVoxSqo4NXZ7ZNQsjGxy2Pl+tAHHSTNMcdF9KYCy8Z4qSaB4JmjcYKmmN0pjEZsim0UlADqSnj7tMoAKcoyaQDNSIeKAGuaZTyuT1oC4NIQIKkBPrSUUASEgDrTGYnig803NABSjpSClJ4oGNPWloAoNMQlRscmnMaZQMKKKKACiiigAooooAKKKKACiiigAooooAKltbmW0uEngcpIhyCKiooA7uz1c6laH5uvDL6GuZ1ICG+fAwO1VLC9eyuBIvK9GX1FX9VkiuAlxGcowoASzvdrgE8GtNJsHKmuWBIOVNaFvfYADUhHdaTfGNlBauplhi1CyZWA6d68xgvCMOp6Vt2WuzJwWJBpjMTxDojWdw0sAO0HPFZFvcnOG616M5g1KA5cbsdDXEazpYtnaSLj1oAt2V4qDdnJqa81hoo/kIB71yqzug4JpHndxhiTSES3d211IS1LDEJYT6iqtXrE4OPWgCtG2x8E4GaupchcBeTTL6zKEyIPlNVI22nmgDYjn3HDda0be+WIj1rASRUdcde5rRgEcrZZwMUAbV5o8Wr2PnRcTqM/WuKnieCUpICCDiuwtdQ+zYVH4+tUtZs1vlNxCAHHUetMZzFFKVIOO9KFxyTQAq9KCvelB9KKAAAUvSiigApRTadSEFFJ3pc0AITikzQ3NAFMBwpDQOKKQwHSkY4oJwOajY5NMBM5ooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACnLIQpX+E9qbRQAtPVe9Rg4qZcEcUATRztGMdq0bO4LuFBrMXBXmlVmibK8UhHUC4+zoDGQD3NZ1/qfnqysQxrLe7lZcbjVcnjOcmgCNuGNJUhGaYRigAAyatWvysDVZTg81KJdowvWgDXEyuNrc5rOvrQwtvUfKadBIS4Jq9J+9iKsvBHFAGIpOetTxtjuahdfLkI9DQGyaANW0XzWxmtGPzLbk/Mh9Kx7SfyiK1IL1W+U8g0AZOqxiK6LJwH5qhnNaWsuGnAHas2mMcvWn0xTg0+gApOcjFLSfxfhQADPelFIxwKbuOaQh5pu71petMPU0AKx9KRTzSUUASbhTNx9aSkpjFJJpKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAClBI6UlFAEqyYqQyDHTNVqcG4xQA4vzQT096ZS5pCJB1pypuNMDUeYV6UAEq7W4pqjLUMxY5NIODQBZifaRir6zHZyeBWSJMHNONw5GM0xjJW3SMfU00GkooAmQ+9SrOI+nWqmaKAHyOZGLMck02kooAWlpM0UhBRRRQAUUUUALSUUmaYxaKTNFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUuaSigBaKSjNAC0GjNHWgBM0UUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAVLb2813OkFvE8srnCoi5LH2FRCus8I2Eth480eCUr5jlJMKegePcAffBFAHJkYorr5/Ad/BbWVvPbtb6vd3MqRwyyriRFTcCMd85HPXIrWX4dXM39hSSaXPGuPL1OGGRTImGOHwTxuU/pQB51iivV5PBE2m6vZy6Va3tnaOXS9mS5jlVI1YEMGI45XJGOgHrXlc0jSzySO29nYsW9ST1oAZRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQADrXUReObyLTUt/sNg13FD9njv2h/fomMYDZ6gcA4rl6KANC61aS7ghjNvBG8W3EyBvMOBjkk/j9arfbbkOzi4l3vwzbzlvrUFFAEouZliMQlcRt1QMcH8KioooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKBQBrW3hbXLyBJ7bSL2WJxlXWBiGHqOKl/4Q3xF/wBAS/8A/Adv8K66w+MupWdjBbyadaymFAm/cy5AGOgqx/wu7UP+gTbf9/WoA4n/AIQ3xF/0BL//AMB2/wAKP+EN8Rf9AS//APAdv8K7b/hd2of9Am2/7+tR/wALu1D/AKBNt/39agDif+EN8Rf9AS//APAdv8KP+EN8Rf8AQEv/APwHb/Cu2/4XdqH/AECbb/v61H/C7tQ/6BNt/wB/WoA4n/hDfEX/AEBL/wD8B2/wo/4Q3xF/0BL/AP8AAdv8K7b/AIXdqH/QJtv+/rUf8Lu1D/oE23/f1qAOJ/4Q3xF/0BL/AP8AAdv8KP8AhDfEX/QEv/8AwHb/AArtv+F3ah/0Cbb/AL+tR/wu7UP+gTbf9/WoA4n/AIQ3xF/0BL//AMB2/wAKP+EN8Rf9AS//APAdv8K7b/hd2of9Am2/7+tR/wALu1D/AKBNt/39agDif+EN8Rf9AS//APAdv8KP+EN8Rf8AQEv/APwHb/Cu2/4XdqH/AECbb/v61H/C7tQ/6BNt/wB/WoA4n/hDfEX/AEBL/wD8B2/wo/4Q3xF/0BL/AP8AAdv8K7b/AIXdqH/QJtv+/rUf8Lu1D/oE23/f1qAOJ/4Q3xF/0BL/AP8AAdv8KiufC2uWcDz3OkXsUSDLO0DAKPUnFd3/AMLu1D/oE23/AH9aq9/8ZdSvLGe2TTrWIyoU37mbaCMHigDzaig0UAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQB//Z" alt="">
     <div class="sb-name">كان يـاما كان</div>
-    <div class="sb-sub">بطولة عائلة انفنتي ترحب بكم</div>
+    <div class="sb-sub">بطولة الكيرم</div>
   </div>
   <nav class="sb-nav">
     <div class="ni on" onclick="ST('reg',this)" data-t="reg"><span class="ic">📝</span><span>تسجيل</span></div>
@@ -696,6 +761,7 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
     <div class="ni" onclick="ST('clips',this)" data-t="clips"><span class="ic">🎥</span><span>لقطات التحكيم</span></div>
     <div class="ni" onclick="ST('vote',this)" data-t="vote"><span class="ic">🗳</span><span>التصويت</span></div>
     <div class="ni" onclick="ST('rules',this)" data-t="rules"><span class="ic">📜</span><span>الشروط</span></div>
+    <div class="ni" onclick="ST('family',this)" data-t="family"><span class="ic">♾️</span><span>عائلتي</span></div>
     <div class="ni" onclick="ST('admin',this)" data-t="admin"><span class="ic">🔐</span><span>الإدارة</span></div>
   </nav>
   <div class="sb-foot"><div class="ctr"><span class="dot"></span><span id="regCount">٠</span> / ٦٤</div></div>
@@ -774,6 +840,12 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
     <div id="voteContent"></div>
   </div>
 
+  <!-- FAMILY (عائلتي) -->
+  <div id="family" class="sec">
+    <div class="pt"><div><div class="pt-t">♾️ عائلتي</div><div class="pt-s" id="familySub">سجل اسمك وانضم لعائلتنا</div></div></div>
+    <div id="familyContent"></div>
+  </div>
+
   <!-- ADMIN -->
   <div id="admin" class="sec">
     <div class="pt"><div><div class="pt-t">🔐 الإدارة</div><div class="pt-s" id="adminStat">مقفلة</div></div></div>
@@ -789,6 +861,7 @@ table.lt tr:hover td{background:rgba(46,118,184,.05)}
   <div class="mni" onclick="ST('trn',this)" data-t="trn"><span class="m-ic">🏆</span><span class="m-lb">بطولة</span></div>
   <div class="mni" onclick="ST('clips',this)" data-t="clips"><span class="m-ic">🎥</span><span class="m-lb">لقطات</span></div>
   <div class="mni" onclick="ST('vote',this)" data-t="vote"><span class="m-ic">🗳</span><span class="m-lb">تصويت</span></div>
+  <div class="mni" onclick="ST('family',this)" data-t="family"><span class="m-ic">♾️</span><span class="m-lb">عائلتي</span></div>
   <div class="mni" onclick="ST('admin',this)" data-t="admin"><span class="m-ic">🔐</span><span class="m-lb">إدارة</span></div>
 </nav>
 
@@ -875,7 +948,7 @@ const DAY_INFO=[
 ];
 const PAL=[['#081420','#4880A8'],['#081018','#386078'],['#0C1828','#5090B0'],['#081420','#286090'],['#081828','#5888A8'],['#081018','#387090'],['#0C1828','#487898'],['#081828','#507090'],['#081420','#3888A8'],['#081018','#508898'],['#0C1828','#286878'],['#081828','#4080A8'],['#081420','#3870A0'],['#081828','#5090A8'],['#0C1018','#387890'],['#0A1828','#4878A0']];
 const GAME=10,BRK=5,SLOT=15,START=480,DIST=[11,11,10];
-const ADMIN_PIN='0406';
+const ADMIN_PIN='1234';
 const FB_URL='https://engmohammed-642d1-default-rtdb.firebaseio.com/kyk';
 
 // ── USER ID (يتولد مره وحده لكل جهاز ويثبت — يستخدم لمنع التصويت المتكرر) ──
@@ -896,7 +969,7 @@ let CM=[];
 (()=>{let mi=0;for(let d=0;d<3;d++)for(let g=0;g<DIST[d];g++){const s=START+(g*SLOT);CM.push({day:d,num:mi+1,p1:mi*2,p2:mi*2+1,s,e:s+GAME,be:s+SLOT,st:fmt(s)});mi++;}})();
 
 // State
-function initS(){return{players:Array.from({length:64},(_,i)=>({id:i,slot:i+1,name:null,photo:null,story:null,registered:false})),tournament:{started:false,bracket:null,champion:null,votingOpen:false},votes:{},totalVotes:0,simMin:0,clips:{},events:[],cheers:{}};}
+function initS(){return{players:Array.from({length:64},(_,i)=>({id:i,slot:i+1,name:null,photo:null,story:null,registered:false})),tournament:{started:false,bracket:null,champion:null,votingOpen:false},votes:{},totalVotes:0,simMin:0,clips:{},events:[],cheers:{},family:{members:{},message:'',registrationOpen:true,logo:null}};}
 let S=initS();
 let _fbReady=false,_saveT=null,simM=0,aDay=0,adminMode=false;
 let dragPid=null,selPid=null,drawAssign={},activeRound='r64',activeDay=1,activeRoundInDay='r64';
@@ -1698,7 +1771,7 @@ async function fbLoad(){
     _fbReady=true;
   }catch(e){console.error(e);}
   hideBar();
-  updCtr();renderList();buildPGrid();refreshSlots();renderRules();renderInsights();renderFeed();
+  updCtr();renderList();buildPGrid();refreshSlots();renderRules();renderInsights();renderFeed();renderFamily();
   const tv=document.getElementById('totalVotes');
   if(tv&&S.totalVotes)tv.textContent=ar(S.totalVotes);
 }
@@ -1738,6 +1811,14 @@ function applyRemote(d){
   }
   // تحميل التشجيعات
   if(d.cheers&&typeof d.cheers==='object')S.cheers=JSON.parse(JSON.stringify(d.cheers));
+  // تحميل عائلتي
+  if(d.family&&typeof d.family==='object'){
+    if(!S.family)S.family={members:{},message:'',registrationOpen:true};
+    if(d.family.members)S.family.members=JSON.parse(JSON.stringify(d.family.members));
+    if(typeof d.family.message==='string')S.family.message=d.family.message;
+    if(typeof d.family.registrationOpen==='boolean')S.family.registrationOpen=d.family.registrationOpen;
+    if(typeof d.family.logo==='string')S.family.logo=d.family.logo;
+  }
   // تحميل الشروط من Firebase (لو الإدارة عدّلت عليها)
   if(d.conditions){
     const arr=Array.isArray(d.conditions)?d.conditions:Object.values(d.conditions);
@@ -1806,6 +1887,9 @@ async function fbPoll(){
     // تحديث الإحصائيات والسجل الحي (في الصفحة الرئيسية)
     if(document.getElementById('reg')?.classList.contains('on')){
       renderInsights();renderFeed();
+    }
+    if(document.getElementById('family')?.classList.contains('on')){
+      renderFamily();
     }
     const tv=document.getElementById('totalVotes');
     if(tv)tv.textContent=ar(S.totalVotes||0);
@@ -2873,9 +2957,80 @@ async function confirmClearPlayers(){
     updCtr();renderList();buildPGrid();renderAdmin();refreshSlots();renderInsights();renderFeed();
   });
 }
-function confirmClearVotes(){showModal('مسح التصويت','مسح جميع التصويتات؟',async()=>{S.votes={};S.totalVotes=0;await fbWrite('votes',null);await fbWrite('totalVotes',0);save();renderAdmin();const tv=document.getElementById('totalVotes');if(tv)tv.textContent=ar(0);});}
-function confirmResetTrn(){showModal('إعادة البطولة','حذف جميع نتائج البطولة؟',()=>{S.tournament={started:false,bracket:null,champion:null,votingOpen:false};save();renderAdmin();renderTrn();});}
-function confirmNuke(){showModal('⚠️ مسح كامل','حذف كل شيء؟',()=>{S=initS();save();updCtr();renderList();buildPGrid();refreshSlots();renderAdmin();renderTrn();const tv=document.getElementById('totalVotes');if(tv)tv.textContent=ar(0);});}
+async function confirmClearVotes(){
+  showModal('مسح التصويت','مسح جميع التصويتات والشروط المثبتة نهائياً؟',async()=>{
+    showBar('🗑 جاري مسح التصويتات...');
+    // مسح محلي
+    S.votes={};
+    S.totalVotes=0;
+    // مسح condId من كل المباريات في الجدول
+    if(S.tournament&&S.tournament.bracket){
+      ['r64','r32','r16','r8','r4','r2'].forEach(r=>{
+        const arr=S.tournament.bracket[r];
+        if(!arr)return;
+        const items=Array.isArray(arr)?arr:Object.values(arr);
+        items.forEach(m=>{if(m)m.condId=null;});
+      });
+    }
+    // مسح pending votes المحلية
+    Object.keys(_pendingVotes).forEach(k=>delete _pendingVotes[k]);
+    // مسح من Firebase نهائياً
+    try{
+      await fbWrite('votes',null);
+      await fbWrite('totalVotes',0);
+      // إعادة كتابة البطولة بدون condIds
+      if(S.tournament)await fbWrite('tournament',S.tournament);
+    }catch(e){console.error('Clear votes failed:',e);}
+    // إعادة تعيين الـ signature عشان polling يحدّث
+    _lastSig='';
+    hideBar();
+    renderAdmin();
+    renderTrn();
+    const tv=document.getElementById('totalVotes');
+    if(tv)tv.textContent=ar(0);
+  });
+}
+async function confirmResetTrn(){
+  showModal('إعادة البطولة','حذف جميع نتائج البطولة من قاعدة البيانات؟',async()=>{
+    showBar('🗑 جاري إعادة البطولة...');
+    S.tournament={started:false,bracket:null,champion:null,votingOpen:false};
+    try{
+      await fbWrite('tournament',S.tournament);
+    }catch(e){console.error(e);}
+    _lastSig='';
+    hideBar();
+    renderAdmin();
+    renderTrn();
+  });
+}
+async function confirmNuke(){
+  showModal('⚠️ مسح كامل','حذف كل شيء من قاعدة البيانات نهائياً؟ هذا الإجراء لا يمكن التراجع عنه.',async()=>{
+    showBar('☢ جاري المسح الكامل...');
+    S=initS();
+    try{
+      // مسح كل المسارات في Firebase
+      await fbWrite('',{
+        players:S.players.map(p=>({...p})),
+        tournament:S.tournament,
+        votes:null,
+        totalVotes:0,
+        simMin:0,
+        clips:null,
+        cheers:null,
+        events:null
+      });
+    }catch(e){console.error(e);}
+    Object.keys(_pendingVotes).forEach(k=>delete _pendingVotes[k]);
+    _lastSig='';
+    hideBar();
+    updCtr();renderList();buildPGrid();refreshSlots();renderAdmin();renderTrn();
+    if(typeof renderInsights==='function')renderInsights();
+    if(typeof renderFeed==='function')renderFeed();
+    if(typeof renderClips==='function')renderClips();
+    const tv=document.getElementById('totalVotes');
+    if(tv)tv.textContent=ar(0);
+  });
+}
 function exportJSON(){const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='kyk_data.json';a.click();}
 function importJSON(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(d.players){S=d;save();updCtr();renderList();buildPGrid();refreshSlots();renderAdmin();if(S.tournament.started)renderTrn();alert('✅ تم الاستيراد');}else alert('ملف غير صالح');}catch(ex){alert('خطأ');}};r.readAsText(f);e.target.value='';}
 
@@ -3032,6 +3187,376 @@ async function castVoteSubmit(mn){
   buildVotePage();
 }
 
+// ── عائلتي (FAMILY) ──
+let famPhoto=null;
+
+// شعار العائلة (SVG: تاج + لانهائية)
+function getFamilyLogoSVG(){
+  return `<svg viewBox="0 0 300 350" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="silverGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#E8E0F0"/>
+        <stop offset="50%" stop-color="#A89CB8"/>
+        <stop offset="100%" stop-color="#5C5070"/>
+      </linearGradient>
+      <linearGradient id="purpleBand" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#6B3FAA"/>
+        <stop offset="50%" stop-color="#9C5FD4"/>
+        <stop offset="100%" stop-color="#6B3FAA"/>
+      </linearGradient>
+      <radialGradient id="bgGrad" cx="50%" cy="50%" r="60%">
+        <stop offset="0%" stop-color="#1A0F2C"/>
+        <stop offset="100%" stop-color="#08040E"/>
+      </radialGradient>
+    </defs>
+    <!-- خلفية درع -->
+    <path d="M30 70 L30 280 Q30 310 60 320 L150 340 L240 320 Q270 310 270 280 L270 70 Z" fill="url(#bgGrad)" stroke="url(#silverGrad)" stroke-width="3"/>
+    <!-- التاج -->
+    <g transform="translate(150,90)">
+      <!-- قاعدة التاج -->
+      <rect x="-50" y="20" width="100" height="14" rx="2" fill="url(#purpleBand)" stroke="url(#silverGrad)" stroke-width="1"/>
+      <!-- جسم التاج -->
+      <path d="M-55 20 L-55 -5 L-40 5 L-25 -15 L-10 5 L0 -25 L10 5 L25 -15 L40 5 L55 -5 L55 20 Z" fill="url(#silverGrad)" stroke="#3C3048" stroke-width="1.5"/>
+      <!-- جواهر -->
+      <circle cx="-40" cy="-3" r="3" fill="#9C5FD4"/>
+      <circle cx="-25" cy="-8" r="3" fill="#E8E0F0"/>
+      <circle cx="0" cy="-15" r="4" fill="#9C5FD4"/>
+      <circle cx="25" cy="-8" r="3" fill="#E8E0F0"/>
+      <circle cx="40" cy="-3" r="3" fill="#9C5FD4"/>
+      <!-- جواهر القاعدة الصغيرة -->
+      <circle cx="-35" cy="27" r="1.5" fill="#E8E0F0"/>
+      <circle cx="-20" cy="27" r="1.5" fill="#E8E0F0"/>
+      <circle cx="-5" cy="27" r="1.5" fill="#E8E0F0"/>
+      <circle cx="10" cy="27" r="1.5" fill="#E8E0F0"/>
+      <circle cx="25" cy="27" r="1.5" fill="#E8E0F0"/>
+    </g>
+    <!-- اللانهائية -->
+    <g transform="translate(150,200)">
+      <path d="M -55 0 C -55 -25 -20 -25 0 0 C 20 25 55 25 55 0 C 55 -25 20 -25 0 0 C -20 25 -55 25 -55 0 Z" fill="url(#silverGrad)" stroke="#3C3048" stroke-width="2"/>
+    </g>
+    <!-- لانهائية صغيرة في الأسفل -->
+    <g transform="translate(150,295) scale(0.4)">
+      <path d="M -55 0 C -55 -25 -20 -25 0 0 C 20 25 55 25 55 0 C 55 -25 20 -25 0 0 C -20 25 -55 25 -55 0 Z" fill="url(#silverGrad)" opacity="0.7"/>
+    </g>
+  </svg>`;
+}
+
+// معاينة صورة لتسجيل العائلة
+function previewFamilyPhoto(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    const img=new Image();
+    img.onload=()=>{
+      const SIZE=80;
+      const canvas=document.createElement('canvas');canvas.width=SIZE;canvas.height=SIZE;
+      const ctx=canvas.getContext('2d');
+      ctx.beginPath();ctx.arc(SIZE/2,SIZE/2,SIZE/2,0,Math.PI*2);ctx.clip();
+      const scale=Math.max(SIZE/img.width,SIZE/img.height);
+      const sw=img.width*scale,sh=img.height*scale;
+      ctx.drawImage(img,(SIZE-sw)/2,(SIZE-sh)/2,sw,sh);
+      famPhoto=canvas.toDataURL('image/jpeg',.55);
+      const c=document.getElementById('famUc');
+      if(c)c.innerHTML=`<img src="${famPhoto}" style="position:absolute;inset:0;width:100%;height:100%;border-radius:50%;object-fit:cover">`;
+    };
+    img.src=ev.target.result;
+  };
+  r.readAsDataURL(f);e.target.value='';
+}
+
+// تسجيل عضو عائلة جديد
+async function regFamilyMember(){
+  if(!S.family)S.family={members:{},message:'',registrationOpen:true};
+  if(!S.family.registrationOpen){
+    alert('التسجيل في عائلتي مقفل حالياً');
+    return;
+  }
+  const nEl=document.getElementById('famName');
+  const sEl=document.getElementById('famStory');
+  const name=nEl.value.trim();
+  const story=sEl?sEl.value.trim():'';
+  if(!name){
+    nEl.focus();nEl.style.borderColor='rgba(180,140,220,.6)';
+    setTimeout(()=>nEl.style.borderColor='',1500);
+    return;
+  }
+  const id='fm_'+Date.now().toString(36)+Math.random().toString(36).substr(2,5);
+  const member={
+    id,name,
+    photo:famPhoto||null,
+    story:story||null,
+    approved:false,
+    submittedBy:USER_ID,
+    t:Date.now()
+  };
+  showBar('💾 جاري التسجيل...');
+  try{
+    await fbWrite('family/members/'+id,member);
+    S.family.members[id]=member;
+    famPhoto=null;
+    nEl.value='';if(sEl)sEl.value='';
+    const uc=document.getElementById('famUc');
+    if(uc)uc.innerHTML='<span class="upl-ic">📷</span><p class="upl-tx">رفع صورتك</p>';
+    const suc=document.getElementById('famSuc');
+    if(suc){suc.textContent='✅ تم التسجيل! بانتظار موافقة الإدارة لإظهار اسمك.';suc.style.display='block';
+      setTimeout(()=>suc.style.display='none',5000);}
+  }catch(e){
+    alert('فشل التسجيل، جرّب مرة ثانية');
+  }
+  hideBar();
+  renderFamily();
+}
+
+// موافقة الإدارة على عضو
+async function approveFamilyMember(id){
+  if(!adminMode)return;
+  const m=S.family&&S.family.members&&S.family.members[id];
+  if(!m)return;
+  m.approved=true;
+  showBar('✓ جاري الموافقة...');
+  try{await fbWrite('family/members/'+id+'/approved',true);}catch(e){}
+  hideBar();
+  renderFamily();
+}
+
+// رفض/حذف عضو
+async function rejectFamilyMember(id){
+  if(!adminMode)return;
+  const m=S.family&&S.family.members&&S.family.members[id];
+  if(!m)return;
+  showModal('حذف '+(m.name||'العضو'),'تأكيد الحذف نهائياً من قاعدة البيانات؟',async()=>{
+    showBar('🗑 جاري الحذف...');
+    if(S.family.members)delete S.family.members[id];
+    try{await fbWrite('family/members/'+id,null);}catch(e){}
+    hideBar();
+    renderFamily();
+  });
+}
+
+// تبديل قفل التسجيل
+async function toggleFamilyRegistration(){
+  if(!adminMode)return;
+  if(!S.family)S.family={members:{},message:'',registrationOpen:true};
+  S.family.registrationOpen=!S.family.registrationOpen;
+  showBar(S.family.registrationOpen?'🔓 فتح التسجيل...':'🔒 إقفال التسجيل...');
+  try{await fbWrite('family/registrationOpen',S.family.registrationOpen);}catch(e){}
+  hideBar();
+  renderFamily();
+}
+
+// تعديل رسالة الإدارة
+function editFamilyMessage(){
+  if(!adminMode)return;
+  if(!S.family)S.family={members:{},message:'',registrationOpen:true};
+  document.getElementById('modal-title').textContent='✏️ تعديل رسالة عائلتي';
+  document.getElementById('modal-body').innerHTML=`
+    <textarea id="famMsgInput" placeholder="اكتب رسالة ترحيب للعائلة..." rows="4" maxlength="500"
+      style="width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(180,140,220,.4);border-radius:var(--r);padding:10px;color:var(--g1);font-family:'Amiri',serif;font-size:14px;outline:none;direction:rtl;resize:vertical;line-height:1.7">${(S.family.message||'').replace(/</g,'&lt;')}</textarea>
+    <div style="font-size:10px;color:var(--g2);margin-top:6px;text-align:left">حتى ٥٠٠ حرف</div>`;
+  modalCb=async()=>{
+    const v=document.getElementById('famMsgInput').value.trim();
+    S.family.message=v;
+    showBar('💾 جاري الحفظ...');
+    try{await fbWrite('family/message',v||'');}catch(e){}
+    hideBar();
+    renderFamily();
+  };
+  document.getElementById('modal-cancel').style.display='flex';
+  document.getElementById('modal-ok').textContent='حفظ';
+  document.getElementById('modal-ok').style.display='block';
+  document.getElementById('modal').classList.add('open');
+}
+
+// رفع شعار العائلة (إدارة فقط)
+function uploadFamilyLogo(e){
+  if(!adminMode)return;
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=async ev=>{
+    const img=new Image();
+    img.onload=async ()=>{
+      // تكبير الصورة لشعار جيد (٤٠٠ بكسل max)
+      const MAX=400;
+      let w=img.width,h=img.height;
+      if(w>MAX||h>MAX){const k=Math.min(MAX/w,MAX/h);w=Math.round(w*k);h=Math.round(h*k);}
+      const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(img,0,0,w,h);
+      const dataUrl=canvas.toDataURL('image/jpeg',0.85);
+      if(!S.family)S.family={members:{},message:'',registrationOpen:true,logo:null};
+      S.family.logo=dataUrl;
+      showBar('💾 جاري حفظ الشعار...');
+      try{await fbWrite('family/logo',dataUrl);}catch(err){console.error(err);}
+      hideBar();
+      renderFamily();
+    };
+    img.src=ev.target.result;
+  };
+  r.readAsDataURL(f);
+  e.target.value='';
+}
+
+async function removeFamilyLogo(){
+  if(!adminMode)return;
+  showModal('حذف الشعار','إزالة شعار العائلة الحالي؟',async()=>{
+    if(S.family)S.family.logo=null;
+    showBar('🗑 جاري الحذف...');
+    try{await fbWrite('family/logo',null);}catch(e){}
+    hideBar();
+    renderFamily();
+  });
+}
+
+// عرض قسم عائلتي كاملاً
+function renderFamily(){
+  const cont=document.getElementById('familyContent');
+  if(!cont)return;
+  if(!S.family)S.family={members:{},message:'',registrationOpen:true};
+  const isOpen=S.family.registrationOpen!==false;
+  const msg=(S.family.message||'').trim();
+  const members=S.family.members||{};
+  const memberList=Object.values(members).filter(m=>m&&m.id);
+  const approved=memberList.filter(m=>m.approved).sort((a,b)=>(a.t||0)-(b.t||0));
+  const pending=memberList.filter(m=>!m.approved).sort((a,b)=>(b.t||0)-(a.t||0));
+
+  // شريط الحالة
+  const statusBar=`<div class="fam-status-bar">
+    <div>
+      <span class="${isOpen?'fam-status-open':'fam-status-closed'}" style="font-weight:700">
+        ${isOpen?'🔓 التسجيل مفتوح':'🔒 التسجيل مقفل'}
+      </span>
+      <span style="color:var(--g2);margin-right:8px">·</span>
+      <span style="color:var(--g1)">${ar(approved.length)} عضو${pending.length&&adminMode?` · ${ar(pending.length)} بانتظار الموافقة`:''}</span>
+    </div>
+    ${adminMode?`<button class="btn ${isOpen?'red':'green'}" onclick="toggleFamilyRegistration()">
+      ${isOpen?'🔒 إقفال التسجيل':'🔓 فتح التسجيل'}
+    </button>`:''}
+  </div>`;
+
+  // البطل (الشعار + الرسالة)
+  const hasLogo=S.family&&S.family.logo;
+  const logoHTML=hasLogo
+    ?`<img src="${S.family.logo}" style="max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 4px 14px rgba(180,140,220,.4))">`
+    :getFamilyLogoSVG();
+  const hero=`<div class="fam-hero">
+    <div class="fam-logo" style="${hasLogo?'width:180px;height:200px;':''}">${logoHTML}</div>
+    ${adminMode?`<div style="margin:6px 0 10px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap">
+      <label class="fam-msg-edit" style="cursor:pointer">
+        <input type="file" accept="image/*" style="display:none" onchange="uploadFamilyLogo(event)">
+        🖼️ ${hasLogo?'تغيير':'رفع'} الشعار
+      </label>
+      ${hasLogo?`<span class="fam-msg-edit" onclick="removeFamilyLogo()" style="background:rgba(160,40,40,.15);border-color:rgba(200,60,60,.3);color:#E08080">🗑 حذف الشعار</span>`:''}
+    </div>`:''}
+    ${msg
+      ?`<div class="fam-msg">${msg.replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>`
+      :`<div class="fam-msg empty">${adminMode?'اضغط "تعديل الرسالة" لإضافة رسالة ترحيب':''}</div>`}
+    ${adminMode?`<span class="fam-msg-edit" onclick="editFamilyMessage()">✏️ تعديل الرسالة</span>`:''}
+  </div>`;
+
+  // فورم التسجيل
+  const regBox=isOpen
+    ?`<div class="fam-reg">
+        <div class="fam-reg-title">✨ انضم لعائلتي</div>
+        <label for="famPi"><div class="upl" id="famUc"><span class="upl-ic">📷</span><p class="upl-tx">رفع صورتك</p></div></label>
+        <input type="file" accept="image/*" style="display:none" id="famPi" onchange="previewFamilyPhoto(event)">
+        <div class="fl"><label>اسمك</label><input type="text" id="famName" placeholder="أدخل اسمك..." style="border-color:rgba(180,140,220,.3)"></div>
+        <div class="fl"><label>قصة صغيرة (اختياري)</label><textarea id="famStory" placeholder="عرّف عن نفسك..." rows="3" maxlength="300" style="width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(180,140,220,.3);border-radius:var(--r);padding:8px 10px;color:var(--g1);font-family:'Amiri',serif;font-size:13px;outline:none;direction:rtl;resize:vertical;line-height:1.7"></textarea></div>
+        <button class="btn" style="width:100%;margin-top:5px;background:rgba(140,90,180,.25);border-color:rgba(180,140,220,.5);color:#E8D8F2" onclick="regFamilyMember()">✨ انضمام</button>
+        <div class="fam-success" id="famSuc"></div>
+        <p style="font-size:10px;color:var(--g2);text-align:center;margin-top:9px">📌 ينتظر اسمك موافقة الإدارة قبل الظهور للعائلة</p>
+      </div>`
+    :`<div class="fam-reg">
+        <div class="fam-reg-closed">
+          <div class="icon">🔒</div>
+          <div style="font-size:15px;color:var(--g1);margin-bottom:5px">التسجيل مقفل حالياً</div>
+          <div style="font-size:11px">انتظر فتح التسجيل من الإدارة</div>
+        </div>
+      </div>`;
+
+  // قائمة الأعضاء
+  const renderMember=(m,isPending)=>{
+    const initial=m.name?m.name.charAt(0):'?';
+    const hash=(m.id||'').split('').reduce((a,c)=>a+c.charCodeAt(0),0);
+    const palette=PAL[hash%PAL.length];
+    const[bg,fg]=palette;
+    return `<div class="fmi ${isPending?'pending':''}" onclick="openFamilyMemberProfile('${m.id}')">
+      ${m.photo?`<img class="fmi-av" src="${m.photo}">`:`<div class="fmi-av-i" style="background:${bg};color:${fg}">${initial}</div>`}
+      <div class="fmi-info">
+        <div class="fmi-name">${(m.name||'').replace(/</g,'&lt;')}</div>
+        ${m.story?`<div class="fmi-story">${(m.story||'').replace(/</g,'&lt;')}</div>`:''}
+      </div>
+      <div class="fmi-actions">
+        ${isPending
+          ?`<span class="fmi-bdg">بانتظار</span>
+            ${adminMode?`<button class="btn green" style="padding:3px 8px;font-size:11px" onclick="event.stopPropagation();approveFamilyMember('${m.id}')">✓</button>
+              <button class="btn red" style="padding:3px 8px;font-size:11px" onclick="event.stopPropagation();rejectFamilyMember('${m.id}')">✕</button>`:''}`
+          :`${adminMode?`<button class="btn red" style="padding:3px 8px;font-size:11px" onclick="event.stopPropagation();rejectFamilyMember('${m.id}')">🗑</button>`:''}
+            <span class="fmi-bdg approved">✓</span>`}
+      </div>
+    </div>`;
+  };
+
+  // عمود الأعضاء (للإدارة: ينتظر فوق، معتمدين تحت)
+  let listInner='';
+  if(adminMode&&pending.length){
+    listInner+='<div style="padding:8px 14px;background:rgba(218,165,32,.08);border-bottom:1px solid var(--sep);font-size:11px;color:#D4A840;letter-spacing:2px">⏳ بانتظار الموافقة</div>';
+    listInner+=pending.map(m=>renderMember(m,true)).join('');
+  }
+  if(approved.length){
+    if(adminMode&&pending.length)listInner+='<div style="padding:8px 14px;background:rgba(30,150,80,.06);border-bottom:1px solid var(--sep);font-size:11px;color:#80D090;letter-spacing:2px">✓ أعضاء العائلة</div>';
+    listInner+=approved.map(m=>renderMember(m,false)).join('');
+  }
+  if(!listInner)listInner='<div class="fam-empty">🌌 لم ينضم أحد بعد — كن الأول!</div>';
+
+  const list=`<div class="fam-list">
+    <div class="fam-list-hdr">
+      <div class="fam-list-t">♾️ أفراد العائلة</div>
+      <div class="fam-list-c">${ar(approved.length)} عضو</div>
+    </div>
+    <div class="fam-list-sc">${listInner}</div>
+  </div>`;
+
+  cont.innerHTML=statusBar+hero+`<div class="fam-grid">${regBox}${list}</div>`;
+  // تحديث subtitle
+  const sub=document.getElementById('familySub');
+  if(sub)sub.textContent=isOpen?'سجل اسمك وانضم لعائلتنا':'التسجيل مقفل حالياً';
+}
+
+// ملف عضو العائلة (مودال صغير بسيط نستخدم مودال اللاعب)
+function openFamilyMemberProfile(id){
+  const m=S.family&&S.family.members&&S.family.members[id];
+  if(!m)return;
+  const hash=(m.id||'').split('').reduce((a,c)=>a+c.charCodeAt(0),0);
+  const[bg,fg]=PAL[hash%PAL.length];
+  const initial=m.name?m.name.charAt(0):'?';
+  const avatar=m.photo
+    ?`<img src="${m.photo}">`
+    :`<div style="background:${bg};color:${fg};width:100%;height:100%;display:flex;align-items:center;justify-content:center">${initial}</div>`;
+  const story=(m.story||'').trim();
+  const d=new Date(m.t||Date.now());
+  document.getElementById('pp-card-body').innerHTML=`
+    <button class="pp-close" onclick="closePlayerProfile()">✕</button>
+    <div class="pp-head" style="background:radial-gradient(ellipse at top,rgba(140,90,180,.22),transparent 60%)">
+      <div class="pp-avatar" style="border-color:#9C7AC8;box-shadow:0 0 24px rgba(140,90,180,.35)">${avatar}</div>
+      <div class="pp-name">${(m.name||'').replace(/</g,'&lt;')}</div>
+      <div class="pp-seat">عضو من عائلتي</div>
+      <div class="pp-status" style="background:rgba(140,90,180,.18);color:#E8D8F2;border-color:rgba(180,140,220,.35)">♾️ عضو ${m.approved?'معتمد':'بانتظار الموافقة'}</div>
+    </div>
+    <div class="pp-section">
+      <h4>📅 تاريخ الانضمام</h4>
+      <div style="font-size:13px;color:var(--g1);text-align:center">${d.toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'})}</div>
+    </div>
+    ${story?`<div class="pp-section">
+      <h4>📖 قصة العضو</h4>
+      <div class="pp-story">${story.replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>
+    </div>`:''}
+    ${adminMode?`<div style="padding:14px 16px;display:flex;gap:7px">
+      ${!m.approved?`<button class="btn green" style="flex:1" onclick="approveFamilyMember('${m.id}');closePlayerProfile()">✓ موافقة وإظهار</button>`:''}
+      <button class="btn red" style="flex:1" onclick="rejectFamilyMember('${m.id}');closePlayerProfile()">🗑 حذف</button>
+    </div>`:''}`;
+  document.getElementById('pp-modal').classList.add('open');
+}
+
 // ── NAVIGATION ──
 function ST(tab,btn){
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
@@ -3043,12 +3568,14 @@ function ST(tab,btn){
   if(tab==='admin')renderAdmin();
   if(tab==='vote'){buildVotePage();}
   if(tab==='clips')renderClips();
+  if(tab==='family')renderFamily();
   window.scrollTo(0,0);
 }
 
 // ── INIT ──
 console.log('[KYK] Script loaded successfully');
 buildPGrid();refreshSlots();
+if(typeof renderFamily==='function')renderFamily();
 fbLoad();
 
 (function(){
