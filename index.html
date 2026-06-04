@@ -1791,6 +1791,60 @@ async function fbLoad(){
   if(tv&&S.totalVotes)tv.textContent=ar(S.totalVotes);
 }
 
+// ترحيل الأصوات القديمة (المفاتيح الرقمية) إلى الجديدة (معرّف الدور الكامل)
+let _migrationDone=false;
+function migrateOldVotes(){
+  if(_migrationDone)return;
+  if(!S.votes)return;
+  const oldKeys=Object.keys(S.votes).filter(k=>/^\d+$/.test(k));
+  if(!oldKeys.length){_migrationDone=true;return;}
+  console.log('[KYK] ترحيل '+oldKeys.length+' من الأصوات القديمة...');
+  let migrated=0;
+  oldKeys.forEach(k=>{
+    const oldVote=S.votes[k];
+    if(!oldVote)return;
+    const matchNum=parseInt(k);
+    // الأصوات القديمة كانت كلها على دور الـ٦٤ (لأنه أول دور)
+    // matchNum 1 → r64_0, matchNum 2 → r64_1, ... etc
+    const newKey='r64_'+(matchNum-1);
+    if(!S.votes[newKey])S.votes[newKey]={voters:{}};
+    if(!S.votes[newKey].voters)S.votes[newKey].voters={};
+    // دمج voters لو موجود
+    if(oldVote.voters){
+      Object.entries(oldVote.voters).forEach(([uid,cid])=>{
+        if(!S.votes[newKey].voters[uid])S.votes[newKey].voters[uid]=cid;
+      });
+    }
+    // دمج counts القديمة كـ legacy voters
+    if(oldVote.counts){
+      Object.entries(oldVote.counts).forEach(([cid,cnt])=>{
+        const n=parseInt(cnt)||0;
+        for(let i=0;i<n;i++){
+          const fid='legacy_'+k+'_'+cid+'_'+i;
+          if(!S.votes[newKey].voters[fid])S.votes[newKey].voters[fid]=parseInt(cid);
+        }
+      });
+    }
+    // احذف القديم من المحلي
+    delete S.votes[k];
+    migrated++;
+  });
+  console.log('[KYK] تم ترحيل '+migrated+' صوت');
+  // ابعت التغيير لـ Firebase بعد ثانية (نتأكد من جاهزية الاتصال)
+  if(migrated>0){
+    setTimeout(async()=>{
+      try{
+        // اكتب الأصوات الجديدة
+        await fbWrite('votes',S.votes);
+        console.log('[KYK] الأصوات المُرحّلة محفوظة في Firebase');
+        _migrationDone=true;
+      }catch(e){console.error('[KYK] فشل حفظ الترحيل:',e);}
+    },1500);
+  }else{
+    _migrationDone=true;
+  }
+}
+
 function applyRemote(d){
   if(!d||typeof d!=='object')return;
   if(Array.isArray(d.players)){
@@ -1807,11 +1861,22 @@ function applyRemote(d){
   }
   if(d.votes){
     S.votes=JSON.parse(JSON.stringify(d.votes));
-    // مهاجرة بنية قديمة (counts/voted/chosen) إلى الجديدة (voters)
+    // ترحيل الأصوات القديمة (مفاتيح رقمية) إلى البنية الجديدة (r64_X)
+    migrateOldVotes();
+    // مهاجرة بنية قديمة (counts) إلى الجديدة (voters)
     Object.keys(S.votes).forEach(k=>{
       const v=S.votes[k];
       if(!v)return;
       if(!v.voters)v.voters={};
+      // لو فيه counts قديمة بدون voters، حوّلها إلى voters وهميين عشان نحافظ على العدد
+      if(v.counts&&Object.keys(v.voters).length===0){
+        Object.entries(v.counts).forEach(([cid,cnt])=>{
+          const n=parseInt(cnt)||0;
+          for(let i=0;i<n;i++){
+            v.voters['legacy_'+k+'_'+cid+'_'+i]=parseInt(cid);
+          }
+        });
+      }
     });
   }
   if(typeof d.totalVotes==='number')S.totalVotes=d.totalVotes;
@@ -2688,7 +2753,10 @@ function renderAdmin(){
       <div class="aa"><div><div class="aa-l">اللاعبون</div><div class="aa-s">${ar(reg.length)} / ٦٤</div></div>
         <button class="btn red" onclick="confirmClearPlayers()">🗑 مسح</button></div>
       <div class="aa"><div><div class="aa-l">التصويتات</div><div class="aa-s">${ar(S.totalVotes||0)} تصويت</div></div>
-        <button class="btn red" onclick="confirmClearVotes()">🗑 مسح</button></div>
+        <div style="display:flex;gap:4px">
+          <button class="btn gold" onclick="manualMigrateVotes()" title="استرجاع الأصوات القديمة">🔄</button>
+          <button class="btn red" onclick="confirmClearVotes()">🗑 مسح</button>
+        </div></div>
     </div>
     <div class="admin-section">
       <h4>💾 البيانات</h4>
@@ -3419,6 +3487,35 @@ async function removeFamilyLogo(){
     hideBar();
     renderFamily();
   });
+}
+
+// إدارة: ترحيل يدوي للأصوات القديمة
+async function manualMigrateVotes(){
+  if(!adminMode)return;
+  showBar('🔄 جاري قراءة الأصوات القديمة...');
+  try{
+    const data=await fbRead('votes');
+    if(data){
+      S.votes=JSON.parse(JSON.stringify(data));
+      _migrationDone=false;
+      migrateOldVotes();
+      // انتظر الكتابة
+      await new Promise(r=>setTimeout(r,2000));
+      // أعد قراءة الكل
+      const fresh=await fbRead();
+      if(fresh)applyRemote(fresh);
+      hideBar();
+      const total=Object.values(S.votes||{}).reduce((s,v)=>s+(v&&v.voters?Object.keys(v.voters).length:0),0);
+      showModal('✅ تم الترحيل','تم ترحيل الأصوات القديمة. الإجمالي الحالي: '+ar(total)+' صوت.',null);
+      renderTrn();renderAdmin();
+    }else{
+      hideBar();
+      showModal('لا يوجد','لا توجد أصوات في قاعدة البيانات.',null);
+    }
+  }catch(e){
+    hideBar();
+    showModal('خطأ','فشل الترحيل: '+e.message,null);
+  }
 }
 
 // إدارة: مسح تصويت قيم معين (matchId)
