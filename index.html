@@ -973,7 +973,7 @@ function initS(){return{players:Array.from({length:64},(_,i)=>({id:i,slot:i+1,na
 let S=initS();
 let _fbReady=false,_saveT=null,simM=0,aDay=0,adminMode=false;
 let dragPid=null,selPid=null,drawAssign={},activeRound='r64',activeDay=1,activeRoundInDay='r64';
-let vmMN=null,vmPending=null;
+let vmMID=null,vmPending=null;
 let modalCb=null;
 let pPhoto=null;
 
@@ -1026,11 +1026,11 @@ function computeInsights(){
   // أكثر شرط تصويتاً + المباراة الأكثر إثارة
   const condTotals={};
   if(S.votes){
-    Object.entries(S.votes).forEach(([mn,v])=>{
+    Object.entries(S.votes).forEach(([mid,v])=>{
       if(!v||!v.voters)return;
       const votes=Object.values(v.voters);
       const mTot=votes.length;
-      if(mTot>ins.hotMatchVotes){ins.hotMatchVotes=mTot;ins.hotMatchNum=parseInt(mn);}
+      if(mTot>ins.hotMatchVotes){ins.hotMatchVotes=mTot;ins.hotMatchNum=mid;}
       votes.forEach(cid=>{condTotals[cid]=(condTotals[cid]||0)+1;});
     });
   }
@@ -1094,10 +1094,17 @@ function renderInsights(){
   }
   // مباراة أكثر إثارة
   if(ins.hotMatchNum&&ins.hotMatchVotes>0){
+    let hotLabel='قيم';
+    if(typeof ins.hotMatchNum==='string'&&ins.hotMatchNum.includes('_')){
+      const[r,i]=ins.hotMatchNum.split('_');
+      hotLabel=(RN[r]||'')+' #'+ar(parseInt(i)+1);
+    }else{
+      hotLabel='قيم '+ar(ins.hotMatchNum);
+    }
     cards.push(`<div class="ins">
       <span class="ins-icon">🔥</span>
       <div class="ins-lbl">الأكثر إثارة</div>
-      <div class="ins-v">قيم ${ar(ins.hotMatchNum)}</div>
+      <div class="ins-v" style="font-size:15px">${hotLabel}</div>
       <div class="ins-sub">${ar(ins.hotMatchVotes)} صوت</div>
     </div>`);
   }
@@ -1521,6 +1528,7 @@ function openPlayerProfile(pid){
           <span>${fmtRelTime(ch.t||Date.now())}</span>
         </div>
         <div class="pp-cheer-msg">${(ch.msg||'').replace(/</g,'&lt;')}</div>
+        ${adminMode?`<div style="text-align:left;margin-top:5px"><button class="btn red" style="padding:2px 8px;font-size:10px" onclick="adminDeleteCheer(${pid},'${ch.uid}')">🗑 حذف</button></div>`:''}
       </div>`).join('')}${cheersList.length>8?`<div style="text-align:center;font-size:11px;color:var(--g2);padding:5px">و ${ar(cheersList.length-8)} رسالة أخرى</div>`:''}</div>`
     :`<div class="pp-cheer-empty">💌 كن أول من يشجّع ${p.registered?p.name:'هذا اللاعب'}</div>`;
   const cheerForm=p.registered&&!userCheer?`
@@ -1558,6 +1566,13 @@ function openPlayerProfile(pid){
       <div class="pp-stat"><div class="pp-stat-v" style="color:#E08080">${ar(stats.losses)}</div><div class="pp-stat-l">خسارة</div></div>
       <div class="pp-stat"><div class="pp-stat-v">${ar(stats.pending)}</div><div class="pp-stat-l">قادمة</div></div>
     </div>
+    ${adminMode?`<div class="pp-section" style="text-align:center">
+      <h4>🛠 إدارة الصورة</h4>
+      <div style="display:flex;gap:7px;justify-content:center;flex-wrap:wrap">
+        <button class="btn" onclick="adminChangePlayerPhoto(${pid})">📷 ${p.photo?'تغيير':'إضافة'} الصورة</button>
+        ${p.photo?`<button class="btn red" onclick="adminRemovePlayerPhoto(${pid})">🗑 حذف الصورة</button>`:''}
+      </div>
+    </div>`:''}
     <div class="pp-section">
       <h4>⚔️ الرحلة</h4>
       <div class="pp-journey">${journeyHTML}</div>
@@ -1692,9 +1707,9 @@ function isSurpriseMatchById(matchId){
 }
 
 // يبني HTML لنتائج التصويت — للأدوار العادية فقط (المفاجأة يتولاها renderTrn)
-function voteResultsHTML(matchNum, opts){
+function voteResultsHTML(matchId, opts){
   opts = opts || {};
-  const info = getVoteInfo(matchNum);
+  const info = getVoteInfo(matchId);
   // لو ما فيه أصوات
   if(info.tot === 0){
     return `<div class="bv-results empty">🗳 ${opts.canVote!==false?'كن أول من يصوّت':'لا أصوات بعد'}</div>`;
@@ -1735,9 +1750,9 @@ function computeCounts(voters){
   Object.values(voters).forEach(cid=>{if(cid)c[cid]=(c[cid]||0)+1;});
   return c;
 }
-// يرجّع كل المعلومات عن تصويت قيم معين
-function getVoteInfo(matchNum){
-  const mv=(S.votes&&S.votes[matchNum])||{};
+// يرجّع كل المعلومات عن تصويت قيم معين (matchId مثل r64_0)
+function getVoteInfo(matchId){
+  const mv=(S.votes&&S.votes[matchId])||{};
   const voters=mv.voters||{};
   const counts=computeCounts(voters);
   const userVote=voters[USER_ID]||null;
@@ -1753,9 +1768,9 @@ function getVoteInfo(matchNum){
   return {voters,counts,userVote,voted:!!userVote,tot,topCond,topPct};
 }
 // كتابة صوت لمستخدم واحد فقط (atomic — لا يدوس صوت غيره)
-async function fbWriteVote(matchNum,condId){
+async function fbWriteVote(matchId,condId){
   try{
-    await fetch(`${FB_URL}/votes/${matchNum}/voters/${USER_ID}.json`,{
+    await fetch(`${FB_URL}/votes/${matchId}/voters/${USER_ID}.json`,{
       method:'PUT',body:JSON.stringify(condId),
       headers:{'Content-Type':'application/json'}
     });
@@ -2295,22 +2310,22 @@ function renderTrn(){
         vhtml+='<div class="bracket-wrap"><div class="bracket-visual"><div class="bv-round" style="min-width:260px"><div class="bv-round-title">دور الـ٦٤ — التصويت</div><div class="bv-matches">';
         b.r64.forEach(m=>{
           if(m.p1===null&&m.p2===null)return;
-          const info=getVoteInfo(m.matchNum);
+          const info=getVoteInfo(m.id);
           const cond=CONDS.find(c=>c.id===m.condId);
           const timeChip = typeof m.startTime==='number'
             ? `<div class="bv-time-wrap"><span class="bv-time${adminMode?' editable':''}" ${adminMode?`onclick="editMatchTime('${m.id}')"`:''}><span class="bv-time-ic">⏰</span>${fmtTime(m.startTime)}${adminMode?'<span class="bv-time-edit">✎</span>':''}</span></div>`
             : '';
           vhtml+=`<div class="bv-match">
             ${timeChip}
-            <div class="bv-player" onclick="openVM(${m.matchNum})" style="cursor:pointer">
+            <div class="bv-player" onclick="openVM('${m.id}')" style="cursor:pointer">
               ${avHTML(m.p1,24)}<span class="bv-name">${pName(m.p1)}</span>
             </div>
             <div class="bv-vs">✦ ضد ✦</div>
-            <div class="bv-player" onclick="openVM(${m.matchNum})" style="cursor:pointer">
+            <div class="bv-player" onclick="openVM('${m.id}')" style="cursor:pointer">
               ${avHTML(m.p2,24)}<span class="bv-name">${pName(m.p2)}</span>
             </div>
-            ${voteResultsHTML(m.matchNum)}
-            <button class="bv-vote-btn${info.voted?' voted':''}" onclick="openVM(${m.matchNum})">
+            ${voteResultsHTML(m.id)}
+            <button class="bv-vote-btn${info.voted?' voted':''}" onclick="openVM('${m.id}')">
               ${cond?cond.icon+' '+cond.name:info.voted?'✅ صوّتت':'🗳 صوّت على شرط القيم'}
             </button>
           </div>`;
@@ -2419,7 +2434,7 @@ function renderTrn(){
 
     items.forEach(m=>{
       const isSurprise = SURPRISE_ROUNDS.includes(m.round);
-      const info = isSurprise ? null : getVoteInfo(m.matchNum);
+      const info = isSurprise ? null : getVoteInfo(m.id);
       const cond = !isSurprise ? CONDS.find(c=>c.id===m.condId) : null;
       const canWin=adminMode&&!m.winner&&m.p1!==null&&m.p2!==null;
       const cl1=m.winner===m.p1?'won':m.winner?'lost':'';
@@ -2433,10 +2448,10 @@ function renderTrn(){
       // اللاعب onclick: للإدارة لاختيار الفائز، للزائر يفتح التصويت (إلا في المفاجأة)
       const oc1 = m.p1!==null&&!m.winner&&canWin
         ? `onclick="setWin('${m.id}',${m.p1})"`
-        : (m.p1!==null&&!m.winner&&!isSurprise?`onclick="openVM(${m.matchNum})"`:'');
+        : (m.p1!==null&&!m.winner&&!isSurprise?`onclick="openVM('${m.id}')"`:'');
       const oc2 = m.p2!==null&&!m.winner&&canWin
         ? `onclick="setWin('${m.id}',${m.p2})"`
-        : (m.p2!==null&&!m.winner&&!isSurprise?`onclick="openVM(${m.matchNum})"`:'');
+        : (m.p2!==null&&!m.winner&&!isSurprise?`onclick="openVM('${m.id}')"`:'');
       const ptr = !m.winner&&(m.p1!==null||m.p2!==null) ? 'cursor:pointer' : '';
 
       const timeChip = typeof m.startTime==='number'
@@ -2452,14 +2467,15 @@ function renderTrn(){
           <div style="font-size:9px;color:var(--g2);margin-top:4px">يُكشف عند بداية المباراة</div>
         </div>`;
       } else {
-        condBlock = voteResultsHTML(m.matchNum)
-          + `<button class="bv-vote-btn${info.voted?' voted':''}" onclick="openVM(${m.matchNum})">
+        condBlock = voteResultsHTML(m.id)
+          + `<button class="bv-vote-btn${info.voted?' voted':''}" onclick="openVM('${m.id}')">
               ${cond
                 ? '🔒 '+cond.icon+' '+cond.name
                 : info.voted
                   ? '✅ صوّتت'
                   : '🗳 صوّت على شرط القيم'}
-            </button>`;
+            </button>`
+          + (adminMode?`<button class="btn red" style="width:100%;margin-top:5px;font-size:11px;padding:5px" onclick="adminClearMatchVotes('${m.id}')">🗑 مسح تصويت هذا القيم</button>`:'');
       }
 
       html+=`<div class="bv-match${m.winner?' done':''}">
@@ -2543,28 +2559,30 @@ function setWin(matchId,winnerId){
 }
 
 // ── VOTE MODAL ──
-function openVM(matchNum){
-  // ابحث عن المباراة بالـ matchNum مع التأكد من الدور — لو في دور المفاجأة لا تفتح
+function openVM(matchId){
+  // ابحث عن المباراة بالـ matchId الكامل
   const b=S.tournament&&S.tournament.bracket;
-  if(b){
-    for(const r of SURPRISE_ROUNDS){
-      const arr=b[r];if(!arr)continue;
-      const items=Array.isArray(arr)?arr:Object.values(arr);
-      if(items.some(m=>m&&m.matchNum===matchNum&&m.round===r))return;
-    }
-  }
-  vmMN=matchNum;vmPending=null;
-  if(!S.votes)S.votes={};
-  if(!S.votes[matchNum])S.votes[matchNum]={voters:{}};
-  if(!S.votes[matchNum].voters)S.votes[matchNum].voters={};
-  const info=getVoteInfo(matchNum);
+  if(!b)return;
+  // إذا في دور المفاجأة، لا تفتح
+  if(SURPRISE_ROUNDS.some(r=>matchId&&matchId.startsWith(r+'_')))return;
+  // ابحث عن المباراة
   let m=null;
-  if(b){for(const r of ['r64','r32','r16','r8','r4','r2']){const f=b[r]&&b[r].find(x=>x.matchNum===matchNum);if(f){m=f;break;}}}
-  const cm=CM.find(x=>x.num===matchNum);
-  const pid1=m?m.p1:cm?cm.p1:null,pid2=m?m.p2:cm?cm.p2:null;
+  for(const r of ['r64','r32','r16','r8','r4','r2']){
+    const arr=b[r];if(!arr)continue;
+    const items=Array.isArray(arr)?arr:Object.values(arr);
+    const f=items.find(x=>x&&x.id===matchId);
+    if(f){m=f;break;}
+  }
+  if(!m)return;
+  vmMID=matchId;vmPending=null;
+  if(!S.votes)S.votes={};
+  if(!S.votes[matchId])S.votes[matchId]={voters:{}};
+  if(!S.votes[matchId].voters)S.votes[matchId].voters={};
+  const info=getVoteInfo(matchId);
+  const pid1=m.p1,pid2=m.p2;
   const p1=pById(pid1),p2=pById(pid2);
   const[bg1,fg1]=pal(pid1??0),[bg2,fg2]=pal(pid2??0);
-  document.getElementById('vm-title').textContent=`تصويت — قيم ${ar(matchNum)}`;
+  document.getElementById('vm-title').textContent=`تصويت — ${RN[m.round]||''} #${ar(m.matchNum)}`;
   document.getElementById('vm-players').innerHTML=`
     <div class="vm-player">
       ${p1&&p1.photo?`<img src="${p1.photo}">`:`<div class="vm-av-i" style="background:${bg1};color:${fg1}">${init(pName(pid1))}</div>`}
@@ -2590,29 +2608,25 @@ function openVM(matchNum){
   document.getElementById('vm').classList.add('open');
 }
 function pickVM(cid,el){
-  const info=getVoteInfo(vmMN);
+  const info=getVoteInfo(vmMID);
   if(info.voted)return;
   document.querySelectorAll('.vm-cond').forEach(e=>e.classList.remove('sel'));
   el.classList.add('sel');vmPending=cid;
 }
 async function submitVM(){
-  if(!vmPending||!vmMN)return;
-  const info=getVoteInfo(vmMN);
+  if(!vmPending||!vmMID)return;
+  const info=getVoteInfo(vmMID);
   if(info.voted)return;
-  // كتابة atomic لـ Firebase (لكل مستخدم مفتاحه الخاص)
-  const ok=await fbWriteVote(vmMN,vmPending);
+  const ok=await fbWriteVote(vmMID,vmPending);
   if(!ok){alert('فشل التصويت — جرّب مره ثانية');return;}
-  // تحديث الحالة المحلية
   if(!S.votes)S.votes={};
-  if(!S.votes[vmMN])S.votes[vmMN]={voters:{}};
-  if(!S.votes[vmMN].voters)S.votes[vmMN].voters={};
-  S.votes[vmMN].voters[USER_ID]=vmPending;
+  if(!S.votes[vmMID])S.votes[vmMID]={voters:{}};
+  if(!S.votes[vmMID].voters)S.votes[vmMID].voters={};
+  S.votes[vmMID].voters[USER_ID]=vmPending;
   S.totalVotes=(S.totalVotes||0)+1;
-  // محاولة لمّ مجموع التصويتات في Firebase (best-effort)
   fbWrite('totalVotes',S.totalVotes);
-  // تحديث العرض
   const tv=document.getElementById('totalVotes');if(tv)tv.textContent=ar(S.totalVotes);
-  const info2=getVoteInfo(vmMN);
+  const info2=getVoteInfo(vmMID);
   CONDS.forEach(c=>{
     const pct=info2.tot>0?Math.round((info2.counts[c.id]||0)/info2.tot*100):0;
     const ce=document.getElementById(`vmcnt-${c.id}`),ve=document.getElementById(`vmc-${c.id}`);
@@ -2624,7 +2638,7 @@ async function submitVM(){
   document.getElementById('vm-submit').textContent='✅ صوّتت مسبقاً';
   setTimeout(()=>{closeVM();renderTrn();},1200);
 }
-function closeVM(){document.getElementById('vm').classList.remove('open');vmMN=null;vmPending=null;}
+function closeVM(){document.getElementById('vm').classList.remove('open');vmMID=null;vmPending=null;}
 document.getElementById('vm').addEventListener('click',e=>{if(e.target===e.currentTarget)closeVM();});
 
 // ── ADMIN ──
@@ -3112,14 +3126,14 @@ async function buildVotePage(){
   let h = '<div class="vgrid">';
   matches.forEach(m=>{
     if(!S.votes) S.votes={};
-    const key = m.matchNum;
+    const key = m.id;
     if(!S.votes[key]) S.votes[key]={voters:{}};
     if(!S.votes[key].voters) S.votes[key].voters={};
     const info = getVoteInfo(key);
     const p1=pById(m.p1), p2=pById(m.p2);
     const[bg1,fg1]=pal(m.p1??0);
     const[bg2,fg2]=pal(m.p2??0);
-    h+=`<div class="vc"><div class="vl">قيم ${ar(key)}</div><div style="display:flex;align-items:center;gap:8px;padding:9px;background:rgba(46,118,184,.06);border-radius:var(--r);margin-bottom:10px"><div style="display:flex;align-items:center;gap:6px;flex:1">${p1&&p1.photo?`<img src="${p1.photo}" style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:1.5px solid var(--sep2);flex-shrink:0">`:`<div style="width:34px;height:34px;border-radius:50%;background:${bg1};color:${fg1};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">${init(pName(m.p1))}</div>`}<span style="font-size:13px;font-weight:700;color:var(--g1)">${pName(m.p1)}</span></div><span style="font-size:10px;color:var(--b2)">ضد</span><div style="display:flex;align-items:center;gap:6px;flex:1;justify-content:flex-end"><span style="font-size:13px;font-weight:700;color:var(--g1)">${pName(m.p2)}</span>${p2&&p2.photo?`<img src="${p2.photo}" style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:1.5px solid var(--sep2);flex-shrink:0">`:`<div style="width:34px;height:34px;border-radius:50%;background:${bg2};color:${fg2};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">${init(pName(m.p2))}</div>`}</div></div>${info.voted?`<div style="text-align:center;padding:5px 8px;background:rgba(30,150,80,.1);border:1px solid rgba(30,150,80,.25);border-radius:var(--r);color:#70D090;font-size:11px;margin-bottom:8px">✅ صوّتت${info.topCond&&info.tot>0?' — الأعلى: '+info.topCond.icon+' '+info.topCond.name+' ('+ar(info.topPct)+'%)':''}</div>`:''}<div class="cg">${CONDS.map(c=>{const cnt=info.counts[c.id]||0;const pct=info.tot>0?Math.round(cnt/info.tot*100):0;const isTop=info.topCond&&info.topCond.id===c.id&&info.tot>0;const isUserVote=info.userVote===c.id;return`<div class="co${isUserVote?' sel':''}${info.voted?' voted':''}" id="vp-${key}-${c.id}" ${info.voted?'':`onclick="castVote(${key},${c.id},this)"`} style="${isTop?'border-color:rgba(46,118,184,.55);':''}"><span>${c.icon} ${c.name}${isUserVote?' ✓':''}</span><span class="vcnt" id="vpcnt-${key}-${c.id}">${ar(pct)}% · ${ar(cnt)}${isTop?' 🏆':''}</span><div class="vbar" style="width:${pct}%;background:${isTop?'var(--b2)':'rgba(46,118,184,.35)'}"></div></div>`;}).join('')}</div>${!info.voted?`<button class="vbtn" id="vbtn-${key}" onclick="castVoteSubmit(${key})">تأكيد التصويت</button>`:''}</div>`;
+    h+=`<div class="vc"><div class="vl">${RN[m.round]||''} · قيم ${ar(m.matchNum)}</div><div style="display:flex;align-items:center;gap:8px;padding:9px;background:rgba(46,118,184,.06);border-radius:var(--r);margin-bottom:10px"><div style="display:flex;align-items:center;gap:6px;flex:1">${p1&&p1.photo?`<img src="${p1.photo}" style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:1.5px solid var(--sep2);flex-shrink:0">`:`<div style="width:34px;height:34px;border-radius:50%;background:${bg1};color:${fg1};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">${init(pName(m.p1))}</div>`}<span style="font-size:13px;font-weight:700;color:var(--g1)">${pName(m.p1)}</span></div><span style="font-size:10px;color:var(--b2)">ضد</span><div style="display:flex;align-items:center;gap:6px;flex:1;justify-content:flex-end"><span style="font-size:13px;font-weight:700;color:var(--g1)">${pName(m.p2)}</span>${p2&&p2.photo?`<img src="${p2.photo}" style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:1.5px solid var(--sep2);flex-shrink:0">`:`<div style="width:34px;height:34px;border-radius:50%;background:${bg2};color:${fg2};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">${init(pName(m.p2))}</div>`}</div></div>${info.voted?`<div style="text-align:center;padding:5px 8px;background:rgba(30,150,80,.1);border:1px solid rgba(30,150,80,.25);border-radius:var(--r);color:#70D090;font-size:11px;margin-bottom:8px">✅ صوّتت${info.topCond&&info.tot>0?' — الأعلى: '+info.topCond.icon+' '+info.topCond.name+' ('+ar(info.topPct)+'%)':''}</div>`:''}<div class="cg">${CONDS.map(c=>{const cnt=info.counts[c.id]||0;const pct=info.tot>0?Math.round(cnt/info.tot*100):0;const isTop=info.topCond&&info.topCond.id===c.id&&info.tot>0;const isUserVote=info.userVote===c.id;return`<div class="co${isUserVote?' sel':''}${info.voted?' voted':''}" id="vp-${key}-${c.id}" ${info.voted?'':`onclick="castVote('${key}',${c.id},this)"`} style="${isTop?'border-color:rgba(46,118,184,.55);':''}"><span>${c.icon} ${c.name}${isUserVote?' ✓':''}</span><span class="vcnt" id="vpcnt-${key}-${c.id}">${ar(pct)}% · ${ar(cnt)}${isTop?' 🏆':''}</span><div class="vbar" style="width:${pct}%;background:${isTop?'var(--b2)':'rgba(46,118,184,.35)'}"></div></div>`;}).join('')}</div>${!info.voted?`<button class="vbtn" id="vbtn-${key}" onclick="castVoteSubmit('${key}')">تأكيد التصويت</button>`:''}</div>`;
   });
   h+='</div>';
   cont.innerHTML=h;
@@ -3141,7 +3155,7 @@ function getVoteMatches(){
         const p2 = m.p2 !== undefined ? m.p2 : null;
         const winner = m.winner !== undefined ? m.winner : null;
         if(p1 !== null && p2 !== null && !winner){
-          result.push({matchNum: m.matchNum, p1: p1, p2: p2, round: m.round, winner: winner, condId: m.condId || null});
+          result.push({id:m.id, matchNum: m.matchNum, p1: p1, p2: p2, round: m.round, winner: winner, condId: m.condId || null});
         }
       });
     }
@@ -3150,36 +3164,36 @@ function getVoteMatches(){
 }
 
 const _pendingVotes={};
-function castVote(mn,cid,el){
-  const info=getVoteInfo(mn);
+function castVote(mid,cid,el){
+  const info=getVoteInfo(mid);
   if(info.voted)return;
-  document.querySelectorAll(`[id^="vp-${mn}-"]`).forEach(e=>e.classList.remove('sel'));
+  document.querySelectorAll(`[id^="vp-${mid}-"]`).forEach(e=>e.classList.remove('sel'));
   el.classList.add('sel');
-  _pendingVotes[mn]=cid;
+  _pendingVotes[mid]=cid;
 }
 
-async function castVoteSubmit(mn){
-  const cid=_pendingVotes[mn];
+async function castVoteSubmit(mid){
+  const cid=_pendingVotes[mid];
   if(!cid){
-    const btn=document.getElementById(`vbtn-${mn}`);
+    const btn=document.getElementById(`vbtn-${mid}`);
     if(btn){btn.style.borderColor='rgba(220,80,80,.6)';setTimeout(()=>btn.style.borderColor='',1500);}
     return;
   }
-  const info=getVoteInfo(mn);
+  const info=getVoteInfo(mid);
   if(info.voted)return;
-  const btn=document.getElementById(`vbtn-${mn}`);
+  const btn=document.getElementById(`vbtn-${mid}`);
   if(btn){btn.disabled=true;btn.textContent='...جاري التصويت';}
-  const ok=await fbWriteVote(mn,cid);
+  const ok=await fbWriteVote(mid,cid);
   if(!ok){
     if(btn){btn.disabled=false;btn.textContent='تأكيد التصويت';}
     alert('فشل التصويت — جرّب مره ثانية');
     return;
   }
   if(!S.votes)S.votes={};
-  if(!S.votes[mn])S.votes[mn]={voters:{}};
-  if(!S.votes[mn].voters)S.votes[mn].voters={};
-  S.votes[mn].voters[USER_ID]=cid;
-  delete _pendingVotes[mn];
+  if(!S.votes[mid])S.votes[mid]={voters:{}};
+  if(!S.votes[mid].voters)S.votes[mid].voters={};
+  S.votes[mid].voters[USER_ID]=cid;
+  delete _pendingVotes[mid];
   S.totalVotes=(S.totalVotes||0)+1;
   fbWrite('totalVotes',S.totalVotes);
   const tv=document.getElementById('totalVotes');
@@ -3404,6 +3418,92 @@ async function removeFamilyLogo(){
     try{await fbWrite('family/logo',null);}catch(e){}
     hideBar();
     renderFamily();
+  });
+}
+
+// إدارة: مسح تصويت قيم معين (matchId)
+async function adminClearMatchVotes(matchId){
+  if(!adminMode)return;
+  showModal('مسح تصويت القيم','هل تريد مسح كل أصوات هذا القيم؟ سيتم إزالة الشرط المثبت أيضاً.',async()=>{
+    showBar('🗑 جاري مسح التصويت...');
+    if(S.votes&&S.votes[matchId])delete S.votes[matchId];
+    // مسح condId من المباراة
+    if(S.tournament&&S.tournament.bracket){
+      for(const r of ['r64','r32','r16','r8','r4','r2']){
+        const arr=S.tournament.bracket[r];if(!arr)continue;
+        const items=Array.isArray(arr)?arr:Object.values(arr);
+        const found=items.find(m=>m&&m.id===matchId);
+        if(found){found.condId=null;break;}
+      }
+    }
+    try{
+      await fbWrite('votes/'+matchId,null);
+      if(S.tournament)await fbWrite('tournament',S.tournament);
+    }catch(e){console.error(e);}
+    _lastSig='';
+    hideBar();
+    renderTrn();
+  });
+}
+
+// إدارة: حذف رسالة تشجيع
+async function adminDeleteCheer(playerId, userId){
+  if(!adminMode)return;
+  showModal('حذف رسالة تشجيع','حذف هذه الرسالة نهائياً؟',async()=>{
+    showBar('🗑 جاري الحذف...');
+    if(S.cheers&&S.cheers[playerId]&&S.cheers[playerId][userId]){
+      delete S.cheers[playerId][userId];
+    }
+    try{await fbWrite(`cheers/${playerId}/${userId}`,null);}catch(e){}
+    hideBar();
+    openPlayerProfile(playerId);
+  });
+}
+
+// إدارة: تغيير صورة لاعب
+function adminChangePlayerPhoto(playerId){
+  if(!adminMode)return;
+  const inp=document.createElement('input');
+  inp.type='file';inp.accept='image/*';
+  inp.onchange=ev=>{
+    const f=ev.target.files[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=ev2=>{
+      const img=new Image();
+      img.onload=async ()=>{
+        const SIZE=80;
+        const canvas=document.createElement('canvas');canvas.width=SIZE;canvas.height=SIZE;
+        const ctx=canvas.getContext('2d');
+        ctx.beginPath();ctx.arc(SIZE/2,SIZE/2,SIZE/2,0,Math.PI*2);ctx.clip();
+        const scale=Math.max(SIZE/img.width,SIZE/img.height);
+        const sw=img.width*scale,sh=img.height*scale;
+        ctx.drawImage(img,(SIZE-sw)/2,(SIZE-sh)/2,sw,sh);
+        const photo=canvas.toDataURL('image/jpeg',.55);
+        const p=pById(playerId);if(!p)return;
+        p.photo=photo;
+        showBar('💾 جاري حفظ الصورة...');
+        try{await fbWrite('players/'+playerId+'/photo',photo);}catch(e){}
+        hideBar();
+        buildPGrid();renderList();renderInsights();
+        openPlayerProfile(playerId);
+      };
+      img.src=ev2.target.result;
+    };
+    r.readAsDataURL(f);
+  };
+  inp.click();
+}
+
+async function adminRemovePlayerPhoto(playerId){
+  if(!adminMode)return;
+  showModal('حذف الصورة','حذف صورة هذا اللاعب؟',async()=>{
+    const p=pById(playerId);if(!p)return;
+    p.photo=null;
+    showBar('🗑 جاري الحذف...');
+    try{await fbWrite('players/'+playerId+'/photo',null);}catch(e){}
+    hideBar();
+    buildPGrid();renderList();renderInsights();
+    openPlayerProfile(playerId);
   });
 }
 
