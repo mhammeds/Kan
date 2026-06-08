@@ -948,7 +948,7 @@ const DAY_INFO=[
 ];
 const PAL=[['#081420','#4880A8'],['#081018','#386078'],['#0C1828','#5090B0'],['#081420','#286090'],['#081828','#5888A8'],['#081018','#387090'],['#0C1828','#487898'],['#081828','#507090'],['#081420','#3888A8'],['#081018','#508898'],['#0C1828','#286878'],['#081828','#4080A8'],['#081420','#3870A0'],['#081828','#5090A8'],['#0C1018','#387890'],['#0A1828','#4878A0']];
 const GAME=10,BRK=5,SLOT=15,START=480,DIST=[11,11,10];
-const ADMIN_PIN='1234';
+const ADMIN_PIN='4458';
 const FB_URL='https://engmohammed-642d1-default-rtdb.firebaseio.com/kyk';
 
 // ── USER ID (يتولد مره وحده لكل جهاز ويثبت — يستخدم لمنع التصويت المتكرر) ──
@@ -1567,8 +1567,9 @@ function openPlayerProfile(pid){
       <div class="pp-stat"><div class="pp-stat-v">${ar(stats.pending)}</div><div class="pp-stat-l">قادمة</div></div>
     </div>
     ${adminMode?`<div class="pp-section" style="text-align:center">
-      <h4>🛠 إدارة الصورة</h4>
+      <h4>🛠 إدارة بيانات اللاعب</h4>
       <div style="display:flex;gap:7px;justify-content:center;flex-wrap:wrap">
+        <button class="btn" onclick="adminEditPlayerName(${pid})">✏️ تعديل الاسم</button>
         <button class="btn" onclick="adminChangePlayerPhoto(${pid})">📷 ${p.photo?'تغيير':'إضافة'} الصورة</button>
         ${p.photo?`<button class="btn red" onclick="adminRemovePlayerPhoto(${pid})">🗑 حذف الصورة</button>`:''}
       </div>
@@ -3555,6 +3556,47 @@ async function adminDeleteCheer(playerId, userId){
     hideBar();
     openPlayerProfile(playerId);
   });
+}
+
+// إدارة: تعديل اسم لاعب
+function adminEditPlayerName(playerId){
+  if(!adminMode)return;
+  const p=pById(playerId);if(!p)return;
+  const curName=p.name||'';
+  document.getElementById('modal-title').textContent='✏️ تعديل اسم اللاعب';
+  document.getElementById('modal-body').innerHTML=`
+    <p style="font-size:12px;color:var(--g2);margin-bottom:9px">مقعد ${ar(p.slot)}</p>
+    <input type="text" id="editNameInput" value="${curName.replace(/"/g,'&quot;')}" maxlength="50"
+      style="width:100%;background:rgba(255,255,255,.04);border:1px solid var(--sep2);border-radius:var(--r);padding:10px 12px;color:var(--g1);font-family:'Amiri',serif;font-size:15px;outline:none;direction:rtl;text-align:center">
+    <p style="font-size:11px;color:var(--g2);margin-top:8px">الاسم الحالي: <span style="color:var(--g1)">${curName||'بدون'}</span></p>`;
+  modalCb=async()=>{
+    const newName=(document.getElementById('editNameInput').value||'').trim();
+    if(!newName){alert('الاسم لا يمكن أن يكون فارغاً');return;}
+    p.name=newName;
+    p.registered=true;
+    showBar('💾 جاري حفظ الاسم الجديد...');
+    try{
+      await fbWrite('players/'+playerId+'/name',newName);
+      await fbWrite('players/'+playerId+'/registered',true);
+    }catch(e){console.error(e);}
+    hideBar();
+    updCtr();renderList();buildPGrid();renderInsights();renderFeed();
+    if(typeof renderTrn==='function')renderTrn();
+    openPlayerProfile(playerId);
+  };
+  // تركيز على الحقل ولما يكتب Enter يحفظ
+  setTimeout(()=>{
+    const inp=document.getElementById('editNameInput');
+    if(inp){
+      inp.focus();
+      inp.select();
+      inp.onkeydown=(e)=>{if(e.key==='Enter'){e.preventDefault();document.getElementById('modal-ok').click();}};
+    }
+  },100);
+  document.getElementById('modal-cancel').style.display='flex';
+  document.getElementById('modal-ok').textContent='حفظ';
+  document.getElementById('modal-ok').style.display='block';
+  document.getElementById('modal').classList.add('open');
 }
 
 // إدارة: تغيير صورة لاعب
