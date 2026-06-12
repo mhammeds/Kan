@@ -2544,6 +2544,10 @@ function renderTrn(){
           + (adminMode?`<button class="btn red" style="width:100%;margin-top:5px;font-size:11px;padding:5px" onclick="adminClearMatchVotes('${m.id}')">🗑 مسح تصويت هذا القيم</button>`:'');
       }
 
+      // زر التراجع عن الفائز للإدارة
+      const undoBtn = (adminMode && m.winner!==null && m.winner!==undefined)
+        ? `<button class="btn gold" style="width:100%;margin-top:6px;font-size:11px;padding:5px" onclick="adminUndoWinner('${m.id}')">✎ تعديل الفائز</button>`
+        : '';
       html+=`<div class="bv-match${m.winner?' done':''}">
         ${timeChip}
         <div class="bv-player ${cl1}${m.p1===null?' empty-p':''}" ${oc1} style="${ptr}">
@@ -2558,6 +2562,7 @@ function renderTrn(){
           ${canWin?'<span style="font-size:9px;color:var(--b3);margin-right:auto;opacity:.7">اضغط للفوز</span>':''}
         </div>
         ${condBlock}
+        ${undoBtn}
       </div>`;
     });
   }
@@ -3556,6 +3561,134 @@ async function adminDeleteCheer(playerId, userId){
     hideBar();
     openPlayerProfile(playerId);
   });
+}
+
+// إدارة: تعديل/تراجع الفائز في مباراة (في حال اختيار خاطئ)
+async function adminUndoWinner(matchId){
+  if(!adminMode)return;
+  const b=S.tournament&&S.tournament.bracket;if(!b)return;
+  const rounds=['r64','r32','r16','r8','r4','r2'];
+  // ابحث عن المباراة
+  let match=null,ri=-1;
+  for(let i=0;i<rounds.length;i++){
+    const arr=b[rounds[i]];if(!arr)continue;
+    const items=Array.isArray(arr)?arr:Object.values(arr);
+    const f=items.find(m=>m&&m.id===matchId);
+    if(f){match=f;ri=i;break;}
+  }
+  if(!match||match.winner===null||match.winner===undefined){
+    alert('لا يوجد فائز محدد لهذه المباراة');
+    return;
+  }
+  const wName=pName(match.winner);
+  const oppName=pName(match.p1===match.winner?match.p2:match.p1);
+  // تحقق أن المباراة التالية ما فيها فائز (لأنه لو الفائز تقدّم لجولة تالية وفاز فيها، الإلغاء معقّد)
+  let nextMatchWithProgress=null;
+  if(ri<rounds.length-1){
+    const nextArr=b[rounds[ri+1]];
+    if(nextArr){
+      const nextItems=Array.isArray(nextArr)?nextArr:Object.values(nextArr);
+      const nextIdx=Math.floor((match.matchNum-1)/2);
+      const nm=nextItems[nextIdx];
+      if(nm&&nm.winner!==null&&nm.winner!==undefined){
+        nextMatchWithProgress=nm;
+      }
+    }
+  }
+  const warning=nextMatchWithProgress
+    ?`⚠️ تنبيه: الفائز ${wName} لعب في الجولة التالية وفاز فيها أيضاً. التعديل سيمسح فوز المباراة التالية كمان.`
+    :'';
+  showModal('تراجع عن الفائز',`الفائز الحالي: ${wName} (ضد ${oppName})\n\nماذا تريد أن تفعل؟${warning?'\n\n'+warning:''}`,null);
+  // غيّر زر OK ليصير "تغيير الفائز"
+  const okBtn=document.getElementById('modal-ok');
+  const cancelBtn=document.getElementById('modal-cancel');
+  // الخيارات: تغيير لـ الخصم أو مسح كامل
+  const body=document.getElementById('modal-body');
+  body.innerHTML=`
+    <p style="font-size:13px;color:var(--g1);line-height:1.7;text-align:center;margin-bottom:14px">
+      الفائز الحالي:<br>
+      <span style="color:#D4A840;font-weight:700;font-size:15px">🏆 ${wName}</span>
+    </p>
+    ${warning?`<div style="background:rgba(218,165,32,.1);border:1px solid rgba(218,165,32,.3);border-radius:var(--r);padding:9px 11px;font-size:11px;color:#D4A840;margin-bottom:13px;line-height:1.6">${warning}</div>`:''}
+    <div style="display:flex;flex-direction:column;gap:7px">
+      <button class="btn gold" onclick="adminChangeWinner('${matchId}',${match.p1===match.winner?match.p2:match.p1});closeModal()">
+        🔄 تغيير الفائز إلى ${oppName}
+      </button>
+      <button class="btn red" onclick="adminClearWinner('${matchId}');closeModal()">
+        ↩️ مسح الفائز (إعادة المباراة)
+      </button>
+      <button class="btn" onclick="closeModal()">إلغاء</button>
+    </div>`;
+  okBtn.style.display='none';
+  cancelBtn.style.display='none';
+  document.getElementById('modal-title').textContent='✎ تعديل نتيجة المباراة';
+  document.getElementById('modal').classList.add('open');
+}
+
+// مسح الفائز (إعادة فتح المباراة)
+async function adminClearWinner(matchId){
+  if(!adminMode)return;
+  const b=S.tournament&&S.tournament.bracket;if(!b)return;
+  const rounds=['r64','r32','r16','r8','r4','r2'];
+  // ابحث عن المباراة
+  let match=null,ri=-1;
+  for(let i=0;i<rounds.length;i++){
+    const arr=b[rounds[i]];if(!arr)continue;
+    const items=Array.isArray(arr)?arr:Object.values(arr);
+    const f=items.find(m=>m&&m.id===matchId);
+    if(f){match=f;ri=i;break;}
+  }
+  if(!match)return;
+  showBar('🔄 جاري التراجع...');
+  const oldWinner=match.winner;
+  match.winner=null;
+  // مسح من الجولة التالية أيضاً (بالتسلسل)
+  if(ri<rounds.length-1){
+    const cleanupChain=(currIdx,childMatchNum)=>{
+      const nextRound=rounds[currIdx+1];if(!nextRound)return;
+      const nextArr=b[nextRound];if(!nextArr)return;
+      const nextItems=Array.isArray(nextArr)?nextArr:Object.values(nextArr);
+      const nextIdx=Math.floor((childMatchNum-1)/2);
+      const nm=nextItems[nextIdx];
+      if(!nm)return;
+      // امسح p1 أو p2 حسب الموقع
+      if(childMatchNum%2===1)nm.p1=null;
+      else nm.p2=null;
+      // لو كان لها فائز، امسحه واستمر بسلسلة المسح
+      if(nm.winner!==null&&nm.winner!==undefined){
+        const nmOldWinner=nm.winner;
+        nm.winner=null;
+        cleanupChain(currIdx+1,nm.matchNum);
+      }
+    };
+    cleanupChain(ri,match.matchNum);
+  }
+  // لو كان آخر مباراة، امسح البطل
+  if(b.done===oldWinner){
+    b.done=null;
+    if(S.tournament)S.tournament.champion=null;
+  }
+  try{await forceSave();}catch(e){console.error(e);}
+  hideBar();
+  renderTrn();renderAdmin();renderInsights();renderFeed();
+}
+
+// تغيير الفائز إلى لاعب آخر
+async function adminChangeWinner(matchId,newWinnerId){
+  if(!adminMode)return;
+  const b=S.tournament&&S.tournament.bracket;if(!b)return;
+  // أولاً، امسح الفائز السابق وتبعاته
+  await adminClearWinner(matchId);
+  // ثانياً، حدد الفائز الجديد
+  if(advanceWinner(b,matchId,newWinnerId)){
+    if(b.done&&S.tournament)S.tournament.champion=b.done;
+    try{await forceSave();}catch(e){console.error(e);}
+    // سجّل الحدث
+    if(typeof addEvent==='function'){
+      addEvent('win',{winner:pName(newWinnerId),loser:'(تم تعديله)',round:''});
+    }
+    renderTrn();renderAdmin();renderInsights();renderFeed();
+  }
 }
 
 // إدارة: تعديل اسم لاعب
