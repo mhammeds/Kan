@@ -244,7 +244,13 @@ body.admin .tm.pick:hover{background:rgba(94,234,212,.12)}
 .trow .no{font-family:'Cinzel Decorative',serif;color:var(--gold);text-align:center}
 .trow img,.trow .ph0{width:46px;height:46px;border-radius:50%;object-fit:cover;cursor:pointer;background:rgba(255,255,255,.06);display:grid;place-items:center;border:1px dashed var(--line2)}
 .trow .inp{padding:9px 10px;font-size:14px}
-@media(max-width:760px){.trow{grid-template-columns:40px 48px 1fr 1fr}.trow .tnm{grid-column:3/5}.trow .act{grid-column:1/-1;justify-content:flex-end}}
+.trow.solo{grid-template-columns:44px 52px 1fr 1fr auto}.trow.solo .n2{display:none}
+.mode-sw{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.mode-sw .mo{padding:16px 10px;border-radius:14px;border:1.5px solid var(--line2);background:rgba(255,255,255,.03);text-align:center;cursor:pointer;transition:.25s}
+.mode-sw .mo b{display:block;font-size:30px;margin-bottom:4px}.mode-sw .mo small{display:block;color:var(--mut);font-size:12.5px;margin-top:2px}
+.mode-sw .mo:hover{border-color:var(--gold)}
+.mode-sw .mo.on{border-color:var(--gold);background:linear-gradient(135deg,rgba(245,207,115,.18),rgba(139,92,246,.18));box-shadow:0 0 24px rgba(245,207,115,.25)}
+@media(max-width:760px){.trow{grid-template-columns:40px 48px 1fr 1fr}.trow .tnm{grid-column:3/5}.trow.solo{grid-template-columns:40px 48px 1fr 1fr}.trow.solo .tnm{grid-column:4/5}.trow .act{grid-column:1/-1;justify-content:flex-end}}
 .act{display:flex;gap:6px}
 .note{font-size:13px;color:var(--mut);line-height:1.8}
 .sw{display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:700}
@@ -555,11 +561,15 @@ let isAdmin=false,editMode=false,online=true,lastV=null,view=innerWidth<900?'lis
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const AR=n=>String(n).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
-const T=k=>(D.site.text&&D.site.text[k]!=null&&D.site.text[k]!=='')?D.site.text[k]:(DEF_TEXT[k]??'');
+const SOLO=()=>D.site.mode==='solo';
+const DEF_SOLO={heroText:'٦٤ مقعد، ٦٤ بطل، ستة أدوار وكل دور بشروطه. واحد بس يكتب اسمه في كتاب الأساطير.',regTitle:'تسجيل لاعب',ctaReg:'سجّل اسمك',regSub:'كل مقعد للاعب واحد، سجّل اسمك والإدارة تعتمد طلبك وتحدد مقعدك',seatsSub:'٦٤ مقعد · لاعب واحد في كل مقعد',jkSub:'كل لاعب عنده كرت جوكر يقدر يستخدمه مرة وحدة في البطولة، اختار الوقت الصح!'};
+const isDefT=(k,v)=>v===DEF_TEXT[k]||v===DEF_SOLO[k];
+const NM=(a,b,sep=' و ')=>SOLO()?String(a||b||''):[a,b].filter(Boolean).join(sep);
+const T=k=>(D.site.text&&D.site.text[k]!=null&&D.site.text[k]!=='')?D.site.text[k]:((SOLO()&&DEF_SOLO[k]!=null)?DEF_SOLO[k]:(DEF_TEXT[k]??''));
 const IMG=k=>(D.site.img&&D.site.img[k])||({logo:DEF_LOGO,avatar:DEF_AVATAR}[k]||'');
 const team=i=>{const t=D.teams[i];return t&&(t.n1||t.n2)?t:null;};
-const tName=i=>{const t=team(i);if(!t)return'';return t.team||[t.n1,t.n2].filter(Boolean).join(' و ');};
-const tNames=i=>{const t=team(i);return t?[t.n1,t.n2].filter(Boolean).join(' و '):'';};
+const tName=i=>{const t=team(i);if(!t)return'';return t.team||NM(t.n1,t.n2);};
+const tNames=i=>{const t=team(i);return t?NM(t.n1,t.n2):'';};
 const R=r=>Object.assign({},DEF_ROUNDS[r],(D.rounds||{})[r]||{});
 const condList=r=>{const c=R(r).conds;return Array.isArray(c)?c.filter(Boolean):(c?Object.values(c).filter(Boolean):[]);};
 
@@ -753,7 +763,7 @@ function draw(mode){
 /* ================== RENDER: HOME ================== */
 function renderHome(){
   const n=Object.keys(D.teams).filter(k=>team(k)).length;
-  let pl=0;Object.values(D.teams).forEach(t=>{if(t&&t.n1)pl++;if(t&&t.n2)pl++;});
+  let pl=0;Object.values(D.teams).forEach(t=>{if(SOLO()){if(t&&(t.n1||t.n2))pl++;return;}if(t&&t.n1)pl++;if(t&&t.n2)pl++;});
   countUp($('stReg'),n);countUp($('stPl'),pl);countUp($('stVotes'),D.totalVotes||0);
   const c=champion();
   $('champHome').innerHTML=c!=null?`<div class="card champ reveal"><div class="crown">👑</div><div style="color:var(--mut);font-weight:700" data-t="champTitle">${esc(T('champTitle'))}</div>${team(c)&&team(c).photo?`<img class="ph" src="${esc(team(c).photo)}">`:''}<div class="nm">${esc(tName(c))}</div><div style="color:var(--mut)">${esc(tNames(c))}</div></div>`:'';
@@ -784,11 +794,11 @@ function renderReg(){
   if(!D.site.regOpen&&!isAdmin){$('regCard').innerHTML=`<div class="closed"><b>🔒</b><div data-t="closedMsg" style="font-size:18px;font-weight:700">${esc(T('closedMsg'))}</div></div>`;}
   else if(!free.length){$('regCard').innerHTML=`<div class="closed"><b>🏰</b><div style="font-size:18px;font-weight:700">كل المقاعد اكتملت!</div></div>`;}
   else $('regCard').innerHTML=`
-    <label class="upl" for="rPh"><div class="pv" id="rPv">${regPhoto?`<img src="${regPhoto}">`:'📷'}</div><div><b>صورة الفريق</b><small>اختياري · تقدر الإدارة تغيّرها لاحقاً</small></div></label>
+    <label class="upl" for="rPh"><div class="pv" id="rPv">${regPhoto?`<img src="${regPhoto}">`:'📷'}</div><div><b>${SOLO()?'صورتك':'صورة الفريق'}</b><small>اختياري · تقدر الإدارة تغيّرها لاحقاً</small></div></label>
     <input type="file" id="rPh" accept="image/*" hidden onchange="regPick(event)">
-    <div class="duo"><div class="fl"><label>الاسم الأول</label><input class="inp" id="rN1" maxlength="40" placeholder="اللاعب الأول"></div>
-    <div class="fl"><label>الاسم الثاني</label><input class="inp" id="rN2" maxlength="40" placeholder="اللاعب الثاني"></div></div>
-    <div class="fl"><label>اسم الفريق (اختياري)</label><input class="inp" id="rTeam" maxlength="40" placeholder="مثلاً: فرسان الظلام"></div>
+    <div class="duo" ${SOLO()?'style="grid-template-columns:1fr"':''}><div class="fl"><label>${SOLO()?'اسمك':'الاسم الأول'}</label><input class="inp" id="rN1" maxlength="40" placeholder="${SOLO()?'اسم اللاعب':'اللاعب الأول'}"></div>
+    ${SOLO()?'':'<div class="fl"><label>الاسم الثاني</label><input class="inp" id="rN2" maxlength="40" placeholder="اللاعب الثاني"></div>'}</div>
+    <div class="fl"><label>${SOLO()?'لقبك (اختياري)':'اسم الفريق (اختياري)'}</label><input class="inp" id="rTeam" maxlength="40" placeholder="${SOLO()?'مثلاً: صقر الجدار':'مثلاً: فرسان الظلام'}"></div>
     <button class="btn" style="width:100%" onclick="register()">⚔️ إرسال طلب التسجيل</button>
     <p class="note" style="text-align:center;margin-top:8px">📌 الإدارة تراجع الطلب وتحدد المقعد</p>
     <div class="msg" id="rMsg"></div>`;
@@ -797,8 +807,9 @@ function renderReg(){
 }
 async function regPick(e){const f=e.target.files[0];if(!f)return;regPhoto=await shrink(f,220,.75);$('rPv').innerHTML=`<img src="${regPhoto}">`;}
 async function register(){
-  const n1=$('rN1').value.trim(),n2=$('rN2').value.trim(),tn=$('rTeam').value.trim();const m=$('rMsg');
-  if(!n1||!n2){m.className='msg err';m.textContent='اكتب الاسمين، كل مقعد لاعبين اثنين';return;}
+  const n1=$('rN1').value.trim(),n2=SOLO()?'':$('rN2').value.trim(),tn=$('rTeam').value.trim();const m=$('rMsg');
+  if(SOLO()){if(!n1){m.className='msg err';m.textContent='اكتب اسمك';return;}}
+  else if(!n1||!n2){m.className='msg err';m.textContent='اكتب الاسمين، كل مقعد لاعبين اثنين';return;}
   const id='rq_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
   const rq={id,n1,n2,team:tn||'',photo:regPhoto||'',at:Date.now(),uid:UID};
   D.requests[id]=rq;await put('requests/'+id,rq);
@@ -811,10 +822,10 @@ function myReqsHTML(){
   let a=[];try{a=JSON.parse(localStorage.getItem('kyk_myreq')||'[]');}catch(e){}
   if(!a.length)return'';
   const rows=a.slice(-5).reverse().map(x=>{
-    if(D.requests[x.id])return`<span class="chip">⏳ ${esc(x.n1)} و ${esc(x.n2)}: قيد المراجعة</span>`;
+    if(D.requests[x.id])return`<span class="chip">⏳ ${esc(NM(x.n1,x.n2))}: قيد المراجعة</span>`;
     const s=Object.keys(D.teams).find(k=>D.teams[k]&&D.teams[k].reqId===x.id);
-    if(s!=null)return`<span class="chip" style="border-color:rgba(94,234,212,.4);color:var(--cyan)">✅ ${esc(x.n1)} و ${esc(x.n2)}: انقبلتوا في المقعد ${+s+1}</span>`;
-    return`<span class="chip" style="border-color:rgba(251,113,133,.4);color:var(--rose)">✖ ${esc(x.n1)} و ${esc(x.n2)}: ما انقبل الطلب</span>`;}).join('');
+    if(s!=null)return`<span class="chip" style="border-color:rgba(94,234,212,.4);color:var(--cyan)">✅ ${esc(NM(x.n1,x.n2))}: انقبلتوا في المقعد ${+s+1}</span>`;
+    return`<span class="chip" style="border-color:rgba(251,113,133,.4);color:var(--rose)">✖ ${esc(NM(x.n1,x.n2))}: ما انقبل الطلب</span>`;}).join('');
   return`<div class="mystat"><b style="font-size:14px;color:var(--mut)">طلباتي</b>${rows}</div>`;
 }
 const reqList=()=>Object.values(D.requests||{}).filter(r=>r&&r.id).sort((a,b)=>(a.at||0)-(b.at||0));
@@ -823,7 +834,7 @@ function reqAdminHTML(){
   if(!L.length)return`<div class="note" style="margin-top:16px;text-align:center">🔐 ما فيه طلبات تسجيل جديدة</div>`;
   return`<div style="margin-top:18px"><b style="font-size:17px">📨 طلبات التسجيل <span class="badge">${L.length}</span></b><div style="margin-top:10px">${L.map((q,k)=>`<div class="rq" style="animation-delay:${k*40}ms">
     <div class="ph">${q.photo?`<img src="${esc(q.photo)}">`:esc((q.team||q.n1||'?').charAt(0))}</div>
-    <div class="inf"><b>${esc(q.n1)} و ${esc(q.n2)}</b>${q.team?`<br><small>فريق: ${esc(q.team)}</small>`:''}<br><small>${new Date(q.at||0).toLocaleString('ar')}</small></div>
+    <div class="inf"><b>${esc(NM(q.n1,q.n2))}</b>${q.team?`<br><small>فريق: ${esc(q.team)}</small>`:''}<br><small>${new Date(q.at||0).toLocaleString('ar')}</small></div>
     ${free.length?`<select class="inp" id="rqs_${q.id}">${free.map(i=>`<option value="${i}">مقعد ${i+1}</option>`).join('')}</select><button class="btn sm cy" onclick="approveReq('${q.id}')">✓ قبول</button>`:'<small style="color:var(--rose)">المقاعد اكتملت</small>'}
     <button class="btn sm red" onclick="rejectReq('${q.id}')">✕ رفض</button></div>`).join('')}</div></div>`;
 }
@@ -833,9 +844,9 @@ async function approveReq(id){
   D.teams[i]={n1:q.n1,n2:q.n2,team:q.team||'',photo:q.photo||'',at:Date.now(),reqId:id};
   delete D.requests[id];
   await put('teams/'+i,D.teams[i]);await put('requests/'+id,null);
-  renderTab(curTab);toast(`✅ ${q.n1} و ${q.n2} في المقعد ${i+1}`);
+  renderTab(curTab);toast(`✅ ${NM(q.n1,q.n2)} في المقعد ${i+1}`);
 }
-function rejectReq(id){const q=D.requests[id];if(!q)return;confirmM('رفض الطلب',`ترفض طلب ${esc(q.n1)} و ${esc(q.n2)}؟`,async()=>{delete D.requests[id];await put('requests/'+id,null);renderTab(curTab);toast('تم رفض الطلب');});}
+function rejectReq(id){const q=D.requests[id];if(!q)return;confirmM('رفض الطلب',`ترفض طلب ${esc(NM(q.n1,q.n2))}؟`,async()=>{delete D.requests[id];await put('requests/'+id,null);renderTab(curTab);toast('تم رفض الطلب');});}
 function updBadges(){
   const n=isAdmin?reqList().length+Object.values(D.family.members||{}).filter(m=>m&&!m.approved).length:0;
   document.querySelectorAll('.nav a[data-k=admin],.mnav a[data-k=admin]').forEach(a=>{let b=a.querySelector('.badge');if(n){if(!b){b=document.createElement('span');b.className='badge';a.appendChild(b);}b.textContent=n;}else if(b)b.remove();});
@@ -852,7 +863,7 @@ function renderSeats(id,q=''){
     const st=c===i?'king':(D.bracket.started?(alive(i)?'alive':'out'):'');
     h+=`<div class="card seat full ${st}" style="animation-delay:${i*15}ms" data-seat="${i}"><span class="no">#${i+1}</span>${c===i?'<span style="position:absolute;top:8px;left:10px;font-size:20px">👑</span>':''}
       <div class="ph">${t.photo?`<img src="${esc(t.photo)}">`:esc((t.team||t.n1||'?').charAt(0))}</div>
-      ${t.team?`<div class="tn">${esc(t.team)}</div>`:''}<div class="nn">${esc(t.n1||'')}<br><span>و</span> ${esc(t.n2||'')}</div>${jkBadge(i)}${cmList(i).length?`<span class="cm">💬 ${AR(cmList(i).length)}</span>`:''}</div>`;
+      ${t.team?`<div class="tn">${esc(t.team)}</div>`:''}<div class="nn">${SOLO()?esc(NM(t.n1,t.n2)):`${esc(t.n1||'')}<br><span>و</span> ${esc(t.n2||'')}`}</div>${jkBadge(i)}${cmList(i).length?`<span class="cm">💬 ${AR(cmList(i).length)}</span>`:''}</div>`;
   }
   box.innerHTML=h||'<div class="empty"><b>🔍</b>ما فيه نتائج</div>';
 }
@@ -921,7 +932,7 @@ function renderRules(){
     <div class="top2"><div class="bi">${esc(x.icon)}</div><div><h3>${esc(x.name)}</h3><div class="w">الدور ${AR(ix+1)} · ${AR(MATCHES[r])} ${MATCHES[r]===1||MATCHES[r]>10?'مواجهة':'مواجهات'}${x.when?' · '+esc(x.when):''}${cr===r?' · <b style="color:var(--cyan)">الحالي</b>':''}</div></div></div>
     <ol>${cl.length?cl.map(c=>`<li>${esc(c)}</li>`).join(''):'<li>لم تُحدد الشروط بعد</li>'}</ol><div class="note" style="margin-top:10px">${x.vote?'🗳 شرط كل قيم يتحدد بتصويت الجمهور من هذي الشروط':'🎁 الشرط تحدده الإدارة'}</div>
     ${isAdmin?`<div class="mbtns"><button class="btn sm ghost" onclick="editRound('${r}')">✏️ تعديل الدور وشروطه</button></div>`:''}</div>`;}).join('');
-  const g=D.site.gen||[];
+  const g=(D.site.gen||[]).map(x=>SOLO()&&x===DEF_GEN[0]?'كل مقعد = لاعب واحد':x);
   $('genRules').innerHTML=`<div class="rcard"><div class="top2"><div class="bi">📜</div><div><h3 data-t="genTitle">${esc(T('genTitle'))}</h3></div></div><ol>${g.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>${isAdmin?`<div class="mbtns"><button class="btn sm ghost" onclick="editGen()">✏️ تعديل القوانين العامة</button></div>`:''}</div>`;
   $('genRules').style.display=g.length||isAdmin?'block':'none';
   observe();
@@ -957,8 +968,8 @@ function aSite(){
   <div class="card" style="margin-top:14px"><b style="font-size:18px">النصوص</b><div class="agrid" style="margin-top:12px">${Object.entries(TEXT_LABELS).map(([k,l])=>`<div class="fl"><label>${l}</label>${['heroText','regSub','pathSub','rulesSub'].includes(k)?`<textarea class="inp" data-k="${k}">${esc(T(k))}</textarea>`:`<input class="inp" data-k="${k}" value="${esc(T(k))}">`}</div>`).join('')}</div>
   <div class="mbtns"><button class="btn" onclick="saveTexts()">💾 حفظ النصوص</button><button class="btn ghost" onclick="resetTexts()">↺ استرجاع النصوص الافتراضية</button></div></div>`;
 }
-async function saveName(){[['heroSub','nmT'],['title','nmS'],['heroTitle','nmH'],['subtitle','nmD']].forEach(([k,id])=>{const v=$(id).value.trim();if(!v||v===DEF_TEXT[k])delete D.site.text[k];else D.site.text[k]=v;});applyTexts();await put('site/text',D.site.text);aSite();toast('✅ تم تغيير اسم البطولة');}
-async function saveTexts(){document.querySelectorAll('#aPane [data-k]').forEach(e=>{const k=e.dataset.k,v=e.value.trim();if(v===DEF_TEXT[k]||!v)delete D.site.text[k];else D.site.text[k]=v;});applyTexts();await put('site/text',D.site.text);toast('✅ تم حفظ النصوص');}
+async function saveName(){[['heroSub','nmT'],['title','nmS'],['heroTitle','nmH'],['subtitle','nmD']].forEach(([k,id])=>{const v=$(id).value.trim();if(!v||isDefT(k,v))delete D.site.text[k];else D.site.text[k]=v;});applyTexts();await put('site/text',D.site.text);aSite();toast('✅ تم تغيير اسم البطولة');}
+async function saveTexts(){document.querySelectorAll('#aPane [data-k]').forEach(e=>{const k=e.dataset.k,v=e.value.trim();if(isDefT(k,v)||!v)delete D.site.text[k];else D.site.text[k]=v;});applyTexts();await put('site/text',D.site.text);toast('✅ تم حفظ النصوص');}
 function resetTexts(){confirmM('استرجاع النصوص','بترجع كل النصوص للوضع الافتراضي، متأكد؟',async()=>{D.site.text={};applyTexts();await put('site/text',{});aSite();toast('تم');});}
 
 function aRounds(){
@@ -982,9 +993,9 @@ async function saveGen(v){D.site.gen=v.split('\n').map(s=>s.trim()).filter(Boole
 function aTeams(){
   let h=`<div class="card" style="margin-bottom:14px">${reqAdminHTML()}</div><div class="card"><p class="note" style="margin-bottom:10px">عدّل أي اسم مباشرة واضغط 💾، اضغط على الصورة لتغييرها. تقدر تسجل فريق في مقعد شاغر من هنا بعد.</p>`;
   for(let i=0;i<SEATS;i++){const t=D.teams[i]||{};
-    h+=`<div class="trow"><div class="no">#${i+1}</div>${t.photo?`<img src="${esc(t.photo)}" onclick="teamImg(${i})">`:`<div class="ph0" onclick="teamImg(${i})">📷</div>`}
-      <input class="inp" id="t1_${i}" value="${esc(t.n1||'')}" placeholder="الاسم الأول"><input class="inp" id="t2_${i}" value="${esc(t.n2||'')}" placeholder="الاسم الثاني">
-      <input class="inp tnm" id="tt_${i}" value="${esc(t.team||'')}" placeholder="اسم الفريق">
+    h+=`<div class="trow ${SOLO()?'solo':''}"><div class="no">#${i+1}</div>${t.photo?`<img src="${esc(t.photo)}" onclick="teamImg(${i})">`:`<div class="ph0" onclick="teamImg(${i})">📷</div>`}
+      <input class="inp" id="t1_${i}" value="${esc(t.n1||'')}" placeholder="${SOLO()?'اسم اللاعب':'الاسم الأول'}"><input class="inp n2" id="t2_${i}" value="${esc(t.n2||'')}" placeholder="الاسم الثاني">
+      <input class="inp tnm" id="tt_${i}" value="${esc(t.team||'')}" placeholder="${SOLO()?'اللقب':'اسم الفريق'}">
       <div class="act"><button class="btn sm" onclick="saveTeam(${i})">💾</button>${team(i)?`<button class="btn sm red" onclick="delTeam(${i})">🗑</button>`:''}</div></div>`;}
   $('aPane').innerHTML=h+'</div>';
 }
@@ -1003,17 +1014,22 @@ function aTrn(){
      <p class="note" style="margin-top:6px">للتجربة فقط: يعبّي المقاعد الفاضية بأسماء وهمية، ومسح التجريبي يشيلها بدون ما يلمس الفرق الحقيقية.</p></div>
    <div class="card"><b style="font-size:18px">🏆 النتائج</b><p class="note" style="margin:8px 0 12px">من صفحة الشجرة اضغط على الفريق الفائز في أي مواجهة عشان يتأهل، واضغط عليه مرة ثانية للتراجع.</p>
      <div class="tools"><button class="btn sm" onclick="go('bracket')">فتح الشجرة</button><button class="btn sm red" onclick="confirmM('مسح النتائج','تمسح كل النتائج وتبقى القرعة نفسها؟',async()=>{D.bracket.w={};draw2();await put('bracket',D.bracket);toast('تم مسح النتائج');})">↺ مسح النتائج</button><button class="btn sm red" onclick="confirmM('إلغاء القرعة','ترجع البطولة لما قبل القرعة؟',async()=>{D.bracket={started:false,order:[],w:{},fixed:{}};D.nvotes={};await put('bracket',D.bracket);await put('nvotes',null);toast('تم إلغاء القرعة');})">✖ إلغاء القرعة</button></div></div>
+   <div class="card"><b style="font-size:18px">⚔️ نوع البطولة</b><p class="note" style="margin:6px 0 0">يتغير التسجيل والمقاعد والشجرة والشهادات حسب النوع. لو حولتها فردية، الاسم الثاني يختفي بس ما ينحذف، ويرجع لو رجعتها ثنائية.</p><div class="mode-sw"><div class="mo ${SOLO()?'':'on'}" onclick="setMode('duo')"><b>👥</b>ثنائية<small>اسمين في كل مقعد</small></div><div class="mo ${SOLO()?'on':''}" onclick="setMode('solo')"><b>👤</b>فردية<small>اسم واحد في كل مقعد</small></div></div></div>
    <div class="card"><b style="font-size:18px">📝 التسجيل</b><label class="sw" style="margin-top:12px"><input type="checkbox" ${D.site.regOpen?'checked':''} onchange="(async()=>{D.site.regOpen=this.checked;await put('site/regOpen',this.checked);toast(this.checked?'التسجيل مفتوح':'التسجيل مغلق');})()"><i></i> التسجيل مفتوح للجميع</label></div>
    <div class="card"><b style="font-size:18px">⏳ موعد انطلاق البطولة</b><p class="note" style="margin:6px 0 10px">يظهر عدّاد تنازلي في الصفحة الرئيسية</p>
      <input class="inp" type="datetime-local" id="sd" value="${esc(D.site.startDate||'')}"><div class="tools" style="margin-top:10px"><button class="btn sm" onclick="(async()=>{D.site.startDate=$('sd').value;await put('site/startDate',D.site.startDate);toast('✅ تم الحفظ');})()">💾 حفظ</button><button class="btn sm ghost" onclick="(async()=>{D.site.startDate='';await put('site/startDate','');aTrn();})()">إخفاء العدّاد</button></div></div>
   </div><div class="card" style="margin-top:14px">${certAdminHTML()}</div>`;
 }
+function setMode(m){if(!isAdmin)return;if((m==='solo')===SOLO())return;
+  const go2=async()=>{D.site.mode=m;renderAll();await put('site/mode',m);toast(m==='solo'?'👤 البطولة صارت فردية: اسم واحد في كل مقعد':'👥 البطولة صارت ثنائية: اسمين في كل مقعد');};
+  const n=Object.values(D.teams).filter(t=>t&&t.n2).length;
+  if(m==='solo'&&n)confirmM('تحويل البطولة لفردية',`فيه ${AR(n)} مقعد فيه اسم ثاني. بيختفي الاسم الثاني ويبقى الأول بس (ما ينحذف، ويرجع لو رجعتها ثنائية). نكمل؟`,go2);else go2();}
 function draw2(){for(let i=0;i<MATCHES[R0];i++){const[a,b]=parts(R0,i);if(a!=null&&b==null)D.bracket.w[R0+'_'+i]=a;else if(b!=null&&a==null)D.bracket.w[R0+'_'+i]=b;}}
 const DEMO_N=['محمد','عبدالله','فهد','خالد','سعود','نايف','تركي','فيصل','سلطان','ناصر','بندر','ماجد','راشد','حمد','يوسف','عمر','علي','سالم','مشعل','وليد','زياد','ريان','بدر','عادل','هشام','طلال','منصور','نواف','صالح','حسن','إبراهيم','عبدالرحمن'];
 const DEMO_T=['نسور الليل','أسياد الحمراء','الصقور','فرسان الجدار','ملوك التربيع','الذئاب','العاصفة','نجوم كان ياما كان','الأساطير','البرق','العقبان','الشهب'];
 function demoFill(){const free=[];for(let i=0;i<SEATS;i++)if(!team(i))free.push(i);if(!free.length)return toast('كل المقاعد مليانة');
   confirmM('تعبئة تجريبية',`بيتعبّى ${AR(free.length)} مقعد فاضي بأسماء تجريبية. نكمل؟`,async()=>{
-    free.forEach((i,k)=>{const a=DEMO_N[(i*7)%DEMO_N.length],b=DEMO_N[(i*11+5)%DEMO_N.length];D.teams[i]={n1:a+' '+AR(i+1),n2:b+' '+AR(i+1),team:k%3===0?DEMO_T[(i/3|0)%DEMO_T.length]:'',demo:true,at:Date.now()};});
+    free.forEach((i,k)=>{const a=DEMO_N[(i*7)%DEMO_N.length],b=DEMO_N[(i*11+5)%DEMO_N.length];D.teams[i]={n1:a+' '+AR(i+1),n2:SOLO()?'':b+' '+AR(i+1),team:k%3===0?DEMO_T[(i/3|0)%DEMO_T.length]:'',demo:true,at:Date.now()};});
     await put('teams',D.teams);renderAll();toast('🧪 تمت التعبئة التجريبية');});}
 function demoClear(){const l=Object.keys(D.teams).filter(k=>D.teams[k]&&D.teams[k].demo);if(!l.length)return toast('ما فيه أسماء تجريبية');
   confirmM('مسح التجريبي',`بينحذف ${AR(l.length)} فريق تجريبي مع تعليقاتهم${D.bracket.started?'، وبتنلغي القرعة الحالية':''}. نكمل؟`,async()=>{
@@ -1163,7 +1179,7 @@ function openProfile(i){
   const canCert=f.st==='out'||f.st==='champ';
   let nm='';try{nm=localStorage.getItem('kyk_cname')||'';}catch(e){}
   modal(`<div class="pf-hero"><div class="pf-ph">${t.photo?`<img src="${esc(t.photo)}">`:esc((t.team||t.n1||'?').charAt(0))}</div>
-    ${t.team?`<div class="pf-tn">${esc(t.team)}</div>`:''}<div class="pf-nn">${esc(t.n1||'')} <span style="color:var(--mut)">و</span> ${esc(t.n2||'')}</div>
+    ${t.team?`<div class="pf-tn">${esc(t.team)}</div>`:''}<div class="pf-nn">${SOLO()?esc(NM(t.n1,t.n2)):`${esc(t.n1||'')} <span style="color:var(--mut)">و</span> ${esc(t.n2||'')}`}</div>
     ${t.motto?`<div class="pf-mo">«${esc(t.motto)}»</div>`:''}<div class="pf-st ${st[0]}">${st[1]}</div><div class="note" style="position:relative;margin-top:6px">المقعد #${AR(i+1)}</div></div>
    ${t.bio?`<div class="pf-sec"><b>📖 الحكاية</b><div class="pf-bio">${esc(t.bio)}</div></div>`:''}
    <div class="pf-sec"><b>🗺 المشوار</b>${pathHTML(f,i)}</div>
@@ -1272,7 +1288,7 @@ async function makeCert(i,noImg){
   x.font='400 46px Tajawal, sans-serif';x.fillStyle='#cbbfe6';
   x.fillText(C.champ?`تتشرّف ${fam} كاملةً بتتويج`:`تتقدّم ${fam} بخالص الشكر والتقدير إلى`,cx,712);
   // names
-  const names=[t.n1,t.n2].filter(Boolean).join('  و  ');
+  const names=NM(t.n1,t.n2,'  و  ');
   fit(names,'700 #px "Aref Ruqaa", serif',C.champ?132:120,1800);
   x.save();x.shadowColor=C.acc;x.shadowBlur=36;x.fillStyle=C.silver?grad(760,880):'#fff1c4';x.fillText(names,cx,884);x.restore();
   let y=884;
@@ -1338,12 +1354,12 @@ document.addEventListener('click',e=>{
   if(seat)return editSeat(+seat.dataset.seat);
 },true);
 function editText(k){const long=T(k).length>40;modal(`<h3>✏️ ${esc(TEXT_LABELS[k]||k)}</h3>${long?`<textarea class="inp" id="etx" rows="4">${esc(T(k))}</textarea>`:`<input class="inp" id="etx" value="${esc(T(k))}">`}
-  <div class="mbtns"><button class="btn" onclick="(async()=>{const v=$('etx').value.trim();if(!v||v===DEF_TEXT['${k}'])delete D.site.text['${k}'];else D.site.text['${k}']=v;closeM();applyTexts();renderTab(curTab);await put('site/text',D.site.text);toast('✅ تم الحفظ');})()">💾 حفظ</button><button class="btn ghost" onclick="closeM()">إلغاء</button></div>`);setTimeout(()=>$('etx')&&$('etx').focus(),50);}
+  <div class="mbtns"><button class="btn" onclick="(async()=>{const v=$('etx').value.trim();if(!v||isDefT('${k}',v))delete D.site.text['${k}'];else D.site.text['${k}']=v;closeM();applyTexts();renderTab(curTab);await put('site/text',D.site.text);toast('✅ تم الحفظ');})()">💾 حفظ</button><button class="btn ghost" onclick="closeM()">إلغاء</button></div>`);setTimeout(()=>$('etx')&&$('etx').focus(),50);}
 function editImg(k){imgPicker(IMG_LABELS[k]||'صورة',!!D.site.img[k],v=>setImg(k,v),k==='bg'?1600:k==='avatar'?240:700);}
 async function setImg(k,v){if(v)D.site.img[k]=v;else delete D.site.img[k];applyTexts();if(curTab==='admin')renderAdmin();await put('site/img/'+k,v||null);toast('✅ تم تحديث الصورة');}
 function editSeat(i){const t=D.teams[i]||{};modal(`<h3>المقعد ${i+1}</h3>
   <div class="upl" onclick="teamImg(${i})"><div class="pv">${t.photo?`<img src="${esc(t.photo)}">`:'📷'}</div><div><b>صورة الفريق</b><small>اضغط للتغيير</small></div></div>
-  <div class="duo"><div class="fl"><label>الاسم الأول</label><input class="inp" id="t1_${i}" value="${esc(t.n1||'')}"></div><div class="fl"><label>الاسم الثاني</label><input class="inp" id="t2_${i}" value="${esc(t.n2||'')}"></div></div>
+  <div class="duo" ${SOLO()?'style="grid-template-columns:1fr"':''}><div class="fl"><label>${SOLO()?'اسم اللاعب':'الاسم الأول'}</label><input class="inp" id="t1_${i}" value="${esc(t.n1||'')}"></div><div class="fl" ${SOLO()?'style="display:none"':''}><label>الاسم الثاني</label><input class="inp" id="t2_${i}" value="${esc(t.n2||'')}"></div></div>
   <div class="fl"><label>اسم الفريق</label><input class="inp" id="tt_${i}" value="${esc(t.team||'')}"></div>
   <div class="fl"><label>الشعار (جملة قصيرة تظهر في الملف)</label><input class="inp" id="tm_${i}" maxlength="80" value="${esc(t.motto||'')}"></div>
   <div class="fl"><label>الحكاية / نبذة عن الفريق</label><textarea class="inp" id="tb_${i}" rows="4" maxlength="800">${esc(t.bio||'')}</textarea></div>
